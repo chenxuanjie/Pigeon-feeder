@@ -1,0 +1,203 @@
+#include "stm32f10x.h"                  // Device header
+#include "main.h"
+#include "NRF24L01.h"
+#include "OLED.h"
+#include "SPI1.h"
+
+uint8_t Status;
+uint8_t TX_ADDRESS[TX_ADR_WIDTH] = {0x34,0x43,0x10,0x10,0x01};  // ??????????
+uint8_t RX_BUF[TX_PLOAD_WIDTH];
+uint8_t TX_BUF[TX_PLOAD_WIDTH];
+
+void NRF24L01_Init(void)
+{
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOC |
+																		NRF24L01_SPI_MISO | NRF24L01_SPI_MOSI, ENABLE);
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Pin = NRF24L01_SPI_CLK | NRF24L01_SPI_MISO | NRF24L01_SPI_MOSI;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	//A口推挽输出
+	GPIO_InitStructure.GPIO_Pin =NRF24L01_SPI_CSN | NRF24L01_SPI_CE;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//B口的IRQ
+	GPIO_InitStructure.GPIO_Pin = NRF24L01_SPI_IRQ;		
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
+	NRF24L01_W_CSN(1);
+	NRF24L01_W_CE(0);
+	NRF24L01_W_IRQ(1);
+	
+	SPI1_Init();
+	
+	NRF24L01_WriteByte(WRITE_REGISTER + CONFIG, 0x08);
+	NRF24L01_WriteByte(WRITE_REGISTER + EN_AA, 0x3F);
+	NRF24L01_WriteByte(WRITE_REGISTER + EN_RXADDR, 0x03);
+	NRF24L01_WriteByte(WRITE_REGISTER + SETUP_AW, 0x03);
+	NRF24L01_WriteByte(WRITE_REGISTER + SETUP_RETR, 0x03);
+	NRF24L01_WriteByte(WRITE_REGISTER + RF_CH, 0x02);
+	NRF24L01_WriteByte(WRITE_REGISTER + RF_SETUP, 0x0E);
+	NRF24L01_WriteByte(WRITE_REGISTER + STATUS, 0x00);
+	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P0, 0x00);
+	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P1, 0x00);
+	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P2, 0x00);
+	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P3, 0x00);
+	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P4, 0x00);
+	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P5, 0x00);
+
+	// Clear the FIFO's
+	NRF24L01_ReadByte(FLUSH_RX);	//??RX_FIFO???
+	NRF24L01_ReadByte(FLUSH_TX);	//??RX_FIFO???
+}
+
+
+uint8_t NRF24L01_WriteByte(uint8_t Register, uint8_t Data)
+{
+	uint8_t Status;
+	NRF24L01_W_CSN(0);
+	Status = SPI_SendByte(Register);
+	SPI_SendByte(Data);
+	NRF24L01_W_CSN(1);
+	return Status;	
+}
+
+uint8_t NRF24L01_ReadByte(uint8_t Register)
+{
+	uint8_t Data;
+	NRF24L01_W_CSN(0);
+	SPI_SendByte(Register);
+	Data = SPI_SendByte(0);
+	NRF24L01_W_CSN(1);
+	return Data;			
+}
+
+uint8_t NRF24L01_WriteData(uint8_t Register, uint8_t *Buf, uint8_t Width)
+{
+	uint8_t Status, i;
+	NRF24L01_W_CSN(0);
+	Status = SPI_SendByte(Register);
+	for (i = 0; i < Width; i ++)
+		SPI_SendByte(*(Buf + i));
+	NRF24L01_W_CSN(1);
+	return Status;
+}
+
+uint8_t NRF24L01_ReadData(uint8_t Register, uint8_t *Buf, uint8_t Width)
+{
+	uint8_t Status, i;
+	NRF24L01_W_CSN(0);
+	Status = SPI_SendByte(Register);
+	for (i = 0; i < Width; i ++)
+		*(Buf + i) = SPI_SendByte(0);
+	NRF24L01_W_CSN(1);
+	return Status;	
+}
+
+/**
+  * @brief  NRF24L01将接收到的数值从缓存区中放入到数组，并清除标志位。
+  * @param  无
+  * @retval Value: 是否成功接收到数值。
+  *     @arg 1: 接收成功。
+  *     @arg 0: 接收失败。
+  */
+uint8_t NRF24L01_ReceiveData(void)
+{
+	uint8_t Value;
+	Status = NRF24L01_ReadByte(STATUS);	  // ??????(???4?5?6??????????,??RX_DR)
+	if (Status&(0x80>>1))				  // ????????? (??????,?1?????????????1)
+	{
+		NRF24L01_ReadData(RD_RX_PLOAD, RX_BUF, TX_PLOAD_WIDTH);  // ?RX FIFO???? (?????,1~32??)????????????????,??????
+		Value = 1;
+	}else{
+		Value = 0;
+	}
+	NRF24L01_WriteByte(WRITE_REGISTER + STATUS, Status);  // ??RX_DS????(???,?????????1,????1????????????)
+	NRF24L01_ReadByte(FLUSH_RX);	//??RX_FIFO???
+	return Value;
+}
+
+/**
+  * @brief  设置要发送的数组元素和字节。
+  * @param  ArrayNum：第ArrayNum个数组元素。
+  * @retval 接收到的数组元素中对应的值。
+  */
+uint8_t NRF24L01_GetData(uint8_t ArrayNum)
+{
+	return RX_BUF[ArrayNum];
+}
+
+/**
+  * @brief  接收模式。
+  * @param  无
+  * @retval 无
+  */
+void RX_Mode(void)
+{
+	NRF24L01_W_CE(0);
+  	NRF24L01_WriteData(WRITE_REGISTER + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);  // ????????0??????????????
+  	NRF24L01_WriteByte(WRITE_REGISTER + EN_AA, 0x01);               // ??????0????
+  	NRF24L01_WriteByte(WRITE_REGISTER + EN_RXADDR, 0x01);           // ??????0
+  	NRF24L01_WriteByte(WRITE_REGISTER + RF_CH, 40);                 // ??????0x40(????????)
+  	NRF24L01_WriteByte(WRITE_REGISTER + RX_PW_P0, TX_PLOAD_WIDTH);  // ????0???????????????
+  	NRF24L01_WriteByte(WRITE_REGISTER + RF_SETUP, 0x07);            // ?????1Mbps,????0dBm,????????
+  	NRF24L01_WriteByte(WRITE_REGISTER + CONFIG, 0x0f);              // CRC??,16?CRC??,??,????
+  	NRF24L01_W_CE(1);                                            // ??CE??????
+}
+
+/**
+  * @brief  发送模式。
+  * @param  无
+  * @retval 无
+  */
+
+void TX_Mode(uint8_t * BUF)
+{
+	NRF24L01_W_CE(0);
+  	NRF24L01_WriteData(WRITE_REGISTER + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);     // ??????
+  	NRF24L01_WriteData(WRITE_REGISTER + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);  // ????????,????0?????????
+  	NRF24L01_WriteData(WR_TX_PLOAD, BUF, TX_PLOAD_WIDTH);                  // ?????TX FIFO
+  	NRF24L01_WriteByte(WRITE_REGISTER + EN_AA, 0x01);       // ??????0????
+  	NRF24L01_WriteByte(WRITE_REGISTER + EN_RXADDR, 0x01);   // ??????0
+  	NRF24L01_WriteByte(WRITE_REGISTER + SETUP_RETR, 0x0a);  // ????????250us+86us,????10?
+  	NRF24L01_WriteByte(WRITE_REGISTER + RF_CH, 40);         // ??????0x40(????????)
+  	NRF24L01_WriteByte(WRITE_REGISTER + RF_SETUP, 0x07);    // ?????1Mbps,????0dBm,????????
+  	NRF24L01_WriteByte(WRITE_REGISTER + CONFIG, 0x0e);      // CRC??,16?cRc??,??
+  	NRF24L01_W_CE(1);                                            // ??CE??????
+}
+
+uint8_t Check_ACK(uint8_t clear)
+{
+	while(GPIO_ReadInputDataBit(GPIOB, NRF24L01_SPI_IRQ));								 //??????
+	Status = NRF24L01_ReadByte(STATUS);                  
+	if(Status&(0x80>>3))
+		if(clear)                         // ????TX FIFO,???????MAX_RT???????
+			NRF24L01_ReadByte(FLUSH_TX);
+	NRF24L01_WriteByte(WRITE_REGISTER + STATUS, Status);  // ??TX_DS?MAX_RT????
+	if(Status&(0x80>>2))
+		return(0x00);
+	else
+		return(0xff);
+}
+
+/**
+  * @brief  设置要发送的数组元素和字节
+  * @param  ArrayNum：第ArrayNum个数组元素。
+  * @param  Byte：要发送的字节。			
+  * @retval 无
+  */
+void NRF24L01_SetBuf(uint8_t ArrayNum, uint8_t Byte)
+{
+	TX_BUF[ArrayNum] = Byte;	
+}
+
+/**
+  * @brief  将数组中的值都发送出去。
+  * @param  无
+  * @retval 无
+  */
+void NRF24L01_TransmitBuf(void)
+{
+	TX_Mode(TX_BUF);			
+	Check_ACK(1);
+}
