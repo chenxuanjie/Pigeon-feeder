@@ -241,6 +241,7 @@ static  uint16_t SPI_TIMEOUT_UserCallback(uint8_t errorCode)
   */
 void NRF24L01_DataReset(void)
 {
+	
 	if (RX_BUF[NORMAL_TRANSMIT] == EmergencyFault)
 	{
 		Relay_Set(ALL, RESET);		//所有喂料器关

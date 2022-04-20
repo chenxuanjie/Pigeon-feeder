@@ -103,7 +103,7 @@ void OLED_SetCursor(uint8_t Y, uint8_t X)
 {
 	OLED_WriteCommand(0xB0 | Y);					//设置Y位置
 	OLED_WriteCommand(0x10 | ((X & 0xF0) >> 4));	//设置X位置低4位
-	OLED_WriteCommand(0x02 | (X & 0x0F));			//设置X位置高4位
+	OLED_WriteCommand(0x00 | (X & 0x0F));			//设置X位置高4位
 }
 
 /**
