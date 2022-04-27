@@ -15,9 +15,9 @@
 
 
 void Hcsr04_Init(void);
-uint32_t Hcsr04_GetDistance1(void);
-uint32_t Hcsr04_GetDistance2(void);
-uint32_t Hcsr04_GetDistance3(void);
-uint32_t Hcsr04_GetDistance4(void);
+float Hcsr04_GetDistance1(void);
+float Hcsr04_GetDistance2(void);
+float Hcsr04_GetDistance3(void);
+float Hcsr04_GetDistance4(void);
 
 #endif

@@ -27,7 +27,7 @@ int16_t Set_Data,Set_Speed=20, Num;
 uint8_t Flag, Hcsr04_StartFlag;
 uint8_t Info1, Info2, Info3, Info4, State1;
 uint8_t X, Y, Value;
-uint32_t Distance1, Distance2, Distance3, Distance4;
+float Distance1, Distance2, Distance3, Distance4;
 int16_t SpeedLeft=0,SpeedRight=0;
 int8_t LeftCalibration=1,RightCalibration=1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1;
@@ -40,7 +40,8 @@ int main(void)
 {	
 	LED_Init();
 	OLED_Init( );
-//	Delay_ms(100);
+	OLED_ShowString(2,1,"1:00.0  2:00.0cm");
+	OLED_ShowString(3,1,"3:00.0  4:00.0cm");	
 	NRF24L01_Init();
 	RX_Mode();
 	Relay_Init();
@@ -68,7 +69,7 @@ int main(void)
 		Distance_Get();
 
 		Num ++;
-		OLED_ShowNum(1, 14, Num, 3);
+		OLED_ShowNum(1, 16, Num, 1);
 		State1 = NRF24L01_ReadByte(STATUS);
 		Info1 = NRF24L01_ReadByte(EN_AA);
 		Info2 = NRF24L01_ReadByte(EN_RXADDR);
@@ -87,9 +88,7 @@ int main(void)
 		OLED_ShowHexNum(4, 10, Info3, 2);
 		OLED_ShowHexNum(4, 13, Info4, 2);
 		
-		if (NRF24L01_GetData(NORMAL_TRANSMIT)!=0)
-			OLED_ShowNum(2, 1, NRF24L01_GetData(NORMAL_TRANSMIT), 4);
-		OLED_ShowHexNum(1,1,NRF24L01_GetData(ROCKER_TRANSMIT),4);
+		OLED_ShowHexNum(1,1,NRF24L01_GetData(ROCKER_TRANSMIT),2);
 
 		
 		if (Flag)
@@ -245,6 +244,7 @@ void Speed(int16_t data)
 
 void Distance_Get(void)
 {
+	OLED_ShowHexNum(1,4,Hcsr04_StartFlag,2);
 	if (Hcsr04_StartFlag&0x08)	//超声波是否使能
 	{
 		switch(Hcsr04_StartFlag&0x07)	//第几个超声波运行
@@ -257,14 +257,14 @@ void Distance_Get(void)
 	Hcsr04_StartFlag &= 0x07;		//清除使能位
 	}	
 	//show
-//	OLED_ShowNum(1 , 3, Distance1/10 ,2);
-//	OLED_ShowNum(2 , 3, Distance2/10 ,2);
-//	OLED_ShowNum(3 , 3, Distance3/10 ,2);
-//	OLED_ShowNum(3 , 10, Distance4/10 ,2);
-//	OLED_ShowNum(1 , 6, Distance1%10 ,1);
-//	OLED_ShowNum(2 , 6, Distance2%10 ,1);
-//	OLED_ShowNum(3 , 6, Distance3%10 ,1);
-//	OLED_ShowNum(3 , 13, Distance4%10 ,1);
+	OLED_ShowNum(2 , 3, Distance1/10, 2);
+	OLED_ShowNum(2 , 11, Distance2/10, 2);
+	OLED_ShowNum(3 , 3, Distance3/10, 2);
+	OLED_ShowNum(3 , 11, Distance4/10, 2);
+	OLED_ShowNum(2 , 6, (uint32_t)Distance1%10 ,1);
+	OLED_ShowNum(2 , 14, (uint32_t)Distance2%10 ,1);
+	OLED_ShowNum(3 , 6, (uint32_t)Distance3%10 ,1);
+	OLED_ShowNum(3 , 14, (uint32_t)Distance4%10 ,1);
 //	OLED_ShowString(1, 1, "1:  . cm");
 //	OLED_ShowString(2, 1, "2:  . cm");
 //	OLED_ShowString(3, 1, "3:  . cm");
@@ -281,7 +281,7 @@ void TIM2_IRQHandler(void)
 		if (T2Count >= 100)
 		{
 			T2Count = 0;
-			if ((Hcsr04_StartFlag&0x07) <= 4)	//小于4，加
+			if ((Hcsr04_StartFlag&0x07) < 4)	//小于4，加
 				Hcsr04_StartFlag ++;
 			else 
 				Hcsr04_StartFlag = 0x01;		//大于4，变为1

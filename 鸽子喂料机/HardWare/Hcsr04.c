@@ -30,9 +30,9 @@ void Hcsr04_Init(void)
 	GPIO_ResetBits(HCSR04_GPIO, HCSR04_TRIG4);
 }
 
-uint32_t Hcsr04_GetDistance1(void)
+float Hcsr04_GetDistance1(void)
 {
-	static uint32_t Distance;
+	static float Distance;
 	if (Hcsr04_Value1 == 0)		//数据已经处理过或第一次调用
 	{
 		GPIO_WriteBit(HCSR04_TRIG1_GPIO, HCSR04_TRIG1, Bit_SET);
@@ -44,15 +44,15 @@ uint32_t Hcsr04_GetDistance1(void)
 	{
 		Distance = T4Count[0] * 65536;
 		Distance += Hcsr04_Value1;
-		Distance = Distance*170/1000;	//单位mm
+		Distance = Distance*0.17;	//单位mm
 		Hcsr04_Value1 = 0;
 	}
 	return Distance;
 }
 
-uint32_t Hcsr04_GetDistance2(void)
+float Hcsr04_GetDistance2(void)
 {
-	static uint32_t Distance;	
+	static float Distance;	
 	if (Hcsr04_Value2 == 0)		//数据已经处理过或第一次调用
 	{
 		GPIO_WriteBit(HCSR04_GPIO, HCSR04_TRIG2, Bit_SET);
@@ -63,15 +63,15 @@ uint32_t Hcsr04_GetDistance2(void)
 	{
 		Distance = T4Count[1] * 65536;
 		Distance += Hcsr04_Value2;
-		Distance = Distance*170/1000;	//单位mm
+		Distance = Distance*0.17;	//单位mm
 		Hcsr04_Value2 = 0;
 	}
 	return Distance;
 }
 
-uint32_t Hcsr04_GetDistance3(void)
+float Hcsr04_GetDistance3(void)
 {
-	static uint32_t Distance;	
+	static float Distance;	
 	if (Hcsr04_Value3 == 0)		//数据已经处理过或第一次调用
 	{
 		GPIO_WriteBit(HCSR04_GPIO, HCSR04_TRIG3, Bit_SET);
@@ -82,16 +82,16 @@ uint32_t Hcsr04_GetDistance3(void)
 	{
 		Distance = T4Count[2] * 65536;
 		Distance += Hcsr04_Value3;
-		Distance = Distance*170/1000;	//单位mm
+		Distance = Distance*0.17;	//单位mm
 		Hcsr04_Value3 = 0;
 	}
 	return Distance;
 }
 
-uint32_t Hcsr04_GetDistance4(void)
+float Hcsr04_GetDistance4(void)
 {
-	static uint32_t Distance;	
-	if (Hcsr04_Value3 == 0)		//数据已经处理过或第一次调用
+	static float Distance;	
+	if (Hcsr04_Value4 == 0)		//数据已经处理过或第一次调用
 	{
 		GPIO_WriteBit(HCSR04_GPIO, HCSR04_TRIG4, Bit_SET);
 		Delay_us(15);
@@ -102,7 +102,7 @@ uint32_t Hcsr04_GetDistance4(void)
 	{
 		Distance = T4Count[3] * 65536;
 		Distance += Hcsr04_Value4;
-		Distance = Distance*170/1000;	//单位mm
+		Distance = Distance*0.17;	//单位mm
 		Hcsr04_Value4 = 0;
 	}
 	return Distance;
