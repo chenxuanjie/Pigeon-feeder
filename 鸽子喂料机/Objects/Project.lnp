@@ -28,6 +28,7 @@
 ".\objects\delay.o"
 ".\objects\tim2.o"
 ".\objects\tim4.o"
+".\objects\usart.o"
 ".\objects\led.o"
 ".\objects\oled.o"
 ".\objects\nrf24l01.o"

@@ -680,6 +680,16 @@
               <FileType>5</FileType>
               <FilePath>.\System\TIM4.h</FilePath>
             </File>
+            <File>
+              <FileName>USART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\System\USART.c</FilePath>
+            </File>
+            <File>
+              <FileName>USART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\System\USART.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
