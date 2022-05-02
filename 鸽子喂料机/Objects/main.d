@@ -40,3 +40,4 @@
 .\objects\main.o: .\HardWare\Relay.H
 .\objects\main.o: .\HardWare\Hcsr04.h
 .\objects\main.o: .\System\TIM2.h
+.\objects\main.o: .\System\USART.h

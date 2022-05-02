@@ -1,9 +1,11 @@
 #include "stm32f10x.h"                  // Device header
 #include "USART.h"
+#include "string.h"
 #include "OLED.h"
 
 uint16_t Data;
-uint16_t USART_Temp[4];
+char USART_Temp[USART_MAX_TEMP];
+uint8_t i;
 
 void USART1_Config(void)
 {
@@ -46,14 +48,27 @@ void USART1_Config(void)
 void USART1_ShowTemp(void)
 {
     uint8_t j;
-    for (j = 0; j < 4; j ++)
+    i = 0;
+    USART_SendData(USART1, 'a');
+    for (j = 0; j < USART_RECIEVE_TEMP; j ++)
 	{
-		USART_SendData(USART1, USART_Temp[j]);
-		if (USART_Temp[j] != 0)
-		OLED_ShowChar(2,j+1,USART_Temp[j]);
-		USART_Temp[j] = 0;
+//        USART_SendData(USART1, USART_Temp[j]);
+        OLED_ShowChar(2,j+1,USART_Temp[j]);
 	}
+    if ( strcmp(USART_Temp, "100020003000") == 0)
+        OLED_ShowNum(1,16,1,1);
+    else
+        OLED_ShowNum(1,16,0,1);
+    
+    if (USART_Temp[3]-'0' > 0)
+        OLED_ShowNum(2,14,USART_Temp[3]-'0',3);
+    if (USART_Temp[7]-'0' > 0)
+        OLED_ShowNum(3,14,USART_Temp[7]-'0',3);
+    if (USART_Temp[11]-'0' > 0)
+        OLED_ShowNum(4,14,USART_Temp[11]-'0',3);
+
 }
+
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str)
 {
 	unsigned int k=0;
@@ -95,13 +110,15 @@ int fgetc(FILE *f)
 
 void USART1_IRQHandler(void)
 {
-    static uint8_t i;
 	if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET)
 	{
 		Data = USART_ReceiveData(USART1);
         USART_Temp[i++] = Data;
-        i %= 4;
-//		USART_SendData(USART1, Data);
+       if (i > USART_MAX_TEMP)
+       {
+          i = 0;
+           USART_Temp[USART_RECIEVE_TEMP] = '\0';
+       }
 		while (USART_GetFlagStatus(USART1, USART_FLAG_TXE)!=SET);
 	}
 	USART_ClearITPendingBit(USART1, USART_FLAG_RXNE);

@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#define USART_RECIEVE_TEMP   12
+#define USART_MAX_TEMP  	 13
 extern uint16_t Data;
 
 void USART1_Config(void);

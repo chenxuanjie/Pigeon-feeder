@@ -30,4 +30,5 @@
 .\objects\usart.o: .\Library\misc.h
 .\objects\usart.o: System\USART.h
 .\objects\usart.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\usart.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\string.h
 .\objects\usart.o: .\HardWare\OLED.h

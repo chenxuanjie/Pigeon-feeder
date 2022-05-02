@@ -21,6 +21,7 @@
 #include "Relay.H"
 #include "Hcsr04.h"
 #include "TIM2.h"
+#include "USART.h"
 //#include "Hcsr04.h"
 
 int16_t Set_Data,Set_Speed=20, Num;
@@ -32,6 +33,7 @@ int16_t SpeedLeft=0,SpeedRight=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1;
 uint8_t State=1;
+uint32_t Timeout;
 
 void Speed(int16_t data);
 void Data_Analyse(void);
@@ -213,6 +215,7 @@ void State2(void)
 	if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM)//拨钮开关04启用校准模式,校准电机方向，摇杆可用	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
+			case KEY_PIN2_NUM		:	Timeout=1000;while(Timeout){};break;     //自动视觉识别并喂料
 			case KEY_PIN4_NUM		:	LeftCalibration=-1;RightCalibration=1;break;
 			case KEY_PIN5_NUM		:	LeftCalibration=1;RightCalibration=-1;break;
 			case KEY_PIN6_NUM		:	LeftCalibration=1;RightCalibration=1;break;
@@ -312,27 +315,32 @@ void Distance_Get(void)
 
 void TIM2_IRQHandler(void)
 {
-	static uint32_t T2Count, T2Count1;
+	static uint32_t T2Count[3];
 	if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update) == SET)
 	{
-		T2Count++;
-		if (T2Count >= 100)
+		T2Count[0]++;
+		if (T2Count[0] >= 100)
 		{
-			T2Count = 0;
+			T2Count[0] = 0;
 			if ((Hcsr04_StartFlag&0x07) < 4)	//小于4，加
 				Hcsr04_StartFlag ++;
 			else 
 				Hcsr04_StartFlag = 0x01;		//大于4，变为1
 			Hcsr04_StartFlag |= 0x08;			//超声波检测使能位
 		}
-	}
 	
-	T2Count1 ++;
-	if (T2Count1 >= 500)
-	{
-		T2Count1 = 0;
-		GPIO_WriteBit(GPIOB, GPIO_Pin_1, (BitAction)!GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_1));
+        //灯闪烁
+        T2Count[1] ++;
+        if (T2Count[1] >= 500)
+        {
+            T2Count[1] = 0;
+            GPIO_WriteBit(GPIOB, GPIO_Pin_1, (BitAction)!GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_1));
+        }  
+
+        //超时时间
+        if (Timeout > 0)
+            Timeout --;
+
 	}
-	
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
 }

@@ -51,5 +51,10 @@
 #define RIGHT_4					0x8
 #define MEDIWM					0x99
 
+typedef enum{
+	SETTINGSTATE = 1,
+	CONTROLSTATE = 2,
+	DEBUGSTATE = 3
+}RemoteState;
 
 #endif
