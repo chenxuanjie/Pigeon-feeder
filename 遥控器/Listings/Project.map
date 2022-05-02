@@ -1250,48 +1250,48 @@ Image Symbol Table
     SetSysClockTo72                          0x08001e89   Thumb Code   214  system_stm32f10x.o(i.SetSysClockTo72)
     i.Show                                   0x08001f68   Section        0  main.o(i.Show)
     i.State2                                 0x080020d4   Section        0  main.o(i.State2)
-    i.StateGet                               0x08002324   Section        0  main.o(i.StateGet)
-    i.StoreData                              0x080023a0   Section        0  main.o(i.StoreData)
-    i.Switch_GetNum                          0x080023f0   Section        0  switch.o(i.Switch_GetNum)
-    i.Switch_GetNum2Looop                    0x080023fc   Section        0  switch.o(i.Switch_GetNum2Looop)
-    i.Switch_Init                            0x08002444   Section        0  switch.o(i.Switch_Init)
-    i.Switch_Loop                            0x08002474   Section        0  switch.o(i.Switch_Loop)
-    i.SysTick_Handler                        0x08002484   Section        0  stm32f10x_it.o(i.SysTick_Handler)
-    i.SystemInit                             0x08002488   Section        0  system_stm32f10x.o(i.SystemInit)
-    i.TIM2_IRQHandler                        0x080024e8   Section        0  buzzer.o(i.TIM2_IRQHandler)
-    i.TIM2_Init                              0x08002524   Section        0  tim2.o(i.TIM2_Init)
-    i.TIM3_IRQHandler                        0x08002588   Section        0  tim3.o(i.TIM3_IRQHandler)
-    i.TIM3_Init                              0x080025ac   Section        0  tim3.o(i.TIM3_Init)
-    i.TIM3_SetIRQHandler                     0x08002618   Section        0  tim3.o(i.TIM3_SetIRQHandler)
-    i.TIM_ClearFlag                          0x08002624   Section        0  stm32f10x_tim.o(i.TIM_ClearFlag)
-    i.TIM_Cmd                                0x0800262a   Section        0  stm32f10x_tim.o(i.TIM_Cmd)
-    i.TIM_DeInit                             0x08002644   Section        0  stm32f10x_tim.o(i.TIM_DeInit)
-    i.TIM_GetFlagStatus                      0x0800282c   Section        0  stm32f10x_tim.o(i.TIM_GetFlagStatus)
-    i.TIM_ITConfig                           0x0800283e   Section        0  stm32f10x_tim.o(i.TIM_ITConfig)
-    i.TIM_TimeBaseInit                       0x08002850   Section        0  stm32f10x_tim.o(i.TIM_TimeBaseInit)
-    i.TX_Mode                                0x080028f4   Section        0  nrf24l01.o(i.TX_Mode)
-    i.Transmit                               0x08002964   Section        0  main.o(i.Transmit)
-    i.TurnMode                               0x08002a08   Section        0  main.o(i.TurnMode)
-    i.UsageFault_Handler                     0x08002ab0   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
-    i.Voltage_Get                            0x08002ab4   Section        0  main.o(i.Voltage_Get)
-    i.main                                   0x08002b64   Section        0  main.o(i.main)
-    x$fpl$ddiv                               0x08002c08   Section      688  ddiv.o(x$fpl$ddiv)
-    ddiv_entry                               0x08002c0f   Thumb Code     0  ddiv.o(x$fpl$ddiv)
-    x$fpl$dfixu                              0x08002eb8   Section       90  dfixu.o(x$fpl$dfixu)
-    x$fpl$dmul                               0x08002f14   Section      340  dmul.o(x$fpl$dmul)
-    x$fpl$dnaninf                            0x08003068   Section      156  dnaninf.o(x$fpl$dnaninf)
-    x$fpl$dretinf                            0x08003104   Section       12  dretinf.o(x$fpl$dretinf)
-    x$fpl$f2d                                0x08003110   Section       86  f2d.o(x$fpl$f2d)
-    x$fpl$fdiv                               0x08003168   Section      388  fdiv.o(x$fpl$fdiv)
-    _fdiv1                                   0x08003169   Thumb Code     0  fdiv.o(x$fpl$fdiv)
-    x$fpl$ffixu                              0x080032ec   Section       62  ffixu.o(x$fpl$ffixu)
-    x$fpl$ffltu                              0x0800332c   Section       38  fflt_clz.o(x$fpl$ffltu)
-    x$fpl$fmul                               0x08003354   Section      258  fmul.o(x$fpl$fmul)
-    x$fpl$fnaninf                            0x08003456   Section      140  fnaninf.o(x$fpl$fnaninf)
-    x$fpl$fretinf                            0x080034e2   Section       10  fretinf.o(x$fpl$fretinf)
-    .constdata                               0x080034ec   Section     1520  oled.o(.constdata)
-    x$fpl$usenofp                            0x080034ec   Section        0  usenofp.o(x$fpl$usenofp)
-    .constdata                               0x08003adc   Section       38  buzzer.o(.constdata)
+    i.StateGet                               0x08002334   Section        0  main.o(i.StateGet)
+    i.StoreData                              0x080023b0   Section        0  main.o(i.StoreData)
+    i.Switch_GetNum                          0x08002400   Section        0  switch.o(i.Switch_GetNum)
+    i.Switch_GetNum2Looop                    0x0800240c   Section        0  switch.o(i.Switch_GetNum2Looop)
+    i.Switch_Init                            0x08002454   Section        0  switch.o(i.Switch_Init)
+    i.Switch_Loop                            0x08002484   Section        0  switch.o(i.Switch_Loop)
+    i.SysTick_Handler                        0x08002494   Section        0  stm32f10x_it.o(i.SysTick_Handler)
+    i.SystemInit                             0x08002498   Section        0  system_stm32f10x.o(i.SystemInit)
+    i.TIM2_IRQHandler                        0x080024f8   Section        0  buzzer.o(i.TIM2_IRQHandler)
+    i.TIM2_Init                              0x08002534   Section        0  tim2.o(i.TIM2_Init)
+    i.TIM3_IRQHandler                        0x08002598   Section        0  tim3.o(i.TIM3_IRQHandler)
+    i.TIM3_Init                              0x080025bc   Section        0  tim3.o(i.TIM3_Init)
+    i.TIM3_SetIRQHandler                     0x08002628   Section        0  tim3.o(i.TIM3_SetIRQHandler)
+    i.TIM_ClearFlag                          0x08002634   Section        0  stm32f10x_tim.o(i.TIM_ClearFlag)
+    i.TIM_Cmd                                0x0800263a   Section        0  stm32f10x_tim.o(i.TIM_Cmd)
+    i.TIM_DeInit                             0x08002654   Section        0  stm32f10x_tim.o(i.TIM_DeInit)
+    i.TIM_GetFlagStatus                      0x0800283c   Section        0  stm32f10x_tim.o(i.TIM_GetFlagStatus)
+    i.TIM_ITConfig                           0x0800284e   Section        0  stm32f10x_tim.o(i.TIM_ITConfig)
+    i.TIM_TimeBaseInit                       0x08002860   Section        0  stm32f10x_tim.o(i.TIM_TimeBaseInit)
+    i.TX_Mode                                0x08002904   Section        0  nrf24l01.o(i.TX_Mode)
+    i.Transmit                               0x08002974   Section        0  main.o(i.Transmit)
+    i.TurnMode                               0x08002a18   Section        0  main.o(i.TurnMode)
+    i.UsageFault_Handler                     0x08002ac0   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
+    i.Voltage_Get                            0x08002ac4   Section        0  main.o(i.Voltage_Get)
+    i.main                                   0x08002b74   Section        0  main.o(i.main)
+    x$fpl$ddiv                               0x08002c18   Section      688  ddiv.o(x$fpl$ddiv)
+    ddiv_entry                               0x08002c1f   Thumb Code     0  ddiv.o(x$fpl$ddiv)
+    x$fpl$dfixu                              0x08002ec8   Section       90  dfixu.o(x$fpl$dfixu)
+    x$fpl$dmul                               0x08002f24   Section      340  dmul.o(x$fpl$dmul)
+    x$fpl$dnaninf                            0x08003078   Section      156  dnaninf.o(x$fpl$dnaninf)
+    x$fpl$dretinf                            0x08003114   Section       12  dretinf.o(x$fpl$dretinf)
+    x$fpl$f2d                                0x08003120   Section       86  f2d.o(x$fpl$f2d)
+    x$fpl$fdiv                               0x08003178   Section      388  fdiv.o(x$fpl$fdiv)
+    _fdiv1                                   0x08003179   Thumb Code     0  fdiv.o(x$fpl$fdiv)
+    x$fpl$ffixu                              0x080032fc   Section       62  ffixu.o(x$fpl$ffixu)
+    x$fpl$ffltu                              0x0800333c   Section       38  fflt_clz.o(x$fpl$ffltu)
+    x$fpl$fmul                               0x08003364   Section      258  fmul.o(x$fpl$fmul)
+    x$fpl$fnaninf                            0x08003466   Section      140  fnaninf.o(x$fpl$fnaninf)
+    x$fpl$fretinf                            0x080034f2   Section       10  fretinf.o(x$fpl$fretinf)
+    .constdata                               0x080034fc   Section     1520  oled.o(.constdata)
+    x$fpl$usenofp                            0x080034fc   Section        0  usenofp.o(x$fpl$usenofp)
+    .constdata                               0x08003aec   Section       38  buzzer.o(.constdata)
     .data                                    0x20000000   Section        6  dma1.o(.data)
     .data                                    0x20000008   Section        4  tim3.o(.data)
     .data                                    0x2000000c   Section        4  spi1.o(.data)
@@ -1557,57 +1557,57 @@ Image Symbol Table
     SPI_SendByte                             0x08001df9   Thumb Code   102  spi1.o(i.SPI_SendByte)
     SVC_Handler                              0x08001e7d   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
     Show                                     0x08001f69   Thumb Code   288  main.o(i.Show)
-    State2                                   0x080020d5   Thumb Code   500  main.o(i.State2)
-    StateGet                                 0x08002325   Thumb Code   102  main.o(i.StateGet)
-    StoreData                                0x080023a1   Thumb Code    50  main.o(i.StoreData)
-    Switch_GetNum                            0x080023f1   Thumb Code     6  switch.o(i.Switch_GetNum)
-    Switch_GetNum2Looop                      0x080023fd   Thumb Code    66  switch.o(i.Switch_GetNum2Looop)
-    Switch_Init                              0x08002445   Thumb Code    44  switch.o(i.Switch_Init)
-    Switch_Loop                              0x08002475   Thumb Code    12  switch.o(i.Switch_Loop)
-    SysTick_Handler                          0x08002485   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
-    SystemInit                               0x08002489   Thumb Code    78  system_stm32f10x.o(i.SystemInit)
-    TIM2_IRQHandler                          0x080024e9   Thumb Code    54  buzzer.o(i.TIM2_IRQHandler)
-    TIM2_Init                                0x08002525   Thumb Code   100  tim2.o(i.TIM2_Init)
-    TIM3_IRQHandler                          0x08002589   Thumb Code    28  tim3.o(i.TIM3_IRQHandler)
-    TIM3_Init                                0x080025ad   Thumb Code   104  tim3.o(i.TIM3_Init)
-    TIM3_SetIRQHandler                       0x08002619   Thumb Code     6  tim3.o(i.TIM3_SetIRQHandler)
-    TIM_ClearFlag                            0x08002625   Thumb Code     6  stm32f10x_tim.o(i.TIM_ClearFlag)
-    TIM_Cmd                                  0x0800262b   Thumb Code    24  stm32f10x_tim.o(i.TIM_Cmd)
-    TIM_DeInit                               0x08002645   Thumb Code   424  stm32f10x_tim.o(i.TIM_DeInit)
-    TIM_GetFlagStatus                        0x0800282d   Thumb Code    18  stm32f10x_tim.o(i.TIM_GetFlagStatus)
-    TIM_ITConfig                             0x0800283f   Thumb Code    18  stm32f10x_tim.o(i.TIM_ITConfig)
-    TIM_TimeBaseInit                         0x08002851   Thumb Code   122  stm32f10x_tim.o(i.TIM_TimeBaseInit)
-    TX_Mode                                  0x080028f5   Thumb Code   104  nrf24l01.o(i.TX_Mode)
-    Transmit                                 0x08002965   Thumb Code   134  main.o(i.Transmit)
-    TurnMode                                 0x08002a09   Thumb Code   116  main.o(i.TurnMode)
-    UsageFault_Handler                       0x08002ab1   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
-    Voltage_Get                              0x08002ab5   Thumb Code   156  main.o(i.Voltage_Get)
-    main                                     0x08002b65   Thumb Code   144  main.o(i.main)
-    __aeabi_ddiv                             0x08002c09   Thumb Code     0  ddiv.o(x$fpl$ddiv)
-    _ddiv                                    0x08002c09   Thumb Code   552  ddiv.o(x$fpl$ddiv)
-    __aeabi_d2uiz                            0x08002eb9   Thumb Code     0  dfixu.o(x$fpl$dfixu)
-    _dfixu                                   0x08002eb9   Thumb Code    90  dfixu.o(x$fpl$dfixu)
-    __aeabi_dmul                             0x08002f15   Thumb Code     0  dmul.o(x$fpl$dmul)
-    _dmul                                    0x08002f15   Thumb Code   332  dmul.o(x$fpl$dmul)
-    __fpl_dnaninf                            0x08003069   Thumb Code   156  dnaninf.o(x$fpl$dnaninf)
-    __fpl_dretinf                            0x08003105   Thumb Code    12  dretinf.o(x$fpl$dretinf)
-    __aeabi_f2d                              0x08003111   Thumb Code     0  f2d.o(x$fpl$f2d)
-    _f2d                                     0x08003111   Thumb Code    86  f2d.o(x$fpl$f2d)
-    __aeabi_fdiv                             0x08003169   Thumb Code     0  fdiv.o(x$fpl$fdiv)
-    _fdiv                                    0x08003169   Thumb Code   384  fdiv.o(x$fpl$fdiv)
-    __aeabi_f2uiz                            0x080032ed   Thumb Code     0  ffixu.o(x$fpl$ffixu)
-    _ffixu                                   0x080032ed   Thumb Code    62  ffixu.o(x$fpl$ffixu)
-    __aeabi_ui2f                             0x0800332d   Thumb Code     0  fflt_clz.o(x$fpl$ffltu)
-    _ffltu                                   0x0800332d   Thumb Code    38  fflt_clz.o(x$fpl$ffltu)
-    __aeabi_fmul                             0x08003355   Thumb Code     0  fmul.o(x$fpl$fmul)
-    _fmul                                    0x08003355   Thumb Code   258  fmul.o(x$fpl$fmul)
-    __fpl_fnaninf                            0x08003457   Thumb Code   140  fnaninf.o(x$fpl$fnaninf)
-    __fpl_fretinf                            0x080034e3   Thumb Code    10  fretinf.o(x$fpl$fretinf)
-    OLED_F8x16                               0x080034ec   Data        1520  oled.o(.constdata)
-    __I$use$fp                               0x080034ec   Number         0  usenofp.o(x$fpl$usenofp)
-    Buzzer_Counter                           0x08003adc   Data          38  buzzer.o(.constdata)
-    Region$$Table$$Base                      0x08003b04   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08003b24   Number         0  anon$$obj.o(Region$$Table)
+    State2                                   0x080020d5   Thumb Code   516  main.o(i.State2)
+    StateGet                                 0x08002335   Thumb Code   102  main.o(i.StateGet)
+    StoreData                                0x080023b1   Thumb Code    50  main.o(i.StoreData)
+    Switch_GetNum                            0x08002401   Thumb Code     6  switch.o(i.Switch_GetNum)
+    Switch_GetNum2Looop                      0x0800240d   Thumb Code    66  switch.o(i.Switch_GetNum2Looop)
+    Switch_Init                              0x08002455   Thumb Code    44  switch.o(i.Switch_Init)
+    Switch_Loop                              0x08002485   Thumb Code    12  switch.o(i.Switch_Loop)
+    SysTick_Handler                          0x08002495   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
+    SystemInit                               0x08002499   Thumb Code    78  system_stm32f10x.o(i.SystemInit)
+    TIM2_IRQHandler                          0x080024f9   Thumb Code    54  buzzer.o(i.TIM2_IRQHandler)
+    TIM2_Init                                0x08002535   Thumb Code   100  tim2.o(i.TIM2_Init)
+    TIM3_IRQHandler                          0x08002599   Thumb Code    28  tim3.o(i.TIM3_IRQHandler)
+    TIM3_Init                                0x080025bd   Thumb Code   104  tim3.o(i.TIM3_Init)
+    TIM3_SetIRQHandler                       0x08002629   Thumb Code     6  tim3.o(i.TIM3_SetIRQHandler)
+    TIM_ClearFlag                            0x08002635   Thumb Code     6  stm32f10x_tim.o(i.TIM_ClearFlag)
+    TIM_Cmd                                  0x0800263b   Thumb Code    24  stm32f10x_tim.o(i.TIM_Cmd)
+    TIM_DeInit                               0x08002655   Thumb Code   424  stm32f10x_tim.o(i.TIM_DeInit)
+    TIM_GetFlagStatus                        0x0800283d   Thumb Code    18  stm32f10x_tim.o(i.TIM_GetFlagStatus)
+    TIM_ITConfig                             0x0800284f   Thumb Code    18  stm32f10x_tim.o(i.TIM_ITConfig)
+    TIM_TimeBaseInit                         0x08002861   Thumb Code   122  stm32f10x_tim.o(i.TIM_TimeBaseInit)
+    TX_Mode                                  0x08002905   Thumb Code   104  nrf24l01.o(i.TX_Mode)
+    Transmit                                 0x08002975   Thumb Code   134  main.o(i.Transmit)
+    TurnMode                                 0x08002a19   Thumb Code   116  main.o(i.TurnMode)
+    UsageFault_Handler                       0x08002ac1   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
+    Voltage_Get                              0x08002ac5   Thumb Code   156  main.o(i.Voltage_Get)
+    main                                     0x08002b75   Thumb Code   144  main.o(i.main)
+    __aeabi_ddiv                             0x08002c19   Thumb Code     0  ddiv.o(x$fpl$ddiv)
+    _ddiv                                    0x08002c19   Thumb Code   552  ddiv.o(x$fpl$ddiv)
+    __aeabi_d2uiz                            0x08002ec9   Thumb Code     0  dfixu.o(x$fpl$dfixu)
+    _dfixu                                   0x08002ec9   Thumb Code    90  dfixu.o(x$fpl$dfixu)
+    __aeabi_dmul                             0x08002f25   Thumb Code     0  dmul.o(x$fpl$dmul)
+    _dmul                                    0x08002f25   Thumb Code   332  dmul.o(x$fpl$dmul)
+    __fpl_dnaninf                            0x08003079   Thumb Code   156  dnaninf.o(x$fpl$dnaninf)
+    __fpl_dretinf                            0x08003115   Thumb Code    12  dretinf.o(x$fpl$dretinf)
+    __aeabi_f2d                              0x08003121   Thumb Code     0  f2d.o(x$fpl$f2d)
+    _f2d                                     0x08003121   Thumb Code    86  f2d.o(x$fpl$f2d)
+    __aeabi_fdiv                             0x08003179   Thumb Code     0  fdiv.o(x$fpl$fdiv)
+    _fdiv                                    0x08003179   Thumb Code   384  fdiv.o(x$fpl$fdiv)
+    __aeabi_f2uiz                            0x080032fd   Thumb Code     0  ffixu.o(x$fpl$ffixu)
+    _ffixu                                   0x080032fd   Thumb Code    62  ffixu.o(x$fpl$ffixu)
+    __aeabi_ui2f                             0x0800333d   Thumb Code     0  fflt_clz.o(x$fpl$ffltu)
+    _ffltu                                   0x0800333d   Thumb Code    38  fflt_clz.o(x$fpl$ffltu)
+    __aeabi_fmul                             0x08003365   Thumb Code     0  fmul.o(x$fpl$fmul)
+    _fmul                                    0x08003365   Thumb Code   258  fmul.o(x$fpl$fmul)
+    __fpl_fnaninf                            0x08003467   Thumb Code   140  fnaninf.o(x$fpl$fnaninf)
+    __fpl_fretinf                            0x080034f3   Thumb Code    10  fretinf.o(x$fpl$fretinf)
+    OLED_F8x16                               0x080034fc   Data        1520  oled.o(.constdata)
+    __I$use$fp                               0x080034fc   Number         0  usenofp.o(x$fpl$usenofp)
+    Buzzer_Counter                           0x08003aec   Data          38  buzzer.o(.constdata)
+    Region$$Table$$Base                      0x08003b14   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08003b34   Number         0  anon$$obj.o(Region$$Table)
     ADC_ConvertedValue                       0x20000000   Data           6  dma1.o(.data)
     TIM3_Handler                             0x20000008   Data           4  tim3.o(.data)
     KeyNumer                                 0x20000010   Data           1  key.o(.data)
@@ -1660,9 +1660,9 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00003b8c, Max: 0x00010000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00003b9c, Max: 0x00010000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00003b24, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00003b34, Max: 0x00010000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1839,76 +1839,76 @@ Memory Map of the image
     0x08001e86   0x08001e86   0x00000002   PAD
     0x08001e88   0x08001e88   0x000000e0   Code   RO           11    i.SetSysClockTo72   system_stm32f10x.o
     0x08001f68   0x08001f68   0x0000016c   Code   RO         3852    i.Show              main.o
-    0x080020d4   0x080020d4   0x00000250   Code   RO         3853    i.State2            main.o
-    0x08002324   0x08002324   0x0000007c   Code   RO         3854    i.StateGet          main.o
-    0x080023a0   0x080023a0   0x00000050   Code   RO         3855    i.StoreData         main.o
-    0x080023f0   0x080023f0   0x0000000c   Code   RO         3763    i.Switch_GetNum     switch.o
-    0x080023fc   0x080023fc   0x00000048   Code   RO         3764    i.Switch_GetNum2Looop  switch.o
-    0x08002444   0x08002444   0x00000030   Code   RO         3765    i.Switch_Init       switch.o
-    0x08002474   0x08002474   0x00000010   Code   RO         3766    i.Switch_Loop       switch.o
-    0x08002484   0x08002484   0x00000002   Code   RO         3992    i.SysTick_Handler   stm32f10x_it.o
-    0x08002486   0x08002486   0x00000002   PAD
-    0x08002488   0x08002488   0x00000060   Code   RO           13    i.SystemInit        system_stm32f10x.o
-    0x080024e8   0x080024e8   0x0000003c   Code   RO         3805    i.TIM2_IRQHandler   buzzer.o
-    0x08002524   0x08002524   0x00000064   Code   RO         3384    i.TIM2_Init         tim2.o
-    0x08002588   0x08002588   0x00000024   Code   RO         3258    i.TIM3_IRQHandler   tim3.o
-    0x080025ac   0x080025ac   0x0000006c   Code   RO         3259    i.TIM3_Init         tim3.o
-    0x08002618   0x08002618   0x0000000c   Code   RO         3260    i.TIM3_SetIRQHandler  tim3.o
-    0x08002624   0x08002624   0x00000006   Code   RO         2415    i.TIM_ClearFlag     stm32f10x_tim.o
-    0x0800262a   0x0800262a   0x00000018   Code   RO         2421    i.TIM_Cmd           stm32f10x_tim.o
-    0x08002642   0x08002642   0x00000002   PAD
-    0x08002644   0x08002644   0x000001e8   Code   RO         2426    i.TIM_DeInit        stm32f10x_tim.o
-    0x0800282c   0x0800282c   0x00000012   Code   RO         2441    i.TIM_GetFlagStatus  stm32f10x_tim.o
-    0x0800283e   0x0800283e   0x00000012   Code   RO         2446    i.TIM_ITConfig      stm32f10x_tim.o
-    0x08002850   0x08002850   0x000000a4   Code   RO         2492    i.TIM_TimeBaseInit  stm32f10x_tim.o
-    0x080028f4   0x080028f4   0x00000070   Code   RO         3605    i.TX_Mode           nrf24l01.o
-    0x08002964   0x08002964   0x000000a4   Code   RO         3856    i.Transmit          main.o
-    0x08002a08   0x08002a08   0x000000a8   Code   RO         3857    i.TurnMode          main.o
-    0x08002ab0   0x08002ab0   0x00000004   Code   RO         3993    i.UsageFault_Handler  stm32f10x_it.o
-    0x08002ab4   0x08002ab4   0x000000b0   Code   RO         3858    i.Voltage_Get       main.o
-    0x08002b64   0x08002b64   0x000000a4   Code   RO         3859    i.main              main.o
-    0x08002c08   0x08002c08   0x000002b0   Code   RO         4055    x$fpl$ddiv          fz_ws.l(ddiv.o)
-    0x08002eb8   0x08002eb8   0x0000005a   Code   RO         4058    x$fpl$dfixu         fz_ws.l(dfixu.o)
-    0x08002f12   0x08002f12   0x00000002   PAD
-    0x08002f14   0x08002f14   0x00000154   Code   RO         4062    x$fpl$dmul          fz_ws.l(dmul.o)
-    0x08003068   0x08003068   0x0000009c   Code   RO         4083    x$fpl$dnaninf       fz_ws.l(dnaninf.o)
-    0x08003104   0x08003104   0x0000000c   Code   RO         4085    x$fpl$dretinf       fz_ws.l(dretinf.o)
-    0x08003110   0x08003110   0x00000056   Code   RO         4064    x$fpl$f2d           fz_ws.l(f2d.o)
-    0x08003166   0x08003166   0x00000002   PAD
-    0x08003168   0x08003168   0x00000184   Code   RO         4067    x$fpl$fdiv          fz_ws.l(fdiv.o)
-    0x080032ec   0x080032ec   0x0000003e   Code   RO         4070    x$fpl$ffixu         fz_ws.l(ffixu.o)
-    0x0800332a   0x0800332a   0x00000002   PAD
-    0x0800332c   0x0800332c   0x00000026   Code   RO         4074    x$fpl$ffltu         fz_ws.l(fflt_clz.o)
-    0x08003352   0x08003352   0x00000002   PAD
-    0x08003354   0x08003354   0x00000102   Code   RO         4080    x$fpl$fmul          fz_ws.l(fmul.o)
-    0x08003456   0x08003456   0x0000008c   Code   RO         4087    x$fpl$fnaninf       fz_ws.l(fnaninf.o)
-    0x080034e2   0x080034e2   0x0000000a   Code   RO         4089    x$fpl$fretinf       fz_ws.l(fretinf.o)
-    0x080034ec   0x080034ec   0x00000000   Code   RO         4091    x$fpl$usenofp       fz_ws.l(usenofp.o)
-    0x080034ec   0x080034ec   0x000005f0   Data   RO         3502    .constdata          oled.o
-    0x08003adc   0x08003adc   0x00000026   Data   RO         3806    .constdata          buzzer.o
-    0x08003b02   0x08003b02   0x00000002   PAD
-    0x08003b04   0x08003b04   0x00000020   Data   RO         4244    Region$$Table       anon$$obj.o
+    0x080020d4   0x080020d4   0x00000260   Code   RO         3853    i.State2            main.o
+    0x08002334   0x08002334   0x0000007c   Code   RO         3854    i.StateGet          main.o
+    0x080023b0   0x080023b0   0x00000050   Code   RO         3855    i.StoreData         main.o
+    0x08002400   0x08002400   0x0000000c   Code   RO         3763    i.Switch_GetNum     switch.o
+    0x0800240c   0x0800240c   0x00000048   Code   RO         3764    i.Switch_GetNum2Looop  switch.o
+    0x08002454   0x08002454   0x00000030   Code   RO         3765    i.Switch_Init       switch.o
+    0x08002484   0x08002484   0x00000010   Code   RO         3766    i.Switch_Loop       switch.o
+    0x08002494   0x08002494   0x00000002   Code   RO         3992    i.SysTick_Handler   stm32f10x_it.o
+    0x08002496   0x08002496   0x00000002   PAD
+    0x08002498   0x08002498   0x00000060   Code   RO           13    i.SystemInit        system_stm32f10x.o
+    0x080024f8   0x080024f8   0x0000003c   Code   RO         3805    i.TIM2_IRQHandler   buzzer.o
+    0x08002534   0x08002534   0x00000064   Code   RO         3384    i.TIM2_Init         tim2.o
+    0x08002598   0x08002598   0x00000024   Code   RO         3258    i.TIM3_IRQHandler   tim3.o
+    0x080025bc   0x080025bc   0x0000006c   Code   RO         3259    i.TIM3_Init         tim3.o
+    0x08002628   0x08002628   0x0000000c   Code   RO         3260    i.TIM3_SetIRQHandler  tim3.o
+    0x08002634   0x08002634   0x00000006   Code   RO         2415    i.TIM_ClearFlag     stm32f10x_tim.o
+    0x0800263a   0x0800263a   0x00000018   Code   RO         2421    i.TIM_Cmd           stm32f10x_tim.o
+    0x08002652   0x08002652   0x00000002   PAD
+    0x08002654   0x08002654   0x000001e8   Code   RO         2426    i.TIM_DeInit        stm32f10x_tim.o
+    0x0800283c   0x0800283c   0x00000012   Code   RO         2441    i.TIM_GetFlagStatus  stm32f10x_tim.o
+    0x0800284e   0x0800284e   0x00000012   Code   RO         2446    i.TIM_ITConfig      stm32f10x_tim.o
+    0x08002860   0x08002860   0x000000a4   Code   RO         2492    i.TIM_TimeBaseInit  stm32f10x_tim.o
+    0x08002904   0x08002904   0x00000070   Code   RO         3605    i.TX_Mode           nrf24l01.o
+    0x08002974   0x08002974   0x000000a4   Code   RO         3856    i.Transmit          main.o
+    0x08002a18   0x08002a18   0x000000a8   Code   RO         3857    i.TurnMode          main.o
+    0x08002ac0   0x08002ac0   0x00000004   Code   RO         3993    i.UsageFault_Handler  stm32f10x_it.o
+    0x08002ac4   0x08002ac4   0x000000b0   Code   RO         3858    i.Voltage_Get       main.o
+    0x08002b74   0x08002b74   0x000000a4   Code   RO         3859    i.main              main.o
+    0x08002c18   0x08002c18   0x000002b0   Code   RO         4055    x$fpl$ddiv          fz_ws.l(ddiv.o)
+    0x08002ec8   0x08002ec8   0x0000005a   Code   RO         4058    x$fpl$dfixu         fz_ws.l(dfixu.o)
+    0x08002f22   0x08002f22   0x00000002   PAD
+    0x08002f24   0x08002f24   0x00000154   Code   RO         4062    x$fpl$dmul          fz_ws.l(dmul.o)
+    0x08003078   0x08003078   0x0000009c   Code   RO         4083    x$fpl$dnaninf       fz_ws.l(dnaninf.o)
+    0x08003114   0x08003114   0x0000000c   Code   RO         4085    x$fpl$dretinf       fz_ws.l(dretinf.o)
+    0x08003120   0x08003120   0x00000056   Code   RO         4064    x$fpl$f2d           fz_ws.l(f2d.o)
+    0x08003176   0x08003176   0x00000002   PAD
+    0x08003178   0x08003178   0x00000184   Code   RO         4067    x$fpl$fdiv          fz_ws.l(fdiv.o)
+    0x080032fc   0x080032fc   0x0000003e   Code   RO         4070    x$fpl$ffixu         fz_ws.l(ffixu.o)
+    0x0800333a   0x0800333a   0x00000002   PAD
+    0x0800333c   0x0800333c   0x00000026   Code   RO         4074    x$fpl$ffltu         fz_ws.l(fflt_clz.o)
+    0x08003362   0x08003362   0x00000002   PAD
+    0x08003364   0x08003364   0x00000102   Code   RO         4080    x$fpl$fmul          fz_ws.l(fmul.o)
+    0x08003466   0x08003466   0x0000008c   Code   RO         4087    x$fpl$fnaninf       fz_ws.l(fnaninf.o)
+    0x080034f2   0x080034f2   0x0000000a   Code   RO         4089    x$fpl$fretinf       fz_ws.l(fretinf.o)
+    0x080034fc   0x080034fc   0x00000000   Code   RO         4091    x$fpl$usenofp       fz_ws.l(usenofp.o)
+    0x080034fc   0x080034fc   0x000005f0   Data   RO         3502    .constdata          oled.o
+    0x08003aec   0x08003aec   0x00000026   Data   RO         3806    .constdata          buzzer.o
+    0x08003b12   0x08003b12   0x00000002   PAD
+    0x08003b14   0x08003b14   0x00000020   Data   RO         4244    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08003b24, Size: 0x000006d8, Max: 0x00005000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08003b34, Size: 0x000006d8, Max: 0x00005000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x08003b24   0x00000006   Data   RW         3221    .data               dma1.o
-    0x20000006   0x08003b2a   0x00000002   PAD
-    0x20000008   0x08003b2c   0x00000004   Data   RW         3261    .data               tim3.o
-    0x2000000c   0x08003b30   0x00000004   Data   RW         3293    .data               spi1.o
-    0x20000010   0x08003b34   0x00000006   Data   RW         3448    .data               key.o
-    0x20000016   0x08003b3a   0x00000016   Data   RW         3606    .data               nrf24l01.o
-    0x2000002c   0x08003b50   0x00000002   Data   RW         3688    .data               encoder.o
-    0x2000002e   0x08003b52   0x00000006   Data   RW         3724    .data               rocker.o
-    0x20000034   0x08003b58   0x00000001   Data   RW         3767    .data               switch.o
-    0x20000035   0x08003b59   0x00000001   PAD
-    0x20000036   0x08003b5a   0x00000002   Data   RW         3807    .data               buzzer.o
-    0x20000038   0x08003b5c   0x00000030   Data   RW         3861    .data               main.o
+    0x20000000   0x08003b34   0x00000006   Data   RW         3221    .data               dma1.o
+    0x20000006   0x08003b3a   0x00000002   PAD
+    0x20000008   0x08003b3c   0x00000004   Data   RW         3261    .data               tim3.o
+    0x2000000c   0x08003b40   0x00000004   Data   RW         3293    .data               spi1.o
+    0x20000010   0x08003b44   0x00000006   Data   RW         3448    .data               key.o
+    0x20000016   0x08003b4a   0x00000016   Data   RW         3606    .data               nrf24l01.o
+    0x2000002c   0x08003b60   0x00000002   Data   RW         3688    .data               encoder.o
+    0x2000002e   0x08003b62   0x00000006   Data   RW         3724    .data               rocker.o
+    0x20000034   0x08003b68   0x00000001   Data   RW         3767    .data               switch.o
+    0x20000035   0x08003b69   0x00000001   PAD
+    0x20000036   0x08003b6a   0x00000002   Data   RW         3807    .data               buzzer.o
+    0x20000038   0x08003b6c   0x00000030   Data   RW         3861    .data               main.o
     0x20000068        -       0x0000000c   Zero   RW         3860    .bss                main.o
     0x20000074        -       0x00000060   Zero   RW         4118    .bss                c_w.l(libspace.o)
-    0x200000d4   0x08003b8c   0x00000004   PAD
+    0x200000d4   0x08003b9c   0x00000004   PAD
     0x200000d8        -       0x00000200   Zero   RW            2    HEAP                startup_stm32f10x_md.o
     0x200002d8        -       0x00000400   Zero   RW            1    STACK               startup_stm32f10x_md.o
 
@@ -1926,7 +1926,7 @@ Image component sizes
        288         30          0          2          0       2203   encoder.o
        182         12          0          0          0       2376   internal_flash.o
        296         40          0          6          0       2156   key.o
-      3586        612          0         48         12      10747   main.o
+      3602        612          0         48         12      10759   main.o
        132         22          0          0          0     215887   misc.o
        636         52          0         22          0       5143   nrf24l01.o
       1004         22       1520          0          0       8884   oled.o
@@ -1948,7 +1948,7 @@ Image component sizes
        156         18          0          4          0       1890   tim3.o
 
     ----------------------------------------------------------------------
-     10756       1184       1828        104       1548     418124   Object Totals
+     10772       1184       1828        104       1548     418136   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         24          0          2          3          0          0   (incl. Padding)
 
@@ -2011,15 +2011,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     13312       1452       1828        104       1648     412504   Grand Totals
-     13312       1452       1828        104       1648     412504   ELF Image Totals
-     13312       1452       1828        104          0          0   ROM Totals
+     13328       1452       1828        104       1648     412516   Grand Totals
+     13328       1452       1828        104       1648     412516   ELF Image Totals
+     13328       1452       1828        104          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                15140 (  14.79kB)
+    Total RO  Size (Code + RO Data)                15156 (  14.80kB)
     Total RW  Size (RW Data + ZI Data)              1752 (   1.71kB)
-    Total ROM Size (Code + RO Data + RW Data)      15244 (  14.89kB)
+    Total ROM Size (Code + RO Data + RW Data)      15260 (  14.90kB)
 
 ==============================================================================
 

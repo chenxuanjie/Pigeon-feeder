@@ -45,7 +45,13 @@ void USART1_Config(void)
 	USART_Cmd(USART1, ENABLE);
 }
 
-void USART1_ShowTemp(void)
+/**
+  * @brief  串口向电脑调用视觉，得到要喂料的时间。
+  * @param  
+  * @retval 
+  */
+
+void USART1_GetFeedTime(void)
 {
     uint8_t j;
     i = 0;
@@ -53,19 +59,19 @@ void USART1_ShowTemp(void)
     for (j = 0; j < USART_RECIEVE_TEMP; j ++)
 	{
 //        USART_SendData(USART1, USART_Temp[j]);
-        OLED_ShowChar(2,j+1,USART_Temp[j]);
+        OLED_ShowChar(1,j+1+3,USART_Temp[j]);
 	}
     if ( strcmp(USART_Temp, "100020003000") == 0)
         OLED_ShowNum(1,16,1,1);
     else
         OLED_ShowNum(1,16,0,1);
     
-    if (USART_Temp[3]-'0' > 0)
-        OLED_ShowNum(2,14,USART_Temp[3]-'0',3);
-    if (USART_Temp[7]-'0' > 0)
-        OLED_ShowNum(3,14,USART_Temp[7]-'0',3);
-    if (USART_Temp[11]-'0' > 0)
-        OLED_ShowNum(4,14,USART_Temp[11]-'0',3);
+//    if (USART_Temp[3]-'0' > 0)
+//        OLED_ShowNum(2,14,USART_Temp[3]-'0',3);
+//    if (USART_Temp[7]-'0' > 0)
+//        OLED_ShowNum(3,14,USART_Temp[7]-'0',3);
+//    if (USART_Temp[11]-'0' > 0)
+//        OLED_ShowNum(4,14,USART_Temp[11]-'0',3);
 
 }
 

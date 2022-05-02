@@ -246,6 +246,8 @@ void State2(void)
 			}
 			break;
 	}
+	if (KeyNum == KEY_PIN2_NUM)
+		NRF24L01_SetBuf(NORMAL_TRANSMIT, AUTO_FEED);
 	CursorControl(CONTROLSTATE);
 }
 void GetData(void)

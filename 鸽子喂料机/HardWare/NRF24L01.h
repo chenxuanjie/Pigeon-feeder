@@ -66,6 +66,7 @@ uint8_t NRF24L01_ReadByte(uint8_t Register);
 uint8_t NRF24L01_ReceiveData(void);
 uint8_t NRF24L01_GetData(uint8_t ArrayNum);
 void NRF24L01_SetBuf(uint8_t ArrayNum, uint8_t Byte);
+void NRF24L01_SetRXBuf(uint8_t ArrayNum, uint8_t Byte);
 void NRF24L01_TransmitBuf(void);
 void NRF24L01_DataReset(void); 
 #endif

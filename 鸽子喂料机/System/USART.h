@@ -9,6 +9,6 @@ extern uint16_t Data;
 
 void USART1_Config(void);
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
-void USART1_ShowTemp(void);
+void USART1_GetFeedTime(void);
 
 #endif

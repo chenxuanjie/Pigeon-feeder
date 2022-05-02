@@ -55,7 +55,7 @@ int main(void)
 	Hcsr04_Init();
 	TIM2_Init();
 	USART_Config();
-	
+	USART1_Config();
 	LEDO_OFF();
 	
 	 Robot_Init();
@@ -75,7 +75,6 @@ int main(void)
 	{
 			
 		While_Init();
-		
 		switch (State)
 		{
 			case SETTINGSTATE://下
@@ -106,9 +105,7 @@ int main(void)
 
 
 		LEDO_OFF();
-		
-		
-		
+				
 	}
 }
 
@@ -137,7 +134,8 @@ void While_Init()
 		OLED_ShowHexNum(4, 10, Info3, 2);
 		OLED_ShowHexNum(4, 13, Info4, 2);
 		
-		OLED_ShowHexNum(1,1,NRF24L01_GetData(ROCKER_TRANSMIT),2);
+		if (NRF24L01_GetData(NORMAL_TRANSMIT) != 0)
+		OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);
 
 		
 		if (Flag)
@@ -215,7 +213,6 @@ void State2(void)
 	if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM)//拨钮开关04启用校准模式,校准电机方向，摇杆可用	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case KEY_PIN2_NUM		:	Timeout=1000;while(Timeout){};break;     //自动视觉识别并喂料
 			case KEY_PIN4_NUM		:	LeftCalibration=-1;RightCalibration=1;break;
 			case KEY_PIN5_NUM		:	LeftCalibration=1;RightCalibration=-1;break;
 			case KEY_PIN6_NUM		:	LeftCalibration=1;RightCalibration=1;break;
@@ -240,6 +237,11 @@ void State2(void)
 			break;
 			case FEED_ON:	//喂料器开
 				Relay_Set(ALL, SET);
+			break;
+			case AUTO_FEED:	//自动喂料开
+				Timeout=1000;
+				while(Timeout){OLED_ShowNum(1,4,Timeout,4);};
+				USART1_GetFeedTime();
 			break;
 		}
 		
@@ -269,13 +271,32 @@ void State3(void)
 			case KEY_PIN7_NUM		:	break;
 		}
 }
+
 void Data_Analyse(void)
 {
-	
+	static uint8_t SwitchNum, LastSwitchNum;	
 	Value = NRF24L01_GetData(ROCKER_TRANSMIT);
 	X = Value&0x0F;
 	Y = (Value&0xF0)>>4;
+	
+	LastSwitchNum = SwitchNum;
+	//State值的改变
+	SwitchNum = NRF24L01_GetData(SWITCH_TRANSMIT);	
+	if (SwitchNum != LastSwitchNum)
+	{
+		if ((SwitchNum&0x02) != 0)	//三挡钮子开关向下拨
+		{
+			State = SETTINGSTATE;		
+		}
+		else if ((SwitchNum&0x08) != 0)	//三挡钮子开关向中间拨
+		{
+			State = CONTROLSTATE;
+		}
+		else 							//三挡钮子开关向上拨
+			State = DEBUGSTATE;
+	}
 }
+
 void Speed(int16_t data)
 {
 
@@ -285,7 +306,6 @@ void Speed(int16_t data)
 
 void Distance_Get(void)
 {
-	OLED_ShowHexNum(1,4,Hcsr04_StartFlag,2);
 	if (Hcsr04_StartFlag&0x08)	//超声波是否使能
 	{
 		switch(Hcsr04_StartFlag&0x07)	//第几个超声波运行
@@ -306,11 +326,6 @@ void Distance_Get(void)
 	OLED_ShowNum(2 , 14, (uint32_t)Distance2%10 ,1);
 	OLED_ShowNum(3 , 6, (uint32_t)Distance3%10 ,1);
 	OLED_ShowNum(3 , 14, (uint32_t)Distance4%10 ,1);
-//	OLED_ShowString(1, 1, "1:  . cm");
-//	OLED_ShowString(2, 1, "2:  . cm");
-//	OLED_ShowString(3, 1, "3:  . cm");
-//	OLED_ShowString(3, 12, ". cm");
-
 }
 
 void TIM2_IRQHandler(void)
@@ -340,6 +355,8 @@ void TIM2_IRQHandler(void)
         //超时时间
         if (Timeout > 0)
             Timeout --;
+		else
+			Timeout = 0;
 
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
