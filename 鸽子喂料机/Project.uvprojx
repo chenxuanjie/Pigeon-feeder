@@ -780,6 +780,16 @@
               <FileType>5</FileType>
               <FilePath>.\HardWare\Hcsr04.h</FilePath>
             </File>
+            <File>
+              <FileName>Feed.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\HardWare\Feed.c</FilePath>
+            </File>
+            <File>
+              <FileName>Feed.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\HardWare\Feed.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

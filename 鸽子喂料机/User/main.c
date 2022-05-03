@@ -253,6 +253,7 @@ void State2(void)
 				Relay_Set(ALL, SET);
 			break;
 			case AUTO_FEED:	//自动喂料开
+				feedTime1 = Bird1 * ;
 			break;
 		}
 		
