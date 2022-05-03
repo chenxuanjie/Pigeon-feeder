@@ -1,7 +1,7 @@
 .\objects\tim4.o: System\TIM4.c
 .\objects\tim4.o: .\Start\stm32f10x.h
 .\objects\tim4.o: .\Start\core_cm3.h
-.\objects\tim4.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\tim4.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\tim4.o: .\Start\system_stm32f10x.h
 .\objects\tim4.o: .\User\stm32f10x_conf.h
 .\objects\tim4.o: .\Library\stm32f10x_adc.h

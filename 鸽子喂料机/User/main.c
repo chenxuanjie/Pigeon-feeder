@@ -21,11 +21,11 @@
 #include "Relay.H"
 #include "Hcsr04.h"
 #include "TIM2.h"
-#include "USART.h"
+#include "Feed.h"
 //#include "Hcsr04.h"
 
 int16_t Set_Data,Set_Speed=20, Num;
-uint8_t Flag, Hcsr04_StartFlag, feedTime1, feedTime2, feedTime3, Bird1, Bird2, Bird3;
+uint8_t Flag, Hcsr04_StartFlag;
 uint8_t Info1, Info2, Info3, Info4, State0;
 uint8_t X, Y, Value;
 float Distance1, Distance2, Distance3, Distance4;
@@ -33,7 +33,7 @@ int16_t SpeedLeft=0,SpeedRight=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1;
 uint8_t State=1;
-uint32_t Timeout;
+uint32_t feedTime1, feedTime2, feedTime3;
 
 void Speed(int16_t data);
 void Data_Analyse(void);
@@ -48,15 +48,15 @@ int main(void)
 {	
 	LED_Init();
 	OLED_Init( );
-	OLED_ShowString(2,1,"1:00.0  2:00.0cm");
-	OLED_ShowString(3,1,"3:00.0  4:00.0cm");	
+//	OLED_ShowString(2,1,"1:00.0  2:00.0cm");
+//	OLED_ShowString(3,1,"3:00.0  4:00.0cm");	
 	NRF24L01_Init();
 	RX_Mode();
 	Relay_Init();
 	Hcsr04_Init();
 	TIM2_Init();
 	USART_Config();
-	USART1_Config();
+	Feed_Init();
 	LEDO_OFF();
 	
 	 Robot_Init();
@@ -74,7 +74,10 @@ int main(void)
 
 	while (1)
 	{
-			
+		OLED_ShowNum(2,1,feedTime1,4);
+		OLED_ShowNum(2,6,feedTime2,4);
+		OLED_ShowNum(2,11,feedTime3,4);
+	
 		While_Init();
 		switch (State)
 		{
@@ -108,19 +111,6 @@ int main(void)
 		LEDO_OFF();
 				
 	}
-}
-
-//每隔0.5s获取现在的鸽子数量
-void GetBirdNum(void)
-{
-	if (Timeout == 0)
-	{
-		USART1_GetFeedTime(&Bird1, &Bird2, &Bird3);
-		Timeout = 500;
-	}
-	OLED_ShowNum(1,4,Bird1,1);
-	OLED_ShowNum(1,6,Bird2,1);
-	OLED_ShowNum(1,8,Bird2,1);
 }
 
 void While_Init()
@@ -253,7 +243,8 @@ void State2(void)
 				Relay_Set(ALL, SET);
 			break;
 			case AUTO_FEED:	//自动喂料开
-				feedTime1 = Bird1 * ;
+				GetFeedTime(&feedTime1, &feedTime2, &feedTime3); 
+				StartFeed(&feedTime1, &feedTime2, &feedTime3);
 			break;
 		}
 		
@@ -330,14 +321,14 @@ void Distance_Get(void)
 	Hcsr04_StartFlag &= 0x07;		//清除使能位
 	}	
 	//show
-	OLED_ShowNum(2 , 3, Distance1/10, 2);
-	OLED_ShowNum(2 , 11, Distance2/10, 2);
-	OLED_ShowNum(3 , 3, Distance3/10, 2);
-	OLED_ShowNum(3 , 11, Distance4/10, 2);
-	OLED_ShowNum(2 , 6, (uint32_t)Distance1%10 ,1);
-	OLED_ShowNum(2 , 14, (uint32_t)Distance2%10 ,1);
-	OLED_ShowNum(3 , 6, (uint32_t)Distance3%10 ,1);
-	OLED_ShowNum(3 , 14, (uint32_t)Distance4%10 ,1);
+//	OLED_ShowNum(2 , 3, Distance1/10, 2);
+//	OLED_ShowNum(2 , 11, Distance2/10, 2);
+//	OLED_ShowNum(3 , 3, Distance3/10, 2);
+//	OLED_ShowNum(3 , 11, Distance4/10, 2);
+//	OLED_ShowNum(2 , 6, (uint32_t)Distance1%10 ,1);
+//	OLED_ShowNum(2 , 14, (uint32_t)Distance2%10 ,1);
+//	OLED_ShowNum(3 , 6, (uint32_t)Distance3%10 ,1);
+//	OLED_ShowNum(3 , 14, (uint32_t)Distance4%10 ,1);
 }
 
 void TIM2_IRQHandler(void)
@@ -369,7 +360,14 @@ void TIM2_IRQHandler(void)
             Timeout --;
 		else
 			Timeout = 0;
-
+		//喂料器时间
+		if (feedTime1 > 0) feedTime1 --;
+		else feedTime1 = 0;
+		if (feedTime2 > 0) feedTime2 --;
+		else feedTime2 = 0;
+		if (feedTime3 > 0) feedTime3 --;
+		else feedTime3 = 0;
+			
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
 }

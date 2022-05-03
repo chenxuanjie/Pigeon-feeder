@@ -37,6 +37,7 @@
 ".\objects\bsp_usart.o"
 ".\objects\robot.o"
 ".\objects\hcsr04.o"
+".\objects\feed.o"
 ".\objects\main.o"
 ".\objects\stm32f10x_it.o"
 --strict --scatter ".\Objects\Project.sct"

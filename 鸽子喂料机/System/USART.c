@@ -50,8 +50,7 @@ void USART1_Config(void)
   * @param  
   * @retval 
   */
-
-void USART1_GetFeedTime(uint8_t* feedTime1, uint8_t* feedTime2, uint8_t* feedTime3)
+void USART1_GetBirdNum(uint8_t* Bird1, uint8_t* Bird2, uint8_t* Bird3)
 {
     uint8_t j;
     i = 0;
@@ -67,19 +66,19 @@ void USART1_GetFeedTime(uint8_t* feedTime1, uint8_t* feedTime2, uint8_t* feedTim
         OLED_ShowNum(1,16,0,1);
     //喂料时间1
 	if (USART_Temp[1]<'0' || USART_Temp[2]<'0' || USART_Temp[3]<'0')
-		*feedTime1 = 0;
+		*Bird1 = 0;
 	else
-		*feedTime1 = (USART_Temp[1]-'0')*100 + (USART_Temp[2]-'0')*10 + (USART_Temp[3]-'0');
+		*Bird1 = (USART_Temp[1]-'0')*100 + (USART_Temp[2]-'0')*10 + (USART_Temp[3]-'0');
 	//喂料时间2
 	if (USART_Temp[5]<'0' || USART_Temp[6]<'0' || USART_Temp[7]<'0')
-		*feedTime2 = 0;
+		*Bird2 = 0;
 	else
-		*feedTime2 = (USART_Temp[5]-'0')*100 + (USART_Temp[6]-'0')*10 + (USART_Temp[7]-'0');
+		*Bird2 = (USART_Temp[5]-'0')*100 + (USART_Temp[6]-'0')*10 + (USART_Temp[7]-'0');
 	//喂料时间3
 	if (USART_Temp[9]<'0' || USART_Temp[10]<'0' || USART_Temp[11]<'0')
-		*feedTime3 = 0;
+		*Bird3 = 0;
 	else
-		*feedTime3 = (USART_Temp[9]-'0')*100 + (USART_Temp[10]-'0')*10 + (USART_Temp[11]-'0');
+		*Bird3 = (USART_Temp[9]-'0')*100 + (USART_Temp[10]-'0')*10 + (USART_Temp[11]-'0');
 }
 
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str)

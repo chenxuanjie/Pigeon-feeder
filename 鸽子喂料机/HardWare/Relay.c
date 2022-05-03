@@ -25,7 +25,7 @@ void Relay_Init(void)
 
 /**
   * @brief  喂料器的打开与关闭
-  * @param  无
+  * @param  SET:打开 	RESET：关闭
   * @retval 无
   */
 void Relay_Set(uint8_t Value, uint8_t State)
