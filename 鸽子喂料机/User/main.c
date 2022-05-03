@@ -25,7 +25,7 @@
 //#include "Hcsr04.h"
 
 int16_t Set_Data,Set_Speed=20, Num;
-uint8_t Flag, Hcsr04_StartFlag;
+uint8_t Flag, Hcsr04_StartFlag, feedTime1, feedTime2, feedTime3, Bird1, Bird2, Bird3;
 uint8_t Info1, Info2, Info3, Info4, State0;
 uint8_t X, Y, Value;
 float Distance1, Distance2, Distance3, Distance4;
@@ -42,6 +42,7 @@ void State1(void);
 void State2(void);
 void State3(void);
 void While_Init(void);
+void GetBirdNum(void);
 
 int main(void)
 {	
@@ -109,9 +110,22 @@ int main(void)
 	}
 }
 
+//每隔0.5s获取现在的鸽子数量
+void GetBirdNum(void)
+{
+	if (Timeout == 0)
+	{
+		USART1_GetFeedTime(&Bird1, &Bird2, &Bird3);
+		Timeout = 500;
+	}
+	OLED_ShowNum(1,4,Bird1,1);
+	OLED_ShowNum(1,6,Bird2,1);
+	OLED_ShowNum(1,8,Bird2,1);
+}
+
 void While_Init()
 {
-	
+		GetBirdNum();
 		Distance_Get();
 
 		Num ++;
@@ -239,9 +253,6 @@ void State2(void)
 				Relay_Set(ALL, SET);
 			break;
 			case AUTO_FEED:	//自动喂料开
-				Timeout=1000;
-				while(Timeout){OLED_ShowNum(1,4,Timeout,4);};
-				USART1_GetFeedTime();
 			break;
 		}
 		

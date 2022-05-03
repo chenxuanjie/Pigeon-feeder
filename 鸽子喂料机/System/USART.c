@@ -51,7 +51,7 @@ void USART1_Config(void)
   * @retval 
   */
 
-void USART1_GetFeedTime(void)
+void USART1_GetFeedTime(uint8_t* feedTime1, uint8_t* feedTime2, uint8_t* feedTime3)
 {
     uint8_t j;
     i = 0;
@@ -59,20 +59,27 @@ void USART1_GetFeedTime(void)
     for (j = 0; j < USART_RECIEVE_TEMP; j ++)
 	{
 //        USART_SendData(USART1, USART_Temp[j]);
-        OLED_ShowChar(1,j+1+3,USART_Temp[j]);
+//        OLED_ShowChar(1,j+1+3,USART_Temp[j]);
 	}
     if ( strcmp(USART_Temp, "100020003000") == 0)
         OLED_ShowNum(1,16,1,1);
     else
         OLED_ShowNum(1,16,0,1);
-    
-//    if (USART_Temp[3]-'0' > 0)
-//        OLED_ShowNum(2,14,USART_Temp[3]-'0',3);
-//    if (USART_Temp[7]-'0' > 0)
-//        OLED_ShowNum(3,14,USART_Temp[7]-'0',3);
-//    if (USART_Temp[11]-'0' > 0)
-//        OLED_ShowNum(4,14,USART_Temp[11]-'0',3);
-
+    //喂料时间1
+	if (USART_Temp[1]<'0' || USART_Temp[2]<'0' || USART_Temp[3]<'0')
+		*feedTime1 = 0;
+	else
+		*feedTime1 = (USART_Temp[1]-'0')*100 + (USART_Temp[2]-'0')*10 + (USART_Temp[3]-'0');
+	//喂料时间2
+	if (USART_Temp[5]<'0' || USART_Temp[6]<'0' || USART_Temp[7]<'0')
+		*feedTime2 = 0;
+	else
+		*feedTime2 = (USART_Temp[5]-'0')*100 + (USART_Temp[6]-'0')*10 + (USART_Temp[7]-'0');
+	//喂料时间3
+	if (USART_Temp[9]<'0' || USART_Temp[10]<'0' || USART_Temp[11]<'0')
+		*feedTime3 = 0;
+	else
+		*feedTime3 = (USART_Temp[9]-'0')*100 + (USART_Temp[10]-'0')*10 + (USART_Temp[11]-'0');
 }
 
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str)
