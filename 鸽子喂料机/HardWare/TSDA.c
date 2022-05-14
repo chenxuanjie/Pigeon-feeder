@@ -5,7 +5,7 @@
 void TSDA_Order(USART_TypeDef* pUSARTx,uint32_t order32)
 {
 
-	uint8_t orders[4],i,checkorder,k;
+	uint8_t orders[4],i;
 	orders[0]=(order32&0XFF000000)>>24;
 	orders[1]=(order32&0XFF0000)>>16;
 	orders[2]=(order32&0XFF00)>>8;
@@ -36,7 +36,7 @@ for(i=0;i<4;i++)
 void TSDA_Data(USART_TypeDef* pUSARTx,int8_t order8,int16_t data)
 {
 	
-	int8_t datas[4],i,checkorder;
+	int8_t datas[4],i;
 	int16_t chack;
 	datas[0]=order8;
 	datas[1]=(data&0XFF00)>>8;

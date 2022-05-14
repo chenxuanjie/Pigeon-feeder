@@ -2,7 +2,7 @@
 .\objects\robot.o: HardWare\ROBOT.H
 .\objects\robot.o: .\Start\stm32f10x.h
 .\objects\robot.o: .\Start\core_cm3.h
-.\objects\robot.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\robot.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\robot.o: .\Start\system_stm32f10x.h
 .\objects\robot.o: .\User\stm32f10x_conf.h
 .\objects\robot.o: .\Library\stm32f10x_adc.h

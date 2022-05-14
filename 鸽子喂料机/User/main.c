@@ -82,13 +82,13 @@ int main(void)
 		switch (State)
 		{
 			case SETTINGSTATE://下
-				State1();
+				State3();
 				break;
 			case CONTROLSTATE://中
 				State2();
 				break;
 			case DEBUGSTATE://上
-				State2();
+				State1();
 				break;
 		}
 		
@@ -117,7 +117,8 @@ void While_Init()
 {
 		GetBirdNum();
 		Distance_Get();
-
+		StartFeed(&feedTime1, &feedTime2, &feedTime3);
+		OLED_ShowNum(1,14,State,2); 
 		Num ++;
 		OLED_ShowNum(1, 16, Num, 1);
 		State0 = NRF24L01_ReadByte(STATUS);
@@ -236,15 +237,14 @@ void State2(void)
 /*********************喂料************************************/		
 		switch( NRF24L01_GetData(NORMAL_TRANSMIT))
 		{
-			case FEED_OFF:	//喂料器关
-				Relay_Set(ALL, RESET);
-			break;
-			case FEED_ON:	//喂料器开
-				Relay_Set(ALL, SET);
-			break;
+//			case FEED_OFF:	//喂料器关
+//				Relay_Set(ALL, RESET);
+//			break;
+//			case FEED_ON:	//喂料器开
+//				Relay_Set(ALL, SET);
+//			break;
 			case AUTO_FEED:	//自动喂料开
 				GetFeedTime(&feedTime1, &feedTime2, &feedTime3); 
-				StartFeed(&feedTime1, &feedTime2, &feedTime3);
 			break;
 		}
 		
