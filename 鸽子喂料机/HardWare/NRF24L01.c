@@ -220,6 +220,17 @@ void NRF24L01_SetBuf(uint8_t ArrayNum, uint8_t Byte)
 	TX_BUF[ArrayNum] = Byte;	
 }
 
+/**
+  * @brief  设置要接收的数组元素和字节
+  * @param  ArrayNum：第ArrayNum个数组元素。
+  * @param  Byte：要接收的字节。			
+  * @retval 无
+  */
+void NRF24L01_SetRXBuf(uint8_t ArrayNum, uint8_t Byte)
+{
+	RX_BUF[ArrayNum] = Byte;	
+}
+
 void NRF24L01_TransmitBuf(void)
 {
 	TX_Mode(TX_BUF);			
