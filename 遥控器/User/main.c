@@ -1,4 +1,3 @@
-/**************************************************/
 /*
 			遥控器
 	状态1：设置模式
@@ -10,8 +9,12 @@
 			（2）喂料按钮
 			（3）急停键
 			（4）光标控制：上下左右
+
+Program: 遥控器
+History:
+	2023/4/14	Shane	16th release
+	code refactoring. 代码重构
 */
-/**************************************************/
 
 #include "stm32f10x.h"                  // Device header
 #include "ADC1.h"
@@ -27,12 +30,15 @@
 #include "Buzzer.h"
 #include "TIM3.h"
 #include "Internal_Flash.h"
+#include "State1.h"
+#include "State2.h"
+#include "State3.h"
 
 
-uint8_t Num=0, RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum, BeepNum=14;
-uint8_t BuzzerChose, FeedChose, FeedSwitch, Mode=1, Select=2, LastSelect, State=1, State1;
+uint8_t Num=0, RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum;
+uint8_t FeedChose, FeedSwitch, Mode=1, Select=2, LastSelect, State=10, State1;
 uint8_t FeedTime1, FeedTime2, FeedTime3;
-uint8_t Info1, Info2, Info3, Info4, State;
+uint8_t Info1, Info2, Info3, Info4, State, StateChangeFlag;
 uint16_t Voltage;
 uint32_t FeedTime1Temp, FeedTime2Temp, FeedTime3Temp, FeedTemp;
 int16_t EncoderNum, Speed;
@@ -46,15 +52,16 @@ void ReadData(void);
 void Transmit(void);
 void GetData(void);
 void StateGet(void);
-void State2(void);
-void Show(void);
+uint8_t State2(void);
+uint8_t Show(void);
 void CursorControl(uint8_t State);
-void OriginalMode(void);
 void FeedMode(void);
-void BuzzerMode(void);
-void OtherMode(void);
-void TurnMode(uint8_t TurnMode);
 void Normal_IRQHandler(void);
+void State_Management(uint8_t inputState, uint8_t *StateChangeFlag);
+void Back(void);
+void Turn(uint8_t inputState);
+uint8_t Get_FirstState(void);
+uint8_t Get_SecondState(void);
 
 int main(void)
 {
@@ -65,30 +72,36 @@ int main(void)
 		GetData();
 		StateGet();
 		Transmit();
-		if (State == SETTINGSTATE)
+		switch (Get_FirstState())
 		{
-			OLED_ShowString(1, 5, "SETTING");
-			switch(Mode)
+			//右拨钮开关向下拨时，设置模式
+			case STATE_SETTING:
 			{
-				case 1:
-					OriginalMode();break;
-				case 2:
-					FeedMode();break;
-				case 3:
-					BuzzerMode();break;
-				case 4:
-					OtherMode();break;
-			}
-			if (KeyNum==KEY_LEFT && Mode!=1)		//返回
-				TurnMode(1);
-			CursorControl(SETTINGSTATE);
+				switch (State)
+				{
+					case STATE_SETTING_ORIGIN:
+						StateChangeFlag = Setting_OriginMode(&State, Select, KeyNum);break;
+					case STATE_SETTING_FEED:
+						FeedMode();break;
+					case STATE_SETTING_BUZZER:
+						StateChangeFlag = Setting_BuzzerMode(&State, Select, KeyNum);break;
+					case STATE_SETTING_OTHER:
+						StateChangeFlag = Setting_OtherMode(&State, Select, KeyNum);break;
+				}
+			}break;
+			//右拨钮开关向中拨时，控制模式
+			case STATE_CONTROL:
+			{
+				State2();
+			}break;
+			//右拨钮开关向上拨时，调试模式
+			case STATE_DEBUG:
+			{
+				Show();
+			}break;
 		}
-		else if (State == CONTROLSTATE)
-		{
-			State2();
-		}
-		else if (State == DEBUGSTATE)
-			Show();			
+		CursorControl(State);
+		State_Management(State, &StateChangeFlag);
 	}
 }
 
@@ -121,13 +134,35 @@ void Init(void)
 }
 
 /**
+  * @brief  Get the tens place in variable "State".
+  * @param  None
+  * @retval None
+  */
+
+uint8_t Get_FirstState(void)
+{
+	return State/10*10;
+}
+
+/**
+  * @brief  Get the ones place in variable "State".
+  * @param  None
+  * @retval None
+  */
+uint8_t Get_SecondState(void)
+{
+	return State%10;
+}
+
+/**
   * @brief  光标控制。
   * @param  ?
   * @retval ?
   */
-void CursorControl(uint8_t State)
+void CursorControl(uint8_t inputState)
 {
-	if (State == SETTINGSTATE)
+	inputState = inputState /10*10;
+	if (inputState == STATE_SETTING)
 	{
 		//光标移动
 		if (RockerNum_Y==UP_4 || KeyNum==KEY_UP)	//选择位减
@@ -135,7 +170,7 @@ void CursorControl(uint8_t State)
 		else if (RockerNum_Y==DOWN_4 || KeyNum==KEY_DOWN)	//选择位加
 				Select ++;
 	}
-	else if (State == CONTROLSTATE)
+	else if (inputState == STATE_CONTROL)
 	{
 		//光标移动
 		if (KeyNum==KEY_UP)	//选择位减
@@ -169,19 +204,19 @@ void StateGet(void)
 		if ((SwitchNum&0x02) != 0)	//三挡钮子开关向下拨
 		{
 			OLED_ShowString(Select, 15, "<-");
-			State = SETTINGSTATE;		
+			State = STATE_SETTING + State%10;		
 		}
 		else if ((SwitchNum&0x08) != 0)	//三挡钮子开关向中间拨
 		{
 			OLED_ShowString(Select, 15, "<-");
-			State = CONTROLSTATE;
+			State = STATE_CONTROL + State%10;
 		}
 		else 							//三挡钮子开关向上拨
-			State = DEBUGSTATE;
+			State = STATE_DEBUG + State%10;
 	}
 }
 
-void State2(void)
+uint8_t State2(void)
 {
 	OLED_ShowString(1, 2, "CONTROL");
 	OLED_ShowString(2, 1, "Speed:");
@@ -248,24 +283,25 @@ void State2(void)
 	}
 	if (KeyNum == KEY_PIN2_NUM)
 		NRF24L01_SetBuf(NORMAL_TRANSMIT, AUTO_FEED);
-	CursorControl(CONTROLSTATE);
+//	CursorControl(STATE_CONTROL);
+	return 0;
 }
 void GetData(void)
 {
 	KeyNum = Key_GetNum();
-	if (KeyNum != 0 && BuzzerChose==SET)
-		Buzzer_SetBeep(BeepNum, 100);
+	if (KeyNum != 0 && Get_BeepChose()==SET)
+		Buzzer_SetBeep(Get_BeepNum(), 100);
 	EncoderNum += Encoder_Get();
-	if (State == SETTINGSTATE)
+	if (State == STATE_SETTING)
 	{
 		//遥控器对”上下左右”的判定
 		RockerNum = Rocker_GetNum();
 		RockerNum_Y = RockerNum&0x0F;
 		RockerNum_X = (RockerNum&0xF0)>>4;
 	}
-	else if (State == DEBUGSTATE)
+	else if (State == STATE_DEBUG)
 	{
-		RockerNum = Rocker_GetNum2Loop();	//原始数据
+ 		RockerNum = Rocker_GetNum2Loop();	//原始数据
 		RockerNum_Y = RockerNum&0x0F;
 		RockerNum_X = (RockerNum&0xF0)>>4;
 		OLED_ShowNum(1, 3, RockerNum_X, 2);
@@ -273,55 +309,7 @@ void GetData(void)
 	}
 }
 
-void OriginalMode(void)
-{
-	OLED_ShowString(FeedLine, 1, "1.Feed:");
-	OLED_ShowString(BuzzerLine, 1, "2.Buzzer");
-	OLED_ShowString(4, 1, "3.Other");
-	if (FeedChose == RESET)
-		OLED_ShowString(FeedLine, 9, "All  ");
-	else
-		OLED_ShowString(FeedLine, 9, "Every");
-	if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_RIGHT)
-		TurnMode(Select);
-	switch(Select)
-	{
-		case 2:
-			if (KeyNum==KEY_PIN2_NUM || KeyNum==KEY_PIN3_NUM)
-				FeedChose =! FeedChose;
-			break;
-	}
-}
 
-void BuzzerMode(void)
-{
-	BeepNum %= Buzzer_NUM+1;
-	OLED_ShowNum(3, 12, BeepNum, 2);
-	if (BuzzerChose == SET)
-		OLED_ShowString(2, 10, "ON ");
-	else
-		OLED_ShowString(2, 10, "OFF");
-	switch(Select)
-	{
-		case 2:
-			if (KeyNum==KEY_PIN2_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					BuzzerChose = !BuzzerChose;	
-			break;
-		case 3:
-			//修改按键声音开关、按键提示音（减）		
-			if (BeepNum>0 && KeyNum==KEY_PIN2_NUM)
-				BeepNum --;
-			//修改按键声音开关、按键提示音（加）
-			if (BeepNum<Buzzer_NUM && KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-				BeepNum ++;
-			BeepNum += Encoder_Get();
-			break;
-		case 4:
-			if (KeyNum==KEY_RIGHT || KeyNum==KEY_PIN1_NUM)
-				TurnMode(1);
-			break;
-	}	
-}
 
 void FeedMode(void)
 {	
@@ -375,44 +363,60 @@ void FeedMode(void)
 	}	
 }
 
-void OtherMode(void)
+
+void State_Management(uint8_t inputState, uint8_t *StateChangeFlag)
 {
-	switch(Select)
+	//返回
+	if (KeyNum==KEY_BACK && Get_FirstState()==STATE_SETTING)
 	{
-		case 4:
-			if (KeyNum==KEY_RIGHT || KeyNum==KEY_PIN1_NUM)
-				TurnMode(1);
-			break;
-	}		
+		Back();
+		State = inputState /10*10;
+	}
+	//跳转
+	else if (*StateChangeFlag)
+		Turn(inputState);
+	//清零标志位
+	*StateChangeFlag = 0;
 }
 
-void TurnMode(uint8_t TurnMode)
+/**
+  * @brief  Back to last state.
+  * @param  None
+  * @retval None
+  */
+void Back(void)
 {
-	Mode = TurnMode;
 	OLED_Clear();
 	OLED_ShowString(Select, 15, "<-");
 	CloseBuzzer();		//防止Flash写入时出现声音异常
 	StoreData();
-	switch(TurnMode)
+}
+/**
+  * @brief  Turn to any state.
+  * @param  None
+  * @retval None
+  */
+void Turn(uint8_t inputState)
+{
+	Back();
+	switch(inputState)
 	{
-		case 1:
-			break;
-		case 3:
+		case STATE_SETTING_BUZZER:
 			OLED_ShowString(2, 1, "1.Buzzer:");
 			OLED_ShowString(3, 1, "2.KeyMusic:");
 			OLED_ShowString(4, 1, "3.Back");
 			break;
-		case 4:
+		case STATE_SETTING_OTHER:
 			OLED_ShowString(2, 1, "1.");
 			OLED_ShowString(3, 1, "2.");
 			OLED_ShowString(4, 1, "3.Back");			
-	}
+	}	
 }
 
 void StoreData(void)
 {
-	StoreArray[BuzzerChoseStore] = BuzzerChose;
-	StoreArray[BeepNumStore] = BeepNum;
+	StoreArray[BuzzerChoseStore] = Get_BeepChose();
+	StoreArray[BeepNumStore] = Get_BeepNum();
 	StoreArray[FeedTime1Store] = FeedTime1;
 	StoreArray[FeedTime2Store] = FeedTime2;
 	StoreArray[FeedTime3Store] = FeedTime3;
@@ -423,8 +427,8 @@ void StoreData(void)
 void ReadData(void)
 {
 	Flash_ReadArray_HalfWord(0x00, StoreArray, STORENUM);
-	BuzzerChose = StoreArray[BuzzerChoseStore];
-	BeepNum = StoreArray[BeepNumStore];
+	Set_BeepChose(StoreArray[BuzzerChoseStore]);
+	Set_BeepNum(StoreArray[BeepNumStore]);
 	FeedChose = StoreArray[FeedChoseStore];
 	FeedTime1 = StoreArray[FeedTime1Store];
 	FeedTime2 = StoreArray[FeedTime2Store];
@@ -451,7 +455,7 @@ void Transmit(void)
 	NRF24L01_SetBuf(NORMAL_TRANSMIT, 0);
 }
 
-void Show(void)
+uint8_t Show(void)
 {
 	OLED_ShowString(1, 1, "X:");
 	OLED_ShowString(1, 6, "Y:");
@@ -477,7 +481,7 @@ void Show(void)
 	OLED_ShowSignedNum(2, 9, EncoderNum, 4);
 	OLED_ShowNum(3, 3, ++Num, 2);
 	OLED_ShowHexNum(3, 8, RockerNum, 2);
-
+	return 0;
 }
 
 void Normal_IRQHandler(void)	//1ms
@@ -489,7 +493,7 @@ void Normal_IRQHandler(void)	//1ms
 		T3_Count[0] = 0;
 		Key_Loop();
 		Switch_Loop();
-		if (State==SETTINGSTATE)
+		if (State==STATE_SETTING)
 			Rocker_Loop();
 	}
 	

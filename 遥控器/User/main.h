@@ -3,6 +3,11 @@
 
 #define ORINGINAL_VOLTAGE		ADC_ConvertedValue[2]
 
+//抽象层
+#define KEY_ENTER				KEY_RIGHT
+#define KEY_ROCKER				KEY_PIN1_NUM
+#define KEY_BACK				KEY_LEFT			
+
 //发送的第n个数组
 #define NORMAL_TRANSMIT			0
 #define KEY_TRANSMIT			1
@@ -62,9 +67,13 @@ typedef enum{
 }RemoteDirection;
 
 typedef enum{
-	SETTINGSTATE = 1,
-	CONTROLSTATE = 2,
-	DEBUGSTATE = 3
+	STATE_SETTING = 10,
+	STATE_SETTING_ORIGIN = 10,
+	STATE_SETTING_FEED = 11,
+	STATE_SETTING_BUZZER = 12,
+	STATE_SETTING_OTHER = 13,
+	STATE_CONTROL = 20,
+	STATE_DEBUG = 30
 }RemoteState;
 
 typedef enum{

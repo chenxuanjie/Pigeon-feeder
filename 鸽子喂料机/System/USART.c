@@ -60,10 +60,10 @@ void USART1_GetBirdNum(uint8_t* Bird1, uint8_t* Bird2, uint8_t* Bird3)
 //        USART_SendData(USART1, USART_Temp[j]);
 //        OLED_ShowChar(1,j+1+3,USART_Temp[j]);
 	}
-    if ( strcmp(USART_Temp, "100020003000") == 0)
-        OLED_ShowNum(1,16,1,1);
-    else
-        OLED_ShowNum(1,16,0,1);
+//    if ( strcmp(USART_Temp, "100020003000") == 0)  //判断是否正常运行
+//        OLED_ShowNum(1,16,1,1);
+//    else
+//        OLED_ShowNum(1,16,0,1);
     //喂料时间1
 	if (USART_Temp[1]<'0' || USART_Temp[2]<'0' || USART_Temp[3]<'0')
 		*Bird1 = 0;
@@ -90,7 +90,7 @@ void Usart_SendString( USART_TypeDef * pUSARTx, char *str)
 	USART_SendData(pUSARTx,*(str + k));
 		
 	/* 等待发送数据寄存器为空 */
-	while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET) ;	
+	while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET)	
     k++;
   } while(*(str + k)!='\0');
   

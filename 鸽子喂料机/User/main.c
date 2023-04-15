@@ -9,6 +9,12 @@
 		5.ENCODER_TRANSMIT：旋转编码器。
 */
 
+/*
+Program: pigeon-feeder
+History:
+	2023/4/14	Shane	16th release
+	code refactoring. 代码重构
+*/
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
 #include "main.h"
@@ -24,17 +30,18 @@
 #include "Feed.h"
 //#include "Hcsr04.h"
 
-int16_t Set_Data,Set_Speed=20, Num;
-uint8_t Flag, Hcsr04_StartFlag;
+int16_t Set_Data,Set_Speed=20, Num;//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
+uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
 uint8_t Info1, Info2, Info3, Info4, State0;
 uint8_t X, Y, Value;
 float Distance1, Distance2, Distance3, Distance4;
-int16_t SpeedLeft=0,SpeedRight=0;
+int16_t SpeedLeft=0,SpeedRight=0,SpeedRight_Robot=0,SpeedLeft_Robot=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
-uint8_t DataReset=1;
+uint8_t DataReset=1,StopFlag=0;
+uint8_t Left=0,Right=0;
 uint8_t State=1;
 uint32_t feedTime1, feedTime2, feedTime3;
-
+uint32_t T2Count[3];
 void Speed(int16_t data);
 void Data_Analyse(void);
 void Distance_Get(void);
@@ -43,7 +50,8 @@ void State2(void);
 void State3(void);
 void While_Init(void);
 void GetBirdNum(void);
-
+void HandleData(void);
+	
 int main(void)
 {	
 	LED_Init();
@@ -72,14 +80,90 @@ int main(void)
 		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
 		GPIO_Init(GPIOA, &GPIO_InitStructure);		
 
+		OLED_ShowString(3, 1, "1:");
+		OLED_ShowString(3, 6, "2:");
+		OLED_ShowString(3, 12, "3:");
 	while (1)
 	{
+		OLED_ShowHexNum(1,12,Value,4);  //遥杆坐标
 		OLED_ShowNum(2,1,feedTime1,4);
 		OLED_ShowNum(2,6,feedTime2,4);
 		OLED_ShowNum(2,11,feedTime3,4);
+
+//监测剩余饲料
+//1	
+		if(Distance1 > 169.7)
+		{
+			OLED_ShowString(3, 3, "Lo");
+		}
+		else
+		{	
+			if(Distance1 > 62.35 && Distance1 <= 169.7)
+			{
+				OLED_ShowString(3, 3, "Mi");
+			}
+			
+			else
+			{
+				OLED_ShowString(3, 3, "Fu");
+			}
+			
+		}
+
+//2
+		if(Distance2 > 169.7)
+		{
+			OLED_ShowString(3, 8, "Lo");
+		}
+		else
+		{	
+			if(Distance2 > 62.35 && Distance2 <= 169.7)
+			{
+				OLED_ShowString(3, 8, "Mi");
+			}
+			
+			else
+			{
+				OLED_ShowString(3, 8, "Fu");
+			}
+			
+		}
+		
+//3
+		if(Distance3 > 169.7)
+		{
+			OLED_ShowString(3, 14, "Lo");
+		}
+		else
+		{	
+			if(Distance3 > 62.35 && Distance3 <= 169.7)
+			{
+				OLED_ShowString(3, 14, "Mi");
+			}
+			
+			else
+			{
+				OLED_ShowString(3, 14, "Fu");
+			}
+			
+		}
+		
+		
+
+//		OLED_ShowNum(3 , 1, Distance1/10, 2);
+////		OLED_ShowString(3, 3,"%");
+//		OLED_ShowNum(3 , 5, Distance2/10, 2);
+////		OLED_ShowString(3, 7,"%");
+//		OLED_ShowNum(3 , 9, Distance3/10, 2);
+////		OLED_ShowString(3, 11,"%");
+////		OLED_ShowNum(3 , 13, Distance4/10, 2);//避障用
 	
 		While_Init();
-		switch (State)
+		if(Left >=2)
+			Left--;
+		if(Right >=2)
+			Right--;
+		switch (State)//遥控右上角拨杆档位
 		{
 			case SETTINGSTATE://下
 				State3();
@@ -92,18 +176,15 @@ int main(void)
 				break;
 		}
 		
-
+		HandleData();
+		if(StopFlag==SET ){SpeedLeft=0;SpeedRight=0;}
 		
-		 DataReset++;
-		 DataReset%=20;
-	if(DataReset ==0)
-		 NRF24L01_DataReset(); //按键信息自动重置，防FNR通讯中断导致失控
 
 /*********************算法驱动************************************/
-		SpeedLeft=LeftInversion*LeftCalibration*SpeedConversion(SpeedLeft);
-		SpeedRight=RightInversion*RightCalibration*SpeedConversion(SpeedRight);
+		SpeedLeft_Robot=LeftInversion*LeftCalibration*SpeedConversion(SpeedLeft);
+		SpeedRight_Robot=RightInversion*RightCalibration*SpeedConversion(SpeedRight);
 
-			Robot_Move(SpeedLeft,SpeedRight);
+			Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 
 
 
@@ -118,9 +199,9 @@ void While_Init()
 		GetBirdNum();
 		Distance_Get();
 		StartFeed(&feedTime1, &feedTime2, &feedTime3);
-		OLED_ShowNum(1,14,State,2); 
-		Num ++;
-		OLED_ShowNum(1, 16, Num, 1);
+//		OLED_ShowNum(1,14,State,2); 
+//		Num ++;
+//		OLED_ShowNum(1, 16, Num, 1);
 		State0 = NRF24L01_ReadByte(STATUS);
 		Info1 = NRF24L01_ReadByte(EN_AA);
 		Info2 = NRF24L01_ReadByte(EN_RXADDR);
@@ -165,10 +246,12 @@ void State1(void)
 		if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM+SWITCH2_PIN1_NUM)	//拨钮开关05启用普通按键控制
 	{
 	/*********************摇杆检测************************************/
+		//根据遥杠调整电机速度
 	NRF24L01_GetData(ROCKER_TRANSMIT);
 
 		switch(Y)
 		{
+			case 0x09:Speed(0x00);break;
 			case UP_1:Speed(Set_Speed/10);break;
 			case UP_2:Speed(Set_Speed/4);break;
 			case UP_3:Speed(Set_Speed/2);break;
@@ -177,7 +260,7 @@ void State1(void)
 			case DOWN_2:Speed(-Set_Speed/4);break;
 			case DOWN_3:Speed(-Set_Speed/2);break;
 			case DOWN_4:Speed(-Set_Speed);break;
-		}	
+		}
 			LeftInversion=1;RightInversion=1;
 		switch(X)
 		{			
@@ -196,7 +279,7 @@ void State1(void)
 	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//急停
+////			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//急停
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//启动
 			case KEY_PIN2_NUM		:	TSDA_Order(LeftWheel,MotorStop);TSDA_Order(RightWheel,MotorStop);break;//关闭
 			case KEY_PIN3_NUM		:	SpeedLeft=0;SpeedRight=0;break;//急停
@@ -300,6 +383,36 @@ void Data_Analyse(void)
 	}
 }
 
+void HandleData(void)
+{
+	static uint8_t LastSwitchNum, NormalNum, LastLinkFlag, NowLinkFlag;
+	NormalNum = NRF24L01_GetData(NORMAL_TRANSMIT);
+
+	//断开连接的情况
+	LastLinkFlag = NowLinkFlag;
+	NowLinkFlag = LINK_FLAG;
+	if (LastLinkFlag==0 && NowLinkFlag==1)
+	StopFlag=RESET;
+	else if (LastLinkFlag==1 && NowLinkFlag==0) //通讯断开
+	{StopFlag=SET;
+	}
+	//常规发送位最高位作为连接标志位	
+	if ((NormalNum&0x80)!=RESET && Error==SET)	//半秒后最高位没有被清除
+	{
+
+		LINK_FLAG = 0;
+	}
+	else if ((NormalNum&0x80)==RESET && Error==SET)//正常工作
+	{
+
+		LINK_FLAG = 1;
+		Error = RESET;		//不是错误情况
+		T2Count[2] = 0;		
+		NRF24L01_SetRXBuf(NORMAL_TRANSMIT, (NormalNum |= 0x80));	//置位标志位，看下次是否被清除
+
+	}
+	
+}
 void Speed(int16_t data)
 {
 
@@ -331,11 +444,23 @@ void Distance_Get(void)
 //	OLED_ShowNum(3 , 14, (uint32_t)Distance4%10 ,1);
 }
 
+
+
+
 void TIM2_IRQHandler(void)
 {
-	static uint32_t T2Count[3];
+
 	if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update) == SET)
 	{
+			//0.5s无响应，则断开连接
+		T2Count[2] ++;
+		if (T2Count[2] >= 500)
+		{
+			Error = SET;
+		}
+		else
+			Error = RESET;
+		
 		T2Count[0]++;
 		if (T2Count[0] >= 100)
 		{
@@ -367,7 +492,7 @@ void TIM2_IRQHandler(void)
 		else feedTime2 = 0;
 		if (feedTime3 > 0) feedTime3 --;
 		else feedTime3 = 0;
-			
+		
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
 }
