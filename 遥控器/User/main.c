@@ -35,13 +35,13 @@ History:
 #include "State3.h"
 
 
-uint8_t Num=0, RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum;
-uint8_t FeedChose, FeedSwitch, Mode=1, Select=2, LastSelect, State=10, State1;
+uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum;
+uint8_t FeedChose, FeedSwitch, Select=2, LastSelect, State=10, State1;
 uint8_t FeedTime1, FeedTime2, FeedTime3;
-uint8_t Info1, Info2, Info3, Info4, State, StateChangeFlag;
+uint8_t State, StateChangeFlag;
 uint16_t Voltage;
 uint32_t FeedTime1Temp, FeedTime2Temp, FeedTime3Temp, FeedTemp;
-int16_t EncoderNum, Speed;
+int16_t EncoderNum;
 
 uint16_t StoreArray[STORENUM] = {0};
 
@@ -51,9 +51,8 @@ void StoreData(void);
 void ReadData(void);
 void Transmit(void);
 void GetData(void);
-void StateGet(void);
+void Get_State(void);
 uint8_t State2(void);
-uint8_t Show(void);
 void CursorControl(uint8_t State);
 void FeedMode(void);
 void Normal_IRQHandler(void);
@@ -70,7 +69,7 @@ int main(void)
 	while (1)
 	{
 		GetData();
-		StateGet();
+		Get_State();
 		Transmit();
 		switch (Get_FirstState())
 		{
@@ -97,7 +96,7 @@ int main(void)
 			//右拨钮开关向上拨时，调试模式
 			case STATE_DEBUG:
 			{
-				Show();
+				Show(KeyNum, SwitchNum, EncoderNum, RockerNum);
 			}break;
 		}
 		CursorControl(State);
@@ -193,7 +192,7 @@ void CursorControl(uint8_t inputState)
 	}		
 }
 
-void StateGet(void)
+void Get_State(void)
 {
 	static uint8_t LastSwitchNum;
 	LastSwitchNum = SwitchNum;
@@ -219,9 +218,6 @@ void StateGet(void)
 uint8_t State2(void)
 {
 	OLED_ShowString(1, 2, "CONTROL");
-	OLED_ShowString(2, 1, "Speed:");
-	OLED_ShowNum(2, 7, Speed, 3);
-	OLED_ShowString(2, 10, "cm/s");
 	OLED_ShowString(3, 1, "Feed:");
 
 	OLED_ShowString(4, 1, "ON:");
@@ -256,18 +252,9 @@ uint8_t State2(void)
 		OLED_ShowString(4, 10, "   ");			
 	}
 	Voltage_Get();
-	if (Speed < 0)
-		Speed = 0;
-	Speed += Encoder_Get();	
 	NRF24L01_SetBuf(NORMAL_TRANSMIT, FeedSwitch + 1);	//设置准备发送的喂料开关		
 	switch(Select)
 	{
-		case 2:
-			if (KeyNum==KEY_LEFT && Speed>0)
-				Speed --;
-			else if (KeyNum==KEY_RIGHT && Speed<1000)
-				Speed ++;
-			break;
 		case 3:
 			if (KeyNum==KEY_LEFT || KeyNum==KEY_RIGHT)
 			{
@@ -455,34 +442,7 @@ void Transmit(void)
 	NRF24L01_SetBuf(NORMAL_TRANSMIT, 0);
 }
 
-uint8_t Show(void)
-{
-	OLED_ShowString(1, 1, "X:");
-	OLED_ShowString(1, 6, "Y:");
-	OLED_ShowString(1, 11, "K:");
-	OLED_ShowString(2, 1, "Encoder:");
-	OLED_ShowString(3, 1, "N:");
-	OLED_ShowString(3, 6, "S:");
-	OLED_ShowString(3, 11, "H:");
-	State1 = NRF24L01_ReadByte(STATUS);
-	Info1 = NRF24L01_ReadByte(EN_AA);
-	Info2 = NRF24L01_ReadByte(EN_RXADDR);
-	Info3 = NRF24L01_ReadByte(RX_ADDR_P0);
-	Info4 = NRF24L01_ReadByte(FIFO_STATUS);
-	OLED_ShowHexNum(4, 1, State1, 2);
-	OLED_ShowHexNum(4, 4, Info1, 2);
-	OLED_ShowHexNum(4, 7, Info2, 2);
-	OLED_ShowHexNum(4, 10, Info3, 2);
-	OLED_ShowHexNum(4, 13, Info4, 2);
-	if (KeyNum != 0)
-		OLED_ShowNum(1, 13, KeyNum, 2);
-	if (SwitchNum != 0)
-		OLED_ShowNum(3, 13, SwitchNum, 2);
-	OLED_ShowSignedNum(2, 9, EncoderNum, 4);
-	OLED_ShowNum(3, 3, ++Num, 2);
-	OLED_ShowHexNum(3, 8, RockerNum, 2);
-	return 0;
-}
+
 
 void Normal_IRQHandler(void)	//1ms
 {

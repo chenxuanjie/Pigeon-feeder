@@ -36,6 +36,7 @@ uint8_t Get_BeepChose(void)
   */
 uint8_t Setting_OriginMode(uint8_t *State, uint8_t Select, uint8_t KeyNum)
 {
+	OLED_ShowString(1, 2, "SETTING");
 	OLED_ShowString(FeedLine, 1, "1.Feed:");
 	OLED_ShowString(BuzzerLine, 1, "2.Buzzer");
 	OLED_ShowString(4, 1, "3.Other");
