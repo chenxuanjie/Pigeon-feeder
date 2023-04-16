@@ -46,7 +46,6 @@ uint32_t T2Count[3];
 void Init(void);
 void Speed(int16_t data);
 void Data_Analyse(void);
-void Get_Distance(void);
 void State1(void);
 void State2(void);
 void State3(void);
@@ -77,7 +76,6 @@ int main(void)
 		OLED_ShowNum(2,6,feedTime2,4);
 		OLED_ShowNum(2,11,feedTime3,4);
 		
-		MonitorFeed();
 			
 		While_Init();
 		if(Left >=2)
@@ -135,7 +133,8 @@ void Init(void)
 void While_Init()
 {
 	Get_BirdNum();
-	Get_Distance();
+	Get_Distance(&Hcsr04_StartFlag);
+	MonitorFeed();
 	StartFeed(&feedTime1, &feedTime2, &feedTime3);
 	//		OLED_ShowNum(1,14,State,2); 
 	//		Num ++;
@@ -169,9 +168,7 @@ void While_Init()
 	NRF24L01_GetData(SWITCH_TRANSMIT);	
 	NRF24L01_GetData(ROCKER_TRANSMIT)	;
 	NRF24L01_GetData(ENCODER_TRANSMIT);	
-	Data_Analyse();
-		
-		
+	Data_Analyse();	
 }
 
 void State1(void)
@@ -319,7 +316,7 @@ void Data_Analyse(void)
 
 void HandleData(void)
 {
-	static uint8_t LastSwitchNum, NormalNum, LastLinkFlag, NowLinkFlag;
+	static uint8_t NormalNum, LastLinkFlag, NowLinkFlag;
 	NormalNum = NRF24L01_GetData(NORMAL_TRANSMIT);
 
 	//断开连接的情况

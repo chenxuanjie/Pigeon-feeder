@@ -14,18 +14,18 @@ float Distance1, Distance2, Distance3, Distance4;
   * @param  Hcsr04_StartFlag: 超声波使能位
   * @retval None
   */
-void Get_Distance(uint8_t Hcsr04_StartFlag)
+void Get_Distance(uint8_t *Hcsr04_StartFlag)
 {
-	if (Hcsr04_StartFlag&0x08)	//超声波是否使能
+	if ((*Hcsr04_StartFlag)&0x08)	//超声波是否使能
 	{
-		switch(Hcsr04_StartFlag&0x07)	//第几个超声波运行
+		switch((*Hcsr04_StartFlag)&0x07)	//第几个超声波运行
 		{
 			case 1: Distance1 = Hcsr04_GetDistance1();break;
 			case 2: Distance2 = Hcsr04_GetDistance2();break;
 			case 3: Distance3 = Hcsr04_GetDistance3();break;
 			case 4: Distance4 = Hcsr04_GetDistance4();break;						
 		}
-	Hcsr04_StartFlag &= 0x07;		//清除使能位
+	(*Hcsr04_StartFlag) &= 0x07;		//清除使能位
 	}	
 	//show
 //	OLED_ShowNum(2 , 3, Distance1/10, 2);
@@ -45,62 +45,37 @@ void Get_Distance(uint8_t Hcsr04_StartFlag)
   */
 void MonitorFeed(void)
 {
-//监测剩余饲料
 //1	
 		if(Distance1 > 169.7)
-		{
 			OLED_ShowString(3, 3, "Lo");
-		}
 		else
 		{	
 			if(Distance1 > 62.35 && Distance1 <= 169.7)
-			{
 				OLED_ShowString(3, 3, "Mi");
-			}
-			
 			else
-			{
 				OLED_ShowString(3, 3, "Fu");
-			}
-			
 		}
 
 //2
 		if(Distance2 > 169.7)
-		{
 			OLED_ShowString(3, 8, "Lo");
-		}
 		else
 		{	
 			if(Distance2 > 62.35 && Distance2 <= 169.7)
-			{
 				OLED_ShowString(3, 8, "Mi");
-			}
-			
 			else
-			{
 				OLED_ShowString(3, 8, "Fu");
-			}
-			
 		}
 		
 //3
 		if(Distance3 > 169.7)
-		{
 			OLED_ShowString(3, 14, "Lo");
-		}
 		else
-		{	
+		{
 			if(Distance3 > 62.35 && Distance3 <= 169.7)
-			{
 				OLED_ShowString(3, 14, "Mi");
-			}
-			
 			else
-			{
 				OLED_ShowString(3, 14, "Fu");
-			}
-			
 		}
 }
 

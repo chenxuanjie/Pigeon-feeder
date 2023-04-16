@@ -5,6 +5,7 @@
 
 extern uint32_t Timeout;
 
+void Get_Distance(uint8_t *Hcsr04_StartFlag);
 void Feeding_Init(void);
 void Get_BirdNum(void);
 void GetFeedTime(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3);
