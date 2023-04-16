@@ -44,3 +44,4 @@
 .\objects\main.o: User\State1.h
 .\objects\main.o: User\State2.h
 .\objects\main.o: User\State3.h
+.\objects\main.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h

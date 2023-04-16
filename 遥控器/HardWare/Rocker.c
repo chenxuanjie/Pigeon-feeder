@@ -15,10 +15,10 @@ void Rocker_Init(void)
 
 uint8_t Rocker_GetNum2Loop(void)
 {
-	/*以实际遥控的物理位置标定xy*/
+	/*以实际遥控的物理位置标定X、Y*/
 	uint8_t Value=0, X=0, Y=0;
-	Y = (float)ROCKER_X/4096*100;
-	X = (float)ROCKER_Y/4096*100;
+	X = (float)ROCKER_X/4096*100;
+	Y = (float)ROCKER_Y/4096*100;
 //	OLED_ShowNum(1, 3, X, 2);
 //	OLED_ShowNum(1, 8, Y, 2);
 	if (X>=40 && X<=59)
@@ -27,39 +27,39 @@ uint8_t Rocker_GetNum2Loop(void)
 			return MEDIWM;	
 	}
 	if (X<=9)
-		X = LEFT_4;
+		X = Y_F4;
 	else if (X>=10 && X<=19)
-		X = LEFT_3;
+		X = Y_F3;
 	else if (X>=20 && X<=29)
-		X = LEFT_2;
+		X = Y_F2;
 	else if (X>=30 && X<=39)
-		X = LEFT_1;
+		X = Y_F1;
 	else if (X>=60 && X<=69)
-		X = RIGHT_1;
+		X = Y_Z1;
 	else if (X>=70 && X<=79)
-		X = RIGHT_2;
+		X = Y_Z2;
 	else if (X>=80 && X<=89)
-		X = RIGHT_3;
+		X = Y_Z3;
 	else if (X>=90 && X<=99)
-		X = RIGHT_4;
+		X = Y_Z4;
 	else X = 0;
 
 	if (Y<=9)
-		Y = UP_4;
+		Y = X_F4;
 	else if (Y>=10 && Y<=19)
-		Y = UP_3;
+		Y = X_F3;
 	else if (Y>=20 && Y<=29)
-		Y = UP_2;
+		Y = X_F2;
 	else if (Y>=30 && Y<=39)
-		Y = UP_1;
+		Y = X_F1;
 	else if (Y>=60 && Y<=69)
-		Y = DOWN_1;
+		Y = X_Z1;
 	else if (Y>=70 && Y<=79)
-		Y = DOWN_2;
+		Y = X_Z2;
 	else if (Y>=80 && Y<=89)
-		Y = DOWN_3;
+		Y = X_Z3;
 	else if (Y>=90 && Y<=99)
-		Y = DOWN_4;	
+		Y = X_Z4;	
 	else Y = 0;
 	
 	Value = (X&0x0F) | ((Y&0x0F)<<4);
