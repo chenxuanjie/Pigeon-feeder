@@ -31,22 +31,22 @@
 #define KEY_RIGHT				KEY_PIN7_NUM
 
 //摇杆抽象层(F为负，Z为正) 		ROCKER_TRANSMIT
-#define UP_1					X_F1		//1,2,3,4表示程度。1为最小，5最大。
-#define UP_2					X_F2
-#define UP_3					X_F3
-#define UP_4					X_F4
-#define DOWN_1					X_Z1
-#define DOWN_2					X_Z2
-#define DOWN_3					X_Z3
-#define DOWN_4					X_Z4
-#define LEFT_1					Y_F1
-#define LEFT_2					Y_F2
-#define LEFT_3					Y_F3
-#define LEFT_4					Y_F4
-#define RIGHT_1					Y_Z1
-#define RIGHT_2					Y_Z2
-#define RIGHT_3					Y_Z3
-#define RIGHT_4					Y_Z4
+#define UP_1					Y_F1		//1,2,3,4表示程度。1为最小，5最大。
+#define UP_2					Y_F2
+#define UP_3					Y_F3
+#define UP_4					Y_F4
+#define DOWN_1					Y_Z1
+#define DOWN_2					Y_Z2
+#define DOWN_3					Y_Z3
+#define DOWN_4					Y_Z4
+#define LEFT_1					X_F1
+#define LEFT_2					X_F2
+#define LEFT_3					X_F3
+#define LEFT_4					X_F4
+#define RIGHT_1					X_Z1
+#define RIGHT_2					X_Z2
+#define RIGHT_3					X_Z3
+#define RIGHT_4					X_Z4
 
 //物理层(F为负，Z为正)
 #define X_F1					0x1		//1,2,3,4表示程度。1为最小，5最大。

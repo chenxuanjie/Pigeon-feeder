@@ -27,39 +27,39 @@ uint8_t Rocker_GetNum2Loop(void)
 			return MEDIWM;	
 	}
 	if (X<=9)
-		X = Y_F4;
+		X = X_F4;
 	else if (X>=10 && X<=19)
-		X = Y_F3;
+		X = X_F3;
 	else if (X>=20 && X<=29)
-		X = Y_F2;
+		X = X_F2;
 	else if (X>=30 && X<=39)
-		X = Y_F1;
+		X = X_F1;
 	else if (X>=60 && X<=69)
-		X = Y_Z1;
+		X = X_Z1;
 	else if (X>=70 && X<=79)
-		X = Y_Z2;
+		X = X_Z2;
 	else if (X>=80 && X<=89)
-		X = Y_Z3;
+		X = X_Z3;
 	else if (X>=90 && X<=99)
-		X = Y_Z4;
+		X = X_Z4;
 	else X = 0;
 
 	if (Y<=9)
-		Y = X_F4;
+		Y = Y_F4;
 	else if (Y>=10 && Y<=19)
-		Y = X_F3;
+		Y = Y_F3;
 	else if (Y>=20 && Y<=29)
-		Y = X_F2;
+		Y = Y_F2;
 	else if (Y>=30 && Y<=39)
-		Y = X_F1;
+		Y = Y_F1;
 	else if (Y>=60 && Y<=69)
-		Y = X_Z1;
+		Y = Y_Z1;
 	else if (Y>=70 && Y<=79)
-		Y = X_Z2;
+		Y = Y_Z2;
 	else if (Y>=80 && Y<=89)
-		Y = X_Z3;
+		Y = Y_Z3;
 	else if (Y>=90 && Y<=99)
-		Y = X_Z4;	
+		Y = Y_Z4;	
 	else Y = 0;
 	
 	Value = (X&0x0F) | ((Y&0x0F)<<4);
