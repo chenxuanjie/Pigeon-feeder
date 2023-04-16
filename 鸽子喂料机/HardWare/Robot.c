@@ -30,9 +30,11 @@ void Robot_Init(void)
 {
 	TSDA_Order(LeftWheel,MotorStop);
 	TSDA_Order(RightWheel,MotorStop);
+	//开启通讯中断自动停机
 	TSDA_Order(LeftWheel,CommunicationOutage_ON);
 	TSDA_Order(RightWheel,CommunicationOutage_ON);
 	Delay_ms(10);
+	//选择速度模式输入
 	TSDA_Order(LeftWheel,SpeedMod);
 	TSDA_Order(RightWheel,SpeedMod);
 	Delay_ms(10);	

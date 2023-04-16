@@ -48,7 +48,7 @@ void USART1_Config(void)
 /**
   * @brief  串口向电脑调用视觉，得到要喂料的时间。
   * @param  
-  * @retval 
+  * @retval None
   */
 void USART1_GetBirdNum(uint8_t* Bird1, uint8_t* Bird2, uint8_t* Bird3)
 {

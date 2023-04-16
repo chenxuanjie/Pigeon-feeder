@@ -5,9 +5,10 @@
 
 extern uint32_t Timeout;
 
-void Feed_Init(void);
-void GetBirdNum(void);
+void Feeding_Init(void);
+void Get_BirdNum(void);
 void GetFeedTime(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3);
 void StartFeed(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3);
+void MonitorFeed(void);
 
 #endif

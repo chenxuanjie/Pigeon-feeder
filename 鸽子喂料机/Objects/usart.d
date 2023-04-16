@@ -1,7 +1,7 @@
 .\objects\usart.o: System\USART.c
 .\objects\usart.o: .\Start\stm32f10x.h
 .\objects\usart.o: .\Start\core_cm3.h
-.\objects\usart.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\usart.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\usart.o: .\Start\system_stm32f10x.h
 .\objects\usart.o: .\User\stm32f10x_conf.h
 .\objects\usart.o: .\Library\stm32f10x_adc.h
@@ -29,6 +29,6 @@
 .\objects\usart.o: .\Library\stm32f10x_wwdg.h
 .\objects\usart.o: .\Library\misc.h
 .\objects\usart.o: System\USART.h
-.\objects\usart.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\usart.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\string.h
+.\objects\usart.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\usart.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\string.h
 .\objects\usart.o: .\HardWare\OLED.h

@@ -1,7 +1,7 @@
 .\objects\feed.o: HardWare\Feed.c
 .\objects\feed.o: .\Start\stm32f10x.h
 .\objects\feed.o: .\Start\core_cm3.h
-.\objects\feed.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\feed.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\feed.o: .\Start\system_stm32f10x.h
 .\objects\feed.o: .\User\stm32f10x_conf.h
 .\objects\feed.o: .\Library\stm32f10x_adc.h
@@ -29,7 +29,8 @@
 .\objects\feed.o: .\Library\stm32f10x_wwdg.h
 .\objects\feed.o: .\Library\misc.h
 .\objects\feed.o: .\System\USART.h
-.\objects\feed.o: C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\feed.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\feed.o: HardWare\OLED.h
 .\objects\feed.o: HardWare\Feed.h
 .\objects\feed.o: HardWare\Relay.h
+.\objects\feed.o: HardWare\Hcsr04.h

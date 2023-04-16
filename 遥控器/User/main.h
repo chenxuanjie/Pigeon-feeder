@@ -30,7 +30,7 @@
 #define KEY_LEFT				KEY_PIN6_NUM
 #define KEY_RIGHT				KEY_PIN7_NUM
 
-//摇杆抽象层(F为负，Z为正) 		ROCKER_TRANSMIT
+//摇杆应用层(F为负，Z为正) 		ROCKER_TRANSMIT
 #define UP_1					Y_F1		//1,2,3,4表示程度。1为最小，5最大。
 #define UP_2					Y_F2
 #define UP_3					Y_F3

@@ -33,23 +33,40 @@
 #define SWITCH3_PIN2_NUM		(0x1 << 2)	//三档钮子开关，
 #define SWITCH3_NONE			(0x1 << 3)	//三档钮子开关，中间
 
-//摇杆 ROCKER_TRANSMIT
-#define UP_1					0x1		//1,2,3,4表示程度。1为最小，5最大。
-#define UP_2					0x2
-#define UP_3					0x3
-#define UP_4					0x4
-#define DOWN_1					0x5
-#define DOWN_2					0x6
-#define DOWN_3					0x7
-#define DOWN_4					0x8
-#define LEFT_1					0x1
-#define LEFT_2					0x2
-#define LEFT_3					0x3
-#define LEFT_4					0x4
-#define RIGHT_1					0x5
-#define RIGHT_2					0x6
-#define RIGHT_3					0x7
-#define RIGHT_4					0x8
+//摇杆应用层(F为负，Z为正) 		ROCKER_TRANSMIT
+#define UP_1					Y_F1		//1,2,3,4表示程度。1为最小，5最大。
+#define UP_2					Y_F2
+#define UP_3					Y_F3
+#define UP_4					Y_F4
+#define DOWN_1					Y_Z1
+#define DOWN_2					Y_Z2
+#define DOWN_3					Y_Z3
+#define DOWN_4					Y_Z4
+#define LEFT_1					X_F1
+#define LEFT_2					X_F2
+#define LEFT_3					X_F3
+#define LEFT_4					X_F4
+#define RIGHT_1					X_Z1
+#define RIGHT_2					X_Z2
+#define RIGHT_3					X_Z3
+#define RIGHT_4					X_Z4
+//物理层(F为负，Z为正)
+#define X_F1					0x1		//1,2,3,4表示程度。1为最小，5最大。
+#define X_F2					0x2
+#define X_F3					0x3
+#define X_F4					0x4
+#define X_Z1					0x5
+#define X_Z2					0x6
+#define X_Z3					0x7
+#define X_Z4					0x8
+#define Y_F1					0x1
+#define Y_F2					0x2
+#define Y_F3					0x3
+#define Y_F4					0x4
+#define Y_Z1					0x5
+#define Y_Z2					0x6
+#define Y_Z3					0x7
+#define Y_Z4					0x8
 #define MEDIWM					0x99
 
 typedef enum{

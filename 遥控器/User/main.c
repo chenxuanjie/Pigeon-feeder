@@ -12,8 +12,8 @@
 
 Program: 遥控器
 History:
-	2023/4/14	Shane	16th release
-	code refactoring. 代码重构
+	2023/4/16	Shane	16th release
+	add some definition of remote control. 代码重构
 */
 
 #include "stm32f10x.h"                  // Device header

@@ -11,7 +11,7 @@
 void Relay_Init(void)
 {
 	RCC_APB2PeriphClockCmd(RELAY_APBPEIRPH | RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);	//重定义PB4引脚功能，免得无法使用
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);	//重定义PB4引脚功能，免得无法使用该引脚
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Pin = RELAY1_PIN | RELAY2_PIN | RELAY3_PIN | RELAY4_PIN;
@@ -25,7 +25,8 @@ void Relay_Init(void)
 
 /**
   * @brief  喂料器的打开与关闭
-  * @param  SET:打开 	RESET：关闭
+* @param  Value: ALL
+		  State:SET:打开 	RESET：关闭
   * @retval 无
   */
 void Relay_Set(uint8_t Value, uint8_t State)

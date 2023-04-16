@@ -8,61 +8,47 @@ Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
 License Information: 1 1, 1, LIC=03C6R-KP1BX-DYTV3-A1T5Q-XFR8S-MGIY3
  
 Tool Versions:
-Toolchain:       MDK-ARM Plus  Version: <unknown>
-Toolchain Path:  C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin
-C Compiler:      Armcc.exe
-Assembler:       Armasm.exe
-Linker/Locator:  ArmLink.exe
-Library Manager: ArmAr.exe
-Hex Converter:   FromElf.exe
-CPU DLL:         SARMCM3.DLL
-Dialog DLL:      DCM.DLL
-    Target DLL: STLink\ST-LINKIII-KEIL_SWO.dll
-Dialog DLL:      TCM.DLL
+Toolchain:       MDK-ARM Plus  Version: 5.24.1
+Toolchain Path:  D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 5 (build 528)
+Assembler:       Armasm.exe V5.06 update 5 (build 528)
+Linker/Locator:  ArmLink.exe V5.06 update 5 (build 528)
+Library Manager: ArmAr.exe V5.06 update 5 (build 528)
+Hex Converter:   FromElf.exe V5.06 update 5 (build 528)
+CPU DLL:         SARMCM3.DLL V5.24.1
+Dialog DLL:      DCM.DLL V1.16.0.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.1.0
+Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
-C:\Users\admin\Desktop\Pigeon-feeder\鸽子喂料机\Project.uvprojx
-Project File Date:  06/13/2022
+C:\Users\admin\Desktop\Pigeon-feeder\16th\Pigeon-feeder\鸽子喂料机\Project.uvprojx
+Project File Date:  04/16/2023
 
 <h2>Output:</h2>
-*** Using Compiler '5.06 update 4 (build 528)', folder: 'C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin'
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin'
 Build target 'Target 1'
-assembling startup_stm32f10x_md.s...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmAsm" --via ".\objects\startup_stm32f10x_md._ia"'
-compiling stm32f10x_adc.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_adc.__i"'
-compiling core_cm3.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\core_cm3.__i"'
-compiling misc.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\misc.__i"'
-compiling system_stm32f10x.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\system_stm32f10x.__i"'
-compiling stm32f10x_can.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_can.__i"'
-compiling stm32f10x_cec.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_cec.__i"'
-compiling stm32f10x_crc.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_crc.__i"'
-compiling stm32f10x_dac.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_dac.__i"'
-compiling stm32f10x_bkp.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_bkp.__i"'
-compiling stm32f10x_dbgmcu.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_dbgmcu.__i"'
-compiling stm32f10x_dma.c...
-*** Error: CreateProcess failed, Command: '"C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmCC" --via ".\objects\stm32f10x_dma.__i"'
+compiling main.c...
+User\main.c(322): warning:  #177-D: variable "LastSwitchNum"  was declared but never referenced
+  	static uint8_t LastSwitchNum, NormalNum, LastLinkFlag, NowLinkFlag;
+User\main.c: 1 warning, 0 errors
 linking...
---- Error: failed to execute 'C:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\ArmLink'
-".\Objects\Project.axf" - 1 Error(s), 0 Warning(s).
+Program Size: Code=14118 RO-data=1790 RW-data=168 ZI-data=1680  
+FromELF: creating hex file...
+".\Objects\Project.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F1xx_DFP.2.4.0.pack
+                Keil.STM32F1xx_DFP.2.4.0
+                STMicroelectronics STM32F1 Series Device Support, Drivers and Examples
+
 <h2>Collection of Component include folders:</h2>
   .\RTE\_Target_1
+  C:\Pigeon-feeder\Keil\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Target not created.
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

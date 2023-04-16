@@ -12,8 +12,10 @@
 /*
 Program: pigeon-feeder
 History:
-	2023/4/14	Shane	16th release
-	code refactoring. ´úÂëÖØ¹¹
+	2023/4/16	Shane	16th release
+	1. add some definition of remote control. ´úÂëÖØ¹¹
+	2. delete LED1,LED2
+	3. change logic of handling distance
 */
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
@@ -34,7 +36,6 @@ int16_t Set_Data,Set_Speed=20, Num;//Set_Speed ÊÇÄ¬ÈÏµÄËÙ¶È£¬»ùÓÚÒ¡¸Ë½Ç¶È£¬Éè¶¨µ
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
 uint8_t Info1, Info2, Info3, Info4, State0;
 uint8_t X, Y, Value;
-float Distance1, Distance2, Distance3, Distance4;
 int16_t SpeedLeft=0,SpeedRight=0,SpeedRight_Robot=0,SpeedLeft_Robot=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1,StopFlag=0;
@@ -42,33 +43,19 @@ uint8_t Left=0,Right=0;
 uint8_t State=1;
 uint32_t feedTime1, feedTime2, feedTime3;
 uint32_t T2Count[3];
+void Init(void);
 void Speed(int16_t data);
 void Data_Analyse(void);
-void Distance_Get(void);
+void Get_Distance(void);
 void State1(void);
 void State2(void);
 void State3(void);
 void While_Init(void);
-void GetBirdNum(void);
 void HandleData(void);
 	
 int main(void)
 {	
-	LED_Init();
-	OLED_Init( );
-//	OLED_ShowString(2,1,"1:00.0  2:00.0cm");
-//	OLED_ShowString(3,1,"3:00.0  4:00.0cm");	
-	NRF24L01_Init();
-	RX_Mode();
-	Relay_Init();
-	Hcsr04_Init();
-	TIM2_Init();
-	USART_Config();
-	Feed_Init();
-	LEDO_OFF();
-	
-	 Robot_Init();
-	
+	Init();	
 		//light
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
@@ -89,75 +76,9 @@ int main(void)
 		OLED_ShowNum(2,1,feedTime1,4);
 		OLED_ShowNum(2,6,feedTime2,4);
 		OLED_ShowNum(2,11,feedTime3,4);
-
-//¼à²âÊ£ÓàËÇÁÏ
-//1	
-		if(Distance1 > 169.7)
-		{
-			OLED_ShowString(3, 3, "Lo");
-		}
-		else
-		{	
-			if(Distance1 > 62.35 && Distance1 <= 169.7)
-			{
-				OLED_ShowString(3, 3, "Mi");
-			}
-			
-			else
-			{
-				OLED_ShowString(3, 3, "Fu");
-			}
-			
-		}
-
-//2
-		if(Distance2 > 169.7)
-		{
-			OLED_ShowString(3, 8, "Lo");
-		}
-		else
-		{	
-			if(Distance2 > 62.35 && Distance2 <= 169.7)
-			{
-				OLED_ShowString(3, 8, "Mi");
-			}
-			
-			else
-			{
-				OLED_ShowString(3, 8, "Fu");
-			}
-			
-		}
 		
-//3
-		if(Distance3 > 169.7)
-		{
-			OLED_ShowString(3, 14, "Lo");
-		}
-		else
-		{	
-			if(Distance3 > 62.35 && Distance3 <= 169.7)
-			{
-				OLED_ShowString(3, 14, "Mi");
-			}
+		MonitorFeed();
 			
-			else
-			{
-				OLED_ShowString(3, 14, "Fu");
-			}
-			
-		}
-		
-		
-
-//		OLED_ShowNum(3 , 1, Distance1/10, 2);
-////		OLED_ShowString(3, 3,"%");
-//		OLED_ShowNum(3 , 5, Distance2/10, 2);
-////		OLED_ShowString(3, 7,"%");
-//		OLED_ShowNum(3 , 9, Distance3/10, 2);
-////		OLED_ShowString(3, 11,"%");
-////		OLED_ShowNum(3 , 13, Distance4/10, 2);//±ÜÕÏÓÃ
-	
 		While_Init();
 		if(Left >=2)
 			Left--;
@@ -194,49 +115,61 @@ int main(void)
 	}
 }
 
+/**		³õÊ¼»¯
+  * @brief  Init pigeon-feeder.
+  * @param  None
+  * @retval None
+  */
+void Init(void)
+{
+	LED_Init();
+	OLED_Init( );
+	NRF24L01_Init();
+	RX_Mode();
+	Hcsr04_Init();
+	TIM2_Init();
+	USART_Config();
+	Feeding_Init();	
+	Robot_Init();
+}
 void While_Init()
 {
-		GetBirdNum();
-		Distance_Get();
-		StartFeed(&feedTime1, &feedTime2, &feedTime3);
-//		OLED_ShowNum(1,14,State,2); 
-//		Num ++;
-//		OLED_ShowNum(1, 16, Num, 1);
-		State0 = NRF24L01_ReadByte(STATUS);
-		Info1 = NRF24L01_ReadByte(EN_AA);
-		Info2 = NRF24L01_ReadByte(EN_RXADDR);
-		Info3 = NRF24L01_ReadByte(RX_ADDR_P0);
-		Info4 = NRF24L01_ReadByte(FIFO_STATUS);
-		Flag = NRF24L01_ReceiveData();
-		//light
-		if (Info4 != 0x11)
-			GPIO_ResetBits(GPIOA, GPIO_Pin_8);
-		else
-			GPIO_SetBits(GPIOA, GPIO_Pin_8);
-		
-		OLED_ShowHexNum(4, 1, State0, 2);
-		OLED_ShowHexNum(4, 4, Info1, 2);
-		OLED_ShowHexNum(4, 7, Info2, 2);
-		OLED_ShowHexNum(4, 10, Info3, 2);
-		OLED_ShowHexNum(4, 13, Info4, 2);
-		
-		if (NRF24L01_GetData(NORMAL_TRANSMIT) != 0)
-		OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);
+	Get_BirdNum();
+	Get_Distance();
+	StartFeed(&feedTime1, &feedTime2, &feedTime3);
+	//		OLED_ShowNum(1,14,State,2); 
+	//		Num ++;
+	//		OLED_ShowNum(1, 16, Num, 1);
+	State0 = NRF24L01_ReadByte(STATUS);
+	Info1 = NRF24L01_ReadByte(EN_AA);
+	Info2 = NRF24L01_ReadByte(EN_RXADDR);
+	Info3 = NRF24L01_ReadByte(RX_ADDR_P0);
+	Info4 = NRF24L01_ReadByte(FIFO_STATUS);
+	Flag = NRF24L01_ReceiveData();
+	//light
+	if (Info4 != 0x11)
+		GPIO_ResetBits(GPIOA, GPIO_Pin_8);
+	else
+		GPIO_SetBits(GPIOA, GPIO_Pin_8);
 
-		
-		if (Flag)
-		{
-			
-			Flag = 0;
-			
-		}
-		Delay_ms(8);
-			NRF24L01_GetData(NORMAL_TRANSMIT);
-			NRF24L01_GetData(KEY_TRANSMIT);		
-			NRF24L01_GetData(SWITCH_TRANSMIT);	
-			NRF24L01_GetData(ROCKER_TRANSMIT)	;
-			NRF24L01_GetData(ENCODER_TRANSMIT);	
-		Data_Analyse();
+	OLED_ShowHexNum(4, 1, State0, 2);
+	OLED_ShowHexNum(4, 4, Info1, 2);
+	OLED_ShowHexNum(4, 7, Info2, 2);
+	OLED_ShowHexNum(4, 10, Info3, 2);
+	OLED_ShowHexNum(4, 13, Info4, 2);
+
+	if (NRF24L01_GetData(NORMAL_TRANSMIT) != 0)
+	OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);
+
+	if (Flag)
+		Flag = 0;
+	Delay_ms(8);
+	NRF24L01_GetData(NORMAL_TRANSMIT);
+	NRF24L01_GetData(KEY_TRANSMIT);		
+	NRF24L01_GetData(SWITCH_TRANSMIT);	
+	NRF24L01_GetData(ROCKER_TRANSMIT)	;
+	NRF24L01_GetData(ENCODER_TRANSMIT);	
+	Data_Analyse();
 		
 		
 }
@@ -247,7 +180,7 @@ void State1(void)
 	{
 	/*********************Ò¡¸Ë¼ì²â************************************/
 		//¸ù¾ÝÒ£¸Üµ÷Õûµç»úËÙ¶È
-	NRF24L01_GetData(ROCKER_TRANSMIT);
+		NRF24L01_GetData(ROCKER_TRANSMIT);
 
 		switch(Y)
 		{
@@ -362,8 +295,9 @@ void Data_Analyse(void)
 {
 	static uint8_t SwitchNum, LastSwitchNum;	
 	Value = NRF24L01_GetData(ROCKER_TRANSMIT);
-	X = Value&0x0F;
-	Y = (Value&0xF0)>>4;
+	//X±íÊ¾Êµ¼Ê²Ù×÷Ê±Ò¡¸Ë×ó¡¢ÓÒ²¦(Ó¦ÓÃ²ã)
+	X = (Value&0xF0)>>4;
+	Y = Value&0x0F;
 	
 	LastSwitchNum = SwitchNum;
 	//StateÖµµÄ¸Ä±ä
@@ -420,39 +354,12 @@ void Speed(int16_t data)
 	SpeedRight=data;
 }
 
-void Distance_Get(void)
-{
-	if (Hcsr04_StartFlag&0x08)	//³¬Éù²¨ÊÇ·ñÊ¹ÄÜ
-	{
-		switch(Hcsr04_StartFlag&0x07)	//µÚ¼¸¸ö³¬Éù²¨ÔËÐÐ
-		{
-			case 1: Distance1 = Hcsr04_GetDistance1();break;
-			case 2: Distance2 = Hcsr04_GetDistance2();break;
-			case 3: Distance3 = Hcsr04_GetDistance3();break;
-			case 4: Distance4 = Hcsr04_GetDistance4();break;						
-		}
-	Hcsr04_StartFlag &= 0x07;		//Çå³ýÊ¹ÄÜÎ»
-	}	
-	//show
-//	OLED_ShowNum(2 , 3, Distance1/10, 2);
-//	OLED_ShowNum(2 , 11, Distance2/10, 2);
-//	OLED_ShowNum(3 , 3, Distance3/10, 2);
-//	OLED_ShowNum(3 , 11, Distance4/10, 2);
-//	OLED_ShowNum(2 , 6, (uint32_t)Distance1%10 ,1);
-//	OLED_ShowNum(2 , 14, (uint32_t)Distance2%10 ,1);
-//	OLED_ShowNum(3 , 6, (uint32_t)Distance3%10 ,1);
-//	OLED_ShowNum(3 , 14, (uint32_t)Distance4%10 ,1);
-}
-
-
-
-
 void TIM2_IRQHandler(void)
 {
 
 	if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update) == SET)
 	{
-			//0.5sÎÞÏìÓ¦£¬Ôò¶Ï¿ªÁ¬½Ó
+		//0.5sÎÞÏìÓ¦£¬Ôò¶Ï¿ªÁ¬½Ó
 		T2Count[2] ++;
 		if (T2Count[2] >= 500)
 		{
