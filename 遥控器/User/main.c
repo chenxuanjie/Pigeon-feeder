@@ -137,7 +137,6 @@ void Init(void)
   * @param  None
   * @retval None
   */
-
 uint8_t Get_FirstState(void)
 {
 	return State/10*10;
@@ -203,15 +202,15 @@ void Get_State(void)
 		if ((SwitchNum&0x02) != 0)	//三挡钮子开关向下拨
 		{
 			OLED_ShowString(Select, 15, "<-");
-			State = STATE_SETTING + State%10;		
+			State = STATE_SETTING + Get_SecondState();		
 		}
 		else if ((SwitchNum&0x08) != 0)	//三挡钮子开关向中间拨
 		{
 			OLED_ShowString(Select, 15, "<-");
-			State = STATE_CONTROL + State%10;
+			State = STATE_CONTROL + Get_SecondState();
 		}
 		else 							//三挡钮子开关向上拨
-			State = STATE_DEBUG + State%10;
+			State = STATE_DEBUG + Get_SecondState();
 	}
 }
 
@@ -270,7 +269,6 @@ uint8_t State2(void)
 	}
 	if (KeyNum == KEY_PIN2_NUM)
 		NRF24L01_SetBuf(NORMAL_TRANSMIT, AUTO_FEED);
-//	CursorControl(STATE_CONTROL);
 	return 0;
 }
 void GetData(void)
