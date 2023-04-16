@@ -1,7 +1,7 @@
 .\objects\internal_flash.o: System\Internal_Flash.c
 .\objects\internal_flash.o: .\Start\stm32f10x.h
 .\objects\internal_flash.o: .\Start\core_cm3.h
-.\objects\internal_flash.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\internal_flash.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\internal_flash.o: .\Start\system_stm32f10x.h
 .\objects\internal_flash.o: .\User\stm32f10x_conf.h
 .\objects\internal_flash.o: .\Library\stm32f10x_adc.h

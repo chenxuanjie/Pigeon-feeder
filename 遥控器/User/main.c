@@ -33,17 +33,23 @@ History:
 #include "State1.h"
 #include "State2.h"
 #include "State3.h"
+#include <stdio.h>
 
+typedef struct machine{
+	uint32_t TimeTemp;
+	uint8_t Time;
+}machine;
 
 uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum;
 uint8_t FeedChose, FeedSwitch, Select=2, LastSelect, State=10, State1;
-uint8_t FeedTime1, FeedTime2, FeedTime3;
 uint8_t State, StateChangeFlag;
 uint16_t Voltage;
-uint32_t FeedTime1Temp, FeedTime2Temp, FeedTime3Temp, FeedTemp;
+uint32_t FeedTemp;
 int16_t EncoderNum;
 
 uint16_t StoreArray[STORENUM] = {0};
+
+machine feeder1, feeder2, feeder3;
 
 void Init(void);
 void Voltage_Get(void);
@@ -107,10 +113,7 @@ int main(void)
 void Voltage_Get(void)
 {
 	Voltage = (float)ORINGINAL_VOLTAGE/4096*3.3*10/2*5;
-	OLED_ShowNum(1, 13, Voltage/10, 1);
-	OLED_ShowChar(1, 14, '.');
-	OLED_ShowNum(1, 15, Voltage%10, 1);
-	OLED_ShowChar(1, 16, 'V');	
+	OLED_printf(1, 13, "%d.%dV",Voltage/10, Voltage%10);	
 }
 void GUI_Init(void)
 {
@@ -129,7 +132,6 @@ void Init(void)
 	OLED_Init( );
 	NRF24L01_Init();	
 	GUI_Init();
-
 }
 
 /**
@@ -137,7 +139,6 @@ void Init(void)
   * @param  None
   * @retval None
   */
-
 uint8_t Get_FirstState(void)
 {
 	return State/10*10;
@@ -153,7 +154,7 @@ uint8_t Get_SecondState(void)
 	return State%10;
 }
 
-/**
+/**		
   * @brief  光标控制。
   * @param  ?
   * @retval ?
@@ -203,15 +204,15 @@ void Get_State(void)
 		if ((SwitchNum&0x02) != 0)	//三挡钮子开关向下拨
 		{
 			OLED_ShowString(Select, 15, "<-");
-			State = STATE_SETTING + State%10;		
+			State = STATE_SETTING + Get_SecondState();		
 		}
 		else if ((SwitchNum&0x08) != 0)	//三挡钮子开关向中间拨
 		{
 			OLED_ShowString(Select, 15, "<-");
-			State = STATE_CONTROL + State%10;
+			State = STATE_CONTROL + Get_SecondState();
 		}
 		else 							//三挡钮子开关向上拨
-			State = STATE_DEBUG + State%10;
+			State = STATE_DEBUG + Get_SecondState();
 	}
 }
 
@@ -221,15 +222,15 @@ uint8_t State2(void)
 	OLED_ShowString(3, 1, "Feed:");
 
 	OLED_ShowString(4, 1, "ON:");
-	if (FeedTime1Temp != 0)
+	if (feeder1.TimeTemp != 0)
 		OLED_ShowChar(4, 4, '1');
 	else
 		OLED_ShowChar(4, 4, ' ');
-	if (FeedTime2Temp != 0)
+	if (feeder2.TimeTemp != 0)
 		OLED_ShowChar(4, 6, '2');
 	else
 		OLED_ShowChar(4, 6, ' ');
-	if (FeedTime2Temp != 0)
+	if (feeder2.TimeTemp != 0)
 		OLED_ShowChar(4, 8, '3');
 	else
 		OLED_ShowChar(4, 8, ' ');
@@ -237,12 +238,12 @@ uint8_t State2(void)
 	if (FeedSwitch == SET)
 	{
 		OLED_ShowString(3, 7, "ON ");
-		if (FeedTime1Temp > FeedTime2Temp)
-			FeedTemp = FeedTime1Temp;
+		if (feeder1.TimeTemp > feeder2.TimeTemp)
+			FeedTemp = feeder1.TimeTemp;
 		else 
-			FeedTemp = FeedTime2Temp;
-		if (FeedTime3Temp > FeedTemp)
-			FeedTemp = FeedTime3Temp;
+			FeedTemp = feeder2.TimeTemp;
+		if (feeder3.TimeTemp > FeedTemp)
+			FeedTemp = feeder3.TimeTemp;
 		OLED_ShowNum(4, 10, FeedTemp/1000, 2);
 		OLED_ShowChar(4, 12, 's');
 	}
@@ -261,16 +262,15 @@ uint8_t State2(void)
 				FeedSwitch =! FeedSwitch;
 				if (FeedSwitch == SET)
 				{
-					FeedTime1Temp = FeedTime1 * 1000;
-					FeedTime2Temp = FeedTime2 * 1000;
-					FeedTime3Temp = FeedTime3 * 1000;
+					feeder1.TimeTemp = feeder1.Time * 1000;
+					feeder2.TimeTemp = feeder2.Time * 1000;
+					feeder3.TimeTemp = feeder3.Time * 1000;
 				}
 			}
 			break;
 	}
 	if (KeyNum == KEY_PIN2_NUM)
 		NRF24L01_SetBuf(NORMAL_TRANSMIT, AUTO_FEED);
-//	CursorControl(STATE_CONTROL);
 	return 0;
 }
 void GetData(void)
@@ -306,20 +306,20 @@ void FeedMode(void)
 	OLED_ShowString(2, 10, "s");
 	OLED_ShowString(3, 10, "s");
 	OLED_ShowString(4, 10, "s");
-	OLED_ShowNum(2, 7, FeedTime1, 3);
-	OLED_ShowNum(3, 7, FeedTime2, 3);
-	OLED_ShowNum(4, 7, FeedTime3, 3);
-	FeedTime1 %= 256;
+	OLED_ShowNum(2, 7, feeder1.Time, 3);
+	OLED_ShowNum(3, 7, feeder2.Time, 3);
+	OLED_ShowNum(4, 7, feeder3.Time, 3);
+	feeder1.Time %= 256;
 	if (FeedChose == RESET)
 	{
 		if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-			FeedTime1 ++;
-		else if (KeyNum==KEY_PIN2_NUM && FeedTime1>0)
-			FeedTime1 --;
+			feeder1.Time ++;
+		else if (KeyNum==KEY_PIN2_NUM && feeder1.Time>0)
+			feeder1.Time --;
 
-		FeedTime1 += Encoder_Get();
-		FeedTime2 = FeedTime1;
-		FeedTime3 = FeedTime1;
+		feeder1.Time += Encoder_Get();
+		feeder2.Time = feeder1.Time;
+		feeder3.Time = feeder1.Time;
 	}
 	else
 	{
@@ -327,24 +327,24 @@ void FeedMode(void)
 		{
 			case 2:		//喂料1时间			
 				if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					FeedTime1 ++;
+					feeder1.Time ++;
 				else if (KeyNum == KEY_PIN2_NUM)
-					FeedTime1 --;
-				FeedTime1 += Encoder_Get();
+					feeder1.Time --;
+				feeder1.Time += Encoder_Get();
 				break;
 			case 3:		//喂料2时间				
 				if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					FeedTime2 ++;
+					feeder2.Time ++;
 				else if (KeyNum == KEY_PIN2_NUM)
-					FeedTime2 --;
-				FeedTime2 += Encoder_Get();
+					feeder2.Time --;
+				feeder2.Time += Encoder_Get();
 				break;
 			case 4:		//喂料3时间				
 				if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					FeedTime3 ++;
+					feeder3.Time ++;
 				else if (KeyNum == KEY_PIN2_NUM)
-					FeedTime3 --;
-				FeedTime3 += Encoder_Get();
+					feeder3.Time --;
+				feeder3.Time += Encoder_Get();
 				break;
 		}	
 	}	
@@ -404,9 +404,9 @@ void StoreData(void)
 {
 	StoreArray[BuzzerChoseStore] = Get_BeepChose();
 	StoreArray[BeepNumStore] = Get_BeepNum();
-	StoreArray[FeedTime1Store] = FeedTime1;
-	StoreArray[FeedTime2Store] = FeedTime2;
-	StoreArray[FeedTime3Store] = FeedTime3;
+	StoreArray[FeedTime1Store] = feeder1.Time;
+	StoreArray[FeedTime2Store] = feeder2.Time;
+	StoreArray[FeedTime3Store] = feeder3.Time;
 	StoreArray[FeedChoseStore] = FeedChose;
 	Flash_WriteArray_HalfWord(0x00, StoreArray, STORENUM);
 }
@@ -417,9 +417,9 @@ void ReadData(void)
 	Set_BeepChose(StoreArray[BuzzerChoseStore]);
 	Set_BeepNum(StoreArray[BeepNumStore]);
 	FeedChose = StoreArray[FeedChoseStore];
-	FeedTime1 = StoreArray[FeedTime1Store];
-	FeedTime2 = StoreArray[FeedTime2Store];
-	FeedTime3 = StoreArray[FeedTime3Store];
+	feeder1.Time = StoreArray[FeedTime1Store];
+	feeder2.Time = StoreArray[FeedTime2Store];
+	feeder3.Time = StoreArray[FeedTime3Store];
 }
 /**
   * @brief  将数据发送出去。
@@ -435,9 +435,9 @@ void Transmit(void)
 	
 	NRF24L01_SetBuf(ROCKER_TRANSMIT, RockerNum);
 	NRF24L01_SetBuf(ENCODER_TRANSMIT, EncoderNum);
-	NRF24L01_SetBuf(FEEDTIME1_TRANSMIT, FeedTime1Temp/1000);
-	NRF24L01_SetBuf(FEEDTIME2_TRANSMIT, FeedTime2Temp/1000);
-	NRF24L01_SetBuf(FEEDTIME3_TRANSMIT, FeedTime3Temp/1000);
+	NRF24L01_SetBuf(FEEDTIME1_TRANSMIT, feeder1.TimeTemp/1000);
+	NRF24L01_SetBuf(FEEDTIME2_TRANSMIT, feeder2.TimeTemp/1000);
+	NRF24L01_SetBuf(FEEDTIME3_TRANSMIT, feeder3.TimeTemp/1000);
 	NRF24L01_TransmitBuf();
 	NRF24L01_SetBuf(NORMAL_TRANSMIT, 0);
 }
@@ -466,18 +466,18 @@ void Normal_IRQHandler(void)	//1ms
 		CloseBuzzer();
 	
 	//喂料时间
-	if (FeedTime1Temp>0 && FeedSwitch==SET)
+	if (feeder1.TimeTemp>0 && FeedSwitch==SET)
 	{
-		FeedTime1Temp --;
+		feeder1.TimeTemp --;
 	}
-	if (FeedTime2Temp>0 && FeedSwitch==SET)
+	if (feeder2.TimeTemp>0 && FeedSwitch==SET)
 	{
-		FeedTime2Temp --;
+		feeder2.TimeTemp --;
 	}
-	if (FeedTime3Temp>0 && FeedSwitch==SET)
+	if (feeder3.TimeTemp>0 && FeedSwitch==SET)
 	{
-		FeedTime3Temp --;
+		feeder3.TimeTemp --;
 	}
-	if (FeedTime1Temp==0 && FeedTime2Temp==0 && FeedTime3Temp==0)
+	if (feeder1.TimeTemp==0 && feeder2.TimeTemp==0 && feeder3.TimeTemp==0)
 		FeedSwitch = RESET;
 }

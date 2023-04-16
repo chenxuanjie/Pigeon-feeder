@@ -1,7 +1,7 @@
 .\objects\nrf24l01.o: HardWare\NRF24L01.c
 .\objects\nrf24l01.o: .\Start\stm32f10x.h
 .\objects\nrf24l01.o: .\Start\core_cm3.h
-.\objects\nrf24l01.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\nrf24l01.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\nrf24l01.o: .\Start\system_stm32f10x.h
 .\objects\nrf24l01.o: .\User\stm32f10x_conf.h
 .\objects\nrf24l01.o: .\Library\stm32f10x_adc.h

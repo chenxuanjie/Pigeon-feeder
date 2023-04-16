@@ -1,7 +1,7 @@
 .\objects\switch.o: HardWare\Switch.c
 .\objects\switch.o: .\Start\stm32f10x.h
 .\objects\switch.o: .\Start\core_cm3.h
-.\objects\switch.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\switch.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\switch.o: .\Start\system_stm32f10x.h
 .\objects\switch.o: .\User\stm32f10x_conf.h
 .\objects\switch.o: .\Library\stm32f10x_adc.h

@@ -1,7 +1,7 @@
 .\objects\state1.o: User\State1.c
 .\objects\state1.o: .\Start\stm32f10x.h
 .\objects\state1.o: .\Start\core_cm3.h
-.\objects\state1.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\state1.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\state1.o: .\Start\system_stm32f10x.h
 .\objects\state1.o: .\User\stm32f10x_conf.h
 .\objects\state1.o: .\Library\stm32f10x_adc.h
