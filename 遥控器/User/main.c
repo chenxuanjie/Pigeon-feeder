@@ -8,12 +8,13 @@
 			（1）速度控制模式
 			（2）喂料按钮
 			（3）急停键
-			（4）光标控制：上下左右
-
+			（4）光标控制：上下左右 */
+/*
 Program: 遥控器
 History:
-	2023/4/16	Shane	16th release
-	add some definition of remote control. 代码重构
+	2023/4/17	Shane	17th release
+	1. add some definition of remote control. 代码重构
+	2. fix logic of rocker.
 */
 
 #include "stm32f10x.h"                  // Device header
@@ -35,12 +36,7 @@ History:
 #include "State3.h"
 #include <stdio.h>
 
-typedef struct machine{
-	uint32_t TimeTemp;
-	uint8_t Time;
-}machine;
-
-uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum;
+uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum, Feeding_AutoFlag;
 uint8_t FeedChose, FeedSwitch, Select=2, LastSelect, State=10, State1;
 uint8_t State, StateChangeFlag;
 uint16_t Voltage;
@@ -103,6 +99,7 @@ int main(void)
 			case STATE_DEBUG:
 			{
 				Show(KeyNum, SwitchNum, EncoderNum, RockerNum);
+				//Feeding_DebugFeedSet(&feeder1, &feeder2, &feeder3);
 			}break;
 		}
 		CursorControl(State);
@@ -219,58 +216,45 @@ void Get_State(void)
 uint8_t State2(void)
 {
 	OLED_ShowString(1, 2, "CONTROL");
-	OLED_ShowString(3, 1, "Feed:");
-
-	OLED_ShowString(4, 1, "ON:");
-	if (feeder1.TimeTemp != 0)
-		OLED_ShowChar(4, 4, '1');
-	else
-		OLED_ShowChar(4, 4, ' ');
-	if (feeder2.TimeTemp != 0)
-		OLED_ShowChar(4, 6, '2');
-	else
-		OLED_ShowChar(4, 6, ' ');
-	if (feeder2.TimeTemp != 0)
-		OLED_ShowChar(4, 8, '3');
-	else
-		OLED_ShowChar(4, 8, ' ');
-	
-	if (FeedSwitch == SET)
+	OLED_ShowString(3, 1, "HandFeed:");
+	//设置相同的落料时间
+	if (FeedSwitch==SET && Feeding_AutoFlag==RESET)
 	{
-		OLED_ShowString(3, 7, "ON ");
-		if (feeder1.TimeTemp > feeder2.TimeTemp)
-			FeedTemp = feeder1.TimeTemp;
+		OLED_ShowNum(3, 10, FeedTemp/1000, 3);
+		OLED_ShowChar(3, 13, 's');
+		if (feeder1.Time_ms > feeder2.Time_ms)
+			FeedTemp = feeder1.Time_ms;
 		else 
-			FeedTemp = feeder2.TimeTemp;
-		if (feeder3.TimeTemp > FeedTemp)
-			FeedTemp = feeder3.TimeTemp;
-		OLED_ShowNum(4, 10, FeedTemp/1000, 2);
-		OLED_ShowChar(4, 12, 's');
+			FeedTemp = feeder2.Time_ms;
+		if (feeder3.Time_ms > FeedTemp)
+			FeedTemp = feeder3.Time_ms;
 	}
 	else
-	{
-		OLED_ShowString(3, 7, "OFF");
-		OLED_ShowString(4, 10, "   ");			
-	}
+		OLED_ShowString(3, 10, " OFF");
 	Voltage_Get();
 	NRF24L01_SetBuf(NORMAL_TRANSMIT, FeedSwitch + 1);	//设置准备发送的喂料开关		
 	switch(Select)
 	{
+		//自动喂料
+		case 2:
+		{
+			if (KeyNum==KEY_ENTER && FeedSwitch==RESET)	//自动与手动不能同时开启
+				Feeding_AutoFeedSet(&Feeding_AutoFlag, 6);			
+		}break;
 		case 3:
-			if (KeyNum==KEY_LEFT || KeyNum==KEY_RIGHT)
+			if ((KeyNum==KEY_LEFT || KeyNum==KEY_ENTER) && Feeding_AutoFlag==RESET)
 			{
 				FeedSwitch =! FeedSwitch;
 				if (FeedSwitch == SET)
 				{
-					feeder1.TimeTemp = feeder1.Time * 1000;
-					feeder2.TimeTemp = feeder2.Time * 1000;
-					feeder3.TimeTemp = feeder3.Time * 1000;
+					feeder1.Time_ms = feeder1.Time_s * 1000;
+					feeder2.Time_ms = feeder2.Time_s * 1000;
+					feeder3.Time_ms = feeder3.Time_s * 1000;
 				}
 			}
 			break;
 	}
-	if (KeyNum == KEY_PIN2_NUM)
-		NRF24L01_SetBuf(NORMAL_TRANSMIT, AUTO_FEED);
+	Feeding_AutoFeedShow(Feeding_AutoFlag);
 	return 0;
 }
 void GetData(void)
@@ -307,20 +291,21 @@ void FeedMode(void)
 	OLED_ShowString(2, 10, "s");
 	OLED_ShowString(3, 10, "s");
 	OLED_ShowString(4, 10, "s");
-	OLED_ShowNum(2, 7, feeder1.Time, 3);
-	OLED_ShowNum(3, 7, feeder2.Time, 3);
-	OLED_ShowNum(4, 7, feeder3.Time, 3);
-	feeder1.Time %= 256;
+	OLED_ShowNum(2, 7, feeder1.Time_s, 3);
+	OLED_ShowNum(3, 7, feeder2.Time_s, 3);
+	OLED_ShowNum(4, 7, feeder3.Time_s, 3);
+	//越界判断
+	feeder1.Time_s %= 256;
 	if (FeedChose == RESET)
 	{
 		if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-			feeder1.Time ++;
-		else if (KeyNum==KEY_PIN2_NUM && feeder1.Time>0)
-			feeder1.Time --;
+			feeder1.Time_s ++;
+		else if (KeyNum==KEY_PIN2_NUM && feeder1.Time_s>0)
+			feeder1.Time_s --;
 
-		feeder1.Time += Encoder_Get();
-		feeder2.Time = feeder1.Time;
-		feeder3.Time = feeder1.Time;
+		feeder1.Time_s += Encoder_Get();
+		feeder2.Time_s = feeder1.Time_s;
+		feeder3.Time_s = feeder1.Time_s;
 	}
 	else
 	{
@@ -328,24 +313,24 @@ void FeedMode(void)
 		{
 			case 2:		//喂料1时间			
 				if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					feeder1.Time ++;
+					feeder1.Time_s ++;
 				else if (KeyNum == KEY_PIN2_NUM)
-					feeder1.Time --;
-				feeder1.Time += Encoder_Get();
+					feeder1.Time_s --;
+				feeder1.Time_s += Encoder_Get();
 				break;
 			case 3:		//喂料2时间				
 				if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					feeder2.Time ++;
+					feeder2.Time_s ++;
 				else if (KeyNum == KEY_PIN2_NUM)
-					feeder2.Time --;
-				feeder2.Time += Encoder_Get();
+					feeder2.Time_s --;
+				feeder2.Time_s += Encoder_Get();
 				break;
 			case 4:		//喂料3时间				
 				if (KeyNum==KEY_PIN1_NUM || KeyNum==KEY_PIN3_NUM || KeyNum==KEY_RIGHT)
-					feeder3.Time ++;
+					feeder3.Time_s ++;
 				else if (KeyNum == KEY_PIN2_NUM)
-					feeder3.Time --;
-				feeder3.Time += Encoder_Get();
+					feeder3.Time_s --;
+				feeder3.Time_s += Encoder_Get();
 				break;
 		}	
 	}	
@@ -405,9 +390,9 @@ void StoreData(void)
 {
 	StoreArray[BuzzerChoseStore] = Get_BeepChose();
 	StoreArray[BeepNumStore] = Get_BeepNum();
-	StoreArray[FeedTime1Store] = feeder1.Time;
-	StoreArray[FeedTime2Store] = feeder2.Time;
-	StoreArray[FeedTime3Store] = feeder3.Time;
+	StoreArray[FeedTime1Store] = feeder1.Time_s;
+	StoreArray[FeedTime2Store] = feeder2.Time_s;
+	StoreArray[FeedTime3Store] = feeder3.Time_s;
 	StoreArray[FeedChoseStore] = FeedChose;
 	Flash_WriteArray_HalfWord(0x00, StoreArray, STORENUM);
 }
@@ -418,9 +403,9 @@ void ReadData(void)
 	Set_BeepChose(StoreArray[BuzzerChoseStore]);
 	Set_BeepNum(StoreArray[BeepNumStore]);
 	FeedChose = StoreArray[FeedChoseStore];
-	feeder1.Time = StoreArray[FeedTime1Store];
-	feeder2.Time = StoreArray[FeedTime2Store];
-	feeder3.Time = StoreArray[FeedTime3Store];
+	feeder1.Time_s = StoreArray[FeedTime1Store];
+	feeder2.Time_s = StoreArray[FeedTime2Store];
+	feeder3.Time_s = StoreArray[FeedTime3Store];
 }
 /**
   * @brief  将数据发送出去。
@@ -436,9 +421,9 @@ void Transmit(void)
 	
 	NRF24L01_SetBuf(ROCKER_TRANSMIT, RockerNum);
 	NRF24L01_SetBuf(ENCODER_TRANSMIT, EncoderNum);
-	NRF24L01_SetBuf(FEEDTIME1_TRANSMIT, feeder1.TimeTemp/1000);
-	NRF24L01_SetBuf(FEEDTIME2_TRANSMIT, feeder2.TimeTemp/1000);
-	NRF24L01_SetBuf(FEEDTIME3_TRANSMIT, feeder3.TimeTemp/1000);
+	NRF24L01_SetBuf(FEEDTIME1_TRANSMIT, feeder1.Time_ms/1000);
+	NRF24L01_SetBuf(FEEDTIME2_TRANSMIT, feeder2.Time_ms/1000);
+	NRF24L01_SetBuf(FEEDTIME3_TRANSMIT, feeder3.Time_ms/1000);
 	NRF24L01_TransmitBuf();
 	NRF24L01_SetBuf(NORMAL_TRANSMIT, 0);
 }
@@ -447,7 +432,7 @@ void Transmit(void)
 
 void Normal_IRQHandler(void)	//1ms
 {
-	static uint16_t T3_Count[1];
+	static uint16_t T3_Count[2];
 	T3_Count[0]++;
 	if ( T3_Count[0] >= 20)
 	{
@@ -467,18 +452,19 @@ void Normal_IRQHandler(void)	//1ms
 		CloseBuzzer();
 	
 	//喂料时间
-	if (feeder1.TimeTemp>0 && FeedSwitch==SET)
+	if (FeedSwitch==SET)
 	{
-		feeder1.TimeTemp --;
+		if (feeder1.Time_ms > 0) feeder1.Time_ms --;
+		if (feeder2.Time_ms > 0) feeder2.Time_ms --;
+		if (feeder3.Time_ms > 0) feeder3.Time_ms --;
 	}
-	if (feeder2.TimeTemp>0 && FeedSwitch==SET)
-	{
-		feeder2.TimeTemp --;
-	}
-	if (feeder3.TimeTemp>0 && FeedSwitch==SET)
-	{
-		feeder3.TimeTemp --;
-	}
-	if (feeder1.TimeTemp==0 && feeder2.TimeTemp==0 && feeder3.TimeTemp==0)
+	if (feeder1.Time_ms==0 && feeder2.Time_ms==0 && feeder3.Time_ms==0)
 		FeedSwitch = RESET;
+	//闪烁
+	T3_Count[1] ++;
+	if (Feeding_AutoFlag>0 && T3_Count[1]>500)
+	{
+		T3_Count[1] = 0;
+		Feeding_AutoFlag --;
+	}
 }

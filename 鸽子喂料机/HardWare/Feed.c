@@ -140,5 +140,13 @@ void StartFeed(uint32_t* feedTime1_ms, uint32_t* feedTime2_ms, uint32_t* feedTim
 	else Relay_Set(2, RESET);
 		
 	if (*feedTime3_ms > 0) Relay_Set(3, SET);
-	else Relay_Set(3, RESET);		
+	else Relay_Set(3, RESET);			
+}
+
+void Feeding_CloseFeeder(uint32_t* feedTime1_ms, uint32_t* feedTime2_ms, uint32_t* feedTime3_ms)
+{
+	*feedTime1_ms = 0;
+	*feedTime2_ms = 0;
+	*feedTime3_ms = 0;
+	Relay_Set(ALL, RESET);
 }

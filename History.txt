@@ -2,6 +2,22 @@
 /*
 Program: 遥控器
 History:
+	2023/4/17	Shane	17th release
+	1. add some definition of remote control. 代码重构
+	2. fix logic of rocker.
+*/
+/*
+Program: pigeon-feeder
+History:
+	2023/4/17	Shane	17th release
+	1. add some definition of remote control. 代码重构
+	2. delete LED1,LED2
+	3. change logic of handling distance
+	4. fix feeder bug
+*/
+/*
+Program: 遥控器
+History:
 	2023/4/16	Shane	16th release
 	add some definition of remote control. 代码重构
 */

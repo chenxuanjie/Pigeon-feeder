@@ -21,7 +21,8 @@
 //Nrmal_Transmit
 #define FEED_OFF				(0x0 + 1)
 #define FEED_ON					(0x1 + 1)
-#define AUTO_FEED				(0x0 + 3)
+#define AUTO_FEED_OFF			(0x0 + 3)
+#define AUTO_FEED_ON			(0x1 + 3)
 #define CHECK					(0xFE)
 //°´¼ü KEY_TRANSMIT
 #define KEY_ROCKER_TRANSMIT			0x1
@@ -72,6 +73,11 @@
 
 #define MAX_MODE				4
 #define STORENUM				6
+
+typedef struct machine{
+	uint32_t Time_ms;
+	uint8_t Time_s;
+}machine;
 
 typedef enum{
 	Feed_ON = 1,

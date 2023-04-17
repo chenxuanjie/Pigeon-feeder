@@ -14,7 +14,8 @@
 //Nrmal_Transmit
 #define FEED_OFF				(0x0 + 1)
 #define FEED_ON					(0x1 + 1)
-#define AUTO_FEED				(0x0 + 3)
+#define AUTO_FEED_OFF			(0x0 + 3)
+#define AUTO_FEED_ON			(0x1 + 3)
 #define CHECK					(0xFE)
 
 //°´¼ü KEY_TRANSMIT

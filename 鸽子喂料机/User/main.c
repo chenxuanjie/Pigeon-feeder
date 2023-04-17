@@ -12,10 +12,11 @@
 /*
 Program: pigeon-feeder
 History:
-	2023/4/16	Shane	16th release
+	2023/4/17	Shane	17th release
 	1. add some definition of remote control. 代码重构
 	2. delete LED1,LED2
 	3. change logic of handling distance
+	4. fix feeder bug
 */
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
@@ -40,7 +41,7 @@ typedef struct machine{
 int16_t Set_Data,Set_Speed=20, Num;//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
 uint8_t Info1, Info2, Info3, Info4, State0;
-uint8_t X, Y, Value;
+uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET;
 int16_t SpeedLeft=0,SpeedRight=0,SpeedRight_Robot=0,SpeedLeft_Robot=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1,StopFlag=0;
@@ -62,13 +63,9 @@ void HandleData(void);
 int main(void)
 {	
 	Init();	
-
-	OLED_ShowString(3, 1, "1:");
-	OLED_ShowString(3, 6, "2:");
-	OLED_ShowString(3, 12, "3:");
 	while (1)
 	{
-		OLED_ShowHexNum(1,12,Value,4);  //遥杆坐标
+		OLED_ShowHexNum(1,15,Value,2);  //遥杆坐标
 		OLED_ShowNum(2,1,feeder1.AutoTime_ms,4);
 		OLED_ShowNum(2,6,feeder2.AutoTime_ms,4);
 		OLED_ShowNum(2,11,feeder3.AutoTime_ms,4);
@@ -119,16 +116,15 @@ void Init(void)
 	USART_Config();
 	Feeding_Init();	
 	Robot_Init();
+	OLED_printf(3, 1, "1:   2:     3:");
 }
 void While_Init()
 {
 	Get_BirdNum(&Timeout);
 	//手动设置的落料时间
-	StartFeed(&feeder1.Time, &feeder2.Time, &feeder3.Time);
+	if (Feeding_AutoFlag==RESET && Feeding_ManualFlag==RESET)
+		StartFeed(&feeder1.Time, &feeder2.Time, &feeder3.Time);
 	MonitorFeed(&Hcsr04_StartFlag);
-	//		OLED_ShowNum(1,14,State,2); 
-	//		Num ++;
-	//		OLED_ShowNum(1, 16, Num, 1);
 	State0 = NRF24L01_ReadByte(STATUS);
 	Info1 = NRF24L01_ReadByte(EN_AA);
 	Info2 = NRF24L01_ReadByte(EN_RXADDR);
@@ -153,11 +149,6 @@ void While_Init()
 	if (Flag)
 		Flag = 0;
 	Delay_ms(8);
-	NRF24L01_GetData(NORMAL_TRANSMIT);
-	NRF24L01_GetData(KEY_TRANSMIT);		
-	NRF24L01_GetData(SWITCH_TRANSMIT);	
-	NRF24L01_GetData(ROCKER_TRANSMIT)	;
-	NRF24L01_GetData(ENCODER_TRANSMIT);	
 	Data_Analyse(&Value);	
 }
 
@@ -198,7 +189,7 @@ void State1(void)
 	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-////			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//急停
+//			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//急停
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//启动
 			case KEY_PIN2_NUM		:	TSDA_Order(LeftWheel,MotorStop);TSDA_Order(RightWheel,MotorStop);break;//关闭
 			case KEY_PIN3_NUM		:	SpeedLeft=0;SpeedRight=0;break;//急停
@@ -212,10 +203,7 @@ void State1(void)
 }
 
 void State2(void)
-{
-	
-	
-		
+{	
 		/* 切换调试模式时，记得按下启动或者停止按键，以免切回普通模式导致保留上一次按键操作*/
 	if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM)//拨钮开关04启用校准模式,校准电机方向，摇杆可用	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
@@ -239,14 +227,21 @@ void State2(void)
 /*********************喂料************************************/		
 		switch( NRF24L01_GetData(NORMAL_TRANSMIT))
 		{
-//			case FEED_OFF:	//喂料器关
-//				Relay_Set(ALL, RESET);
-//			break;
-//			case FEED_ON:	//喂料器开
-//				Relay_Set(ALL, SET);
-//			break;
-			case AUTO_FEED:	//自动喂料开
-				Get_FeedTime(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
+			case FEED_OFF:	//喂料器关
+				Relay_Set(ALL, RESET);
+				Feeding_ManualFlag = RESET;
+			break;
+			case FEED_ON:	//喂料器开
+				Relay_Set(ALL, SET);
+				Feeding_ManualFlag = SET;
+			break;
+			case AUTO_FEED_ON:	//自动喂料开
+				Get_FeedTime(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms);
+				Feeding_AutoFlag = SET;
+			break;
+			case AUTO_FEED_OFF:	//自动喂料关
+				Feeding_CloseFeeder(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
+				Feeding_AutoFlag = RESET;
 			break;
 		}
 		

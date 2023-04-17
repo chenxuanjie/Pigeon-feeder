@@ -1,5 +1,7 @@
 #include "stm32f10x.h"
 #include "OLED_Font.h"
+#include <stdio.h>
+#include <stdarg.h>	//包含了va_list 等类型
 
 /*引脚配置*/
 #define OLED_W_SCL(x)		GPIO_WriteBit(GPIOA, GPIO_Pin_11, (BitAction)(x))
@@ -318,4 +320,25 @@ void OLED_Init(void)
 	OLED_WriteCommand(0xAF);	//开启显示
 		
 	OLED_Clear();				//OLED清屏
+}
+
+/**
+  * @brief  重定向printf函数
+  * @param  无
+  * @retval 无
+  */
+signed int OLED_printf(uint8_t x,uint8_t y,const char *pFormat, ...){
+
+    char pStr[25] = {'\0'}; 
+    va_list ap;
+    signed int result;
+
+    // Forward call to vprintf
+    va_start(ap, pFormat);
+    result = vsprintf((char *)pStr, pFormat, ap);
+    va_end(ap);
+
+    OLED_ShowString(x,y, pStr);
+
+    return result;
 }

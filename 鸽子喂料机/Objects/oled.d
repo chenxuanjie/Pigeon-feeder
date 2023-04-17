@@ -29,3 +29,5 @@
 .\objects\oled.o: .\Library\stm32f10x_wwdg.h
 .\objects\oled.o: .\Library\misc.h
 .\objects\oled.o: HardWare\OLED_Font.h
+.\objects\oled.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\oled.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdarg.h
