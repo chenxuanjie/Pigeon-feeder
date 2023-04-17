@@ -10,6 +10,11 @@
 #define RightWheel					TSDA_Usart2 //ÓÒ³µÂÖ
 
 void Robot_Init(void);
+void Robot_SetSpeed(int16_t data);
+int16_t Robot_GetSpeedLeft(void);
+int16_t Robot_GetSpeedRight(void);
+void Robot_SetSpeedLeft(int16_t Data);
+void Robot_SetSpeedRight(int16_t Data);
 int16_t SpeedConversion(int32_t data);
 void Robot_Move(int16_t LeftSpeed,int16_t RightSpeed);
 void Robot_ShutDown(void);

@@ -3,6 +3,18 @@
 Program: 遥控器
 History:
 	2023/4/17	Shane	17th release
+*/
+/*
+Program: pigeon-feeder
+History:
+	2023/4/17	Shane	17th release
+	1. change speed() -> Robot_SetSpeed()
+*/
+
+/*
+Program: 遥控器
+History:
+	2023/4/17	Shane	17th release
 	1. add some definition of remote control. 代码重构
 	2. fix logic of rocker.
 */

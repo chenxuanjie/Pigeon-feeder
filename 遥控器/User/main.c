@@ -13,8 +13,6 @@
 Program: Ò£¿ØÆ÷
 History:
 	2023/4/17	Shane	17th release
-	1. add some definition of remote control. ´úÂëÖØ¹¹
-	2. fix logic of rocker.
 */
 
 #include "stm32f10x.h"                  // Device header

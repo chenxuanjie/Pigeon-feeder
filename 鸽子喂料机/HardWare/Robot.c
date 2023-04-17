@@ -2,6 +2,34 @@
 #include "TSDA.H"
 #include "DELAY.H"
 
+int16_t SpeedLeft=0,SpeedRight=0;
+
+void Robot_SetSpeed(int16_t data)
+{
+	SpeedLeft=data;
+	SpeedRight=data;
+}
+
+void Robot_SetSpeedLeft(int16_t Data)
+{
+	SpeedLeft = Data;
+}
+
+void Robot_SetSpeedRight(int16_t Data)
+{
+	SpeedRight = Data;
+}
+
+int16_t Robot_GetSpeedLeft(void)
+{
+	return SpeedLeft;
+}
+
+int16_t Robot_GetSpeedRight(void)
+{
+	return SpeedRight;
+}
+
 /**
   * @brief  单位换算（cm/s -> 通讯数据）
   * @param  data:喂料机移动速度 单位cm/s 只容许输入0~100；

@@ -13,10 +13,6 @@
 Program: pigeon-feeder
 History:
 	2023/4/17	Shane	17th release
-	1. add some definition of remote control. ´úÂëÖØ¹¹
-	2. delete LED1,LED2
-	3. change logic of handling distance
-	4. fix feeder bug
 */
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
@@ -31,6 +27,7 @@ History:
 #include "Hcsr04.h"
 #include "TIM2.h"
 #include "Feed.h"
+#include "State3.h"
 //#include "Hcsr04.h"
 
 typedef struct machine{
@@ -42,7 +39,7 @@ int16_t Set_Data,Set_Speed=20, Num;//Set_Speed ÊÇÄ¬ÈÏµÄËÙ¶È£¬»ùÓÚÒ¡¸Ë½Ç¶È£¬Éè¶¨µ
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
 uint8_t Info1, Info2, Info3, Info4, State0;
 uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET;
-int16_t SpeedLeft=0,SpeedRight=0,SpeedRight_Robot=0,SpeedLeft_Robot=0;
+int16_t SpeedRight_Robot=0,SpeedLeft_Robot=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1,StopFlag=0;
 uint8_t Left=0,Right=0, State=1;
@@ -52,7 +49,6 @@ uint32_t T2Count[3];
 machine feeder1, feeder2, feeder3;
 
 void Init(void);
-void Speed(int16_t data);
 void Data_Analyse(uint8_t *Rocker_XY);
 void State1(void);
 void State2(void);
@@ -86,12 +82,12 @@ int main(void)
 		}
 		
 		HandleData();
-		if(StopFlag==SET ){SpeedLeft=0;SpeedRight=0;}
+		if(StopFlag==SET ){Robot_SetSpeed(0);}
 		
 
 /*********************Ëã·¨Çý¶¯************************************/
-		SpeedLeft_Robot=LeftInversion*LeftCalibration*SpeedConversion(SpeedLeft);
-		SpeedRight_Robot=RightInversion*RightCalibration*SpeedConversion(SpeedRight);
+		SpeedLeft_Robot=LeftInversion*LeftCalibration*SpeedConversion(Robot_GetSpeedLeft());
+		SpeedRight_Robot=RightInversion*RightCalibration*SpeedConversion(Robot_GetSpeedRight());
 
 			Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 
@@ -148,7 +144,7 @@ void While_Init()
 
 	if (Flag)
 		Flag = 0;
-	Delay_ms(8);
+//	Delay_ms(8);
 	Data_Analyse(&Value);	
 }
 
@@ -158,41 +154,18 @@ void State1(void)
 		if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM+SWITCH2_PIN1_NUM)	//²¦Å¥¿ª¹Ø05ÆôÓÃÆÕÍ¨°´¼ü¿ØÖÆ
 	{
 	/*********************Ò¡¸Ë¼ì²â************************************/
-
-		switch(Y)
-		{
-			case STOP_Y:Speed(0x00);break;
-			case UP_1:Speed(Set_Speed/10);break;
-			case UP_2:Speed(Set_Speed/4);break;
-			case UP_3:Speed(Set_Speed/2);break;
-			case UP_4:Speed(Set_Speed);break;
-			case DOWN_1:Speed(-Set_Speed/10);break;
-			case DOWN_2:Speed(-Set_Speed/4);break;
-			case DOWN_3:Speed(-Set_Speed/2);break;
-			case DOWN_4:Speed(-Set_Speed);break;
-		}
-			LeftInversion=1;RightInversion=1;
-		switch(X)
-		{			
-			case LEFT_1:break;
-			case LEFT_2:Speed(Set_Speed/10);LeftInversion=-1;break;
-			case LEFT_3:Speed(Set_Speed/4);LeftInversion=-1;break;
-			case LEFT_4:Speed(Set_Speed/2);LeftInversion=-1;break;
-			case RIGHT_1:break;
-			case RIGHT_2:Speed(Set_Speed/10);RightInversion=-1;break;
-			case RIGHT_3:Speed(Set_Speed/4);RightInversion=-1;break;
-			case RIGHT_4:Speed(Set_Speed/2);RightInversion=-1;break;
-			case STOP_X:Speed(0x00);break;	
-		}
-		
-		/********************°´¼ü¼ì²â************************************/
+		//×ÔÐý×ªÍä
+		Robot_SelfTurn(X, Y, &LeftInversion, &RightInversion, Set_Speed);
+		//²îËÙ×ªÍä
+//		Robot_DifferentialTurn(X, Y, &LeftInversion, &RightInversion, Set_Speed);
+	/********************°´¼ü¼ì²â************************************/
 	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-//			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//¼±Í£
+//			case EmergencyFault	:	Robot_SetSpeed(0);break;//¼±Í£
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//Æô¶¯
 			case KEY_PIN2_NUM		:	TSDA_Order(LeftWheel,MotorStop);TSDA_Order(RightWheel,MotorStop);break;//¹Ø±Õ
-			case KEY_PIN3_NUM		:	SpeedLeft=0;SpeedRight=0;break;//¼±Í£
+			case KEY_PIN3_NUM		:	Robot_SetSpeed(0);break;//¼±Í£
 			case KEY_PIN4_NUM		:	break;//Ê¹ÓÃÐý×ª±àÂëÆ÷
 			case KEY_PIN5_NUM		:	Set_Speed=NRF24L01_GetData(ENCODER_TRANSMIT);break;
 			case KEY_PIN6_NUM		:	break;
@@ -215,13 +188,13 @@ void State2(void)
 		}
 		
 		
-		/*********************Ðý×ª±àÂëÆ÷¼ì²â************************************/
-	
-		if(NRF24L01_GetData(KEY_TRANSMIT)==KEY_PIN4_NUM)
-		{
-			Set_Data=NRF24L01_GetData(ENCODER_TRANSMIT);
-			Speed(Set_Data);
-		}
+//		/*********************Ðý×ª±àÂëÆ÷¼ì²â************************************/
+//	
+//		if(NRF24L01_GetData(KEY_TRANSMIT)==KEY_PIN4_NUM)
+//		{
+//			Set_Data=NRF24L01_GetData(ENCODER_TRANSMIT);
+//			Robot_SetSpeed(Set_Data);
+//		}
 
 	
 /*********************Î¹ÁÏ************************************/		
@@ -248,10 +221,10 @@ void State2(void)
 		
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//¼±Í£
+			case EmergencyFault	:	Robot_SetSpeed(0);break;//¼±Í£
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//Æô¶¯
 			case KEY_PIN2_NUM		:	TSDA_Order(LeftWheel,MotorStop);TSDA_Order(RightWheel,MotorStop);break;//¹Ø±Õ
-			case KEY_PIN3_NUM		:	SpeedLeft=0;SpeedRight=0;break;//¼±Í£
+			case KEY_PIN3_NUM		:	Robot_SetSpeed(0);break;//¼±Í£
 		}
 		
 		
@@ -261,10 +234,10 @@ void State3(void)
 {
 	switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case EmergencyFault		:	SpeedLeft=0;SpeedRight=0;break;//¼±Í£
+			case EmergencyFault		:	Robot_SetSpeed(0);break;//¼±Í£
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//Æô¶¯
 			case KEY_PIN2_NUM		:	break;
-			case KEY_PIN3_NUM		:	SpeedLeft=0;SpeedRight=0;break;//¼±Í£
+			case KEY_PIN3_NUM		:	Robot_SetSpeed(0);break;//¼±Í£
 			case KEY_PIN4_NUM		:	break;
 			case KEY_PIN5_NUM		:	break;
 			case KEY_PIN6_NUM		:	break;
@@ -328,12 +301,6 @@ void HandleData(void)
 	}
 	
 }
-void Speed(int16_t data)
-{
-
-	SpeedLeft=data;
-	SpeedRight=data;
-}
 
 void TIM2_IRQHandler(void)
 {
@@ -361,24 +328,16 @@ void TIM2_IRQHandler(void)
 		}
 
         //Timeout¼õµ½0£¬Ôò»ñÈ¡¸ë×ÓÊýÁ¿
-        if (Timeout > 0)
-            Timeout --;
-		else
-			Timeout = 0;
+        if (Timeout > 0) 
+			Timeout --;
 		//Î¹ÁÏÆ÷Ê±¼ä
 		if (feeder1.Time > 0) feeder1.Time --;
-		else feeder1.Time = 0;
 		if (feeder2.Time > 0) feeder2.Time --;
-		else feeder2.Time = 0;
 		if (feeder3.Time > 0) feeder3.Time --;
-		else feeder3.Time = 0;
 		//×Ô¶¯ÂäÁÏµÄÊ±¼ä
 		if (feeder1.AutoTime_ms > 0) feeder1.AutoTime_ms --;
-		else feeder1.AutoTime_ms = 0;
 		if (feeder2.AutoTime_ms > 0) feeder2.AutoTime_ms --;
-		else feeder2.AutoTime_ms = 0;
 		if (feeder3.AutoTime_ms > 0) feeder3.AutoTime_ms --;
-		else feeder3.AutoTime_ms = 0;	
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
 }
