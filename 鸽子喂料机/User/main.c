@@ -32,6 +32,11 @@ History:
 #include "Feed.h"
 //#include "Hcsr04.h"
 
+typedef struct machine{
+	uint32_t Time;
+	uint32_t AutoTime_ms;
+}machine;
+
 int16_t Set_Data,Set_Speed=20, Num;//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
 uint8_t Info1, Info2, Info3, Info4, State0;
@@ -39,13 +44,15 @@ uint8_t X, Y, Value;
 int16_t SpeedLeft=0,SpeedRight=0,SpeedRight_Robot=0,SpeedLeft_Robot=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
 uint8_t DataReset=1,StopFlag=0;
-uint8_t Left=0,Right=0;
-uint8_t State=1;
-uint32_t feedTime1, feedTime2, feedTime3;
+uint8_t Left=0,Right=0, State=1;
+uint32_t Timeout=0;
 uint32_t T2Count[3];
+
+machine feeder1, feeder2, feeder3;
+
 void Init(void);
 void Speed(int16_t data);
-void Data_Analyse(void);
+void Data_Analyse(uint8_t *Rocker_XY);
 void State1(void);
 void State2(void);
 void State3(void);
@@ -55,33 +62,19 @@ void HandleData(void);
 int main(void)
 {	
 	Init();	
-		//light
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-		GPIO_InitTypeDef GPIO_InitStructure;
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-		GPIO_Init(GPIOB, &GPIO_InitStructure);
-		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
-		GPIO_Init(GPIOA, &GPIO_InitStructure);		
 
-		OLED_ShowString(3, 1, "1:");
-		OLED_ShowString(3, 6, "2:");
-		OLED_ShowString(3, 12, "3:");
+	OLED_ShowString(3, 1, "1:");
+	OLED_ShowString(3, 6, "2:");
+	OLED_ShowString(3, 12, "3:");
 	while (1)
 	{
 		OLED_ShowHexNum(1,12,Value,4);  //遥杆坐标
-		OLED_ShowNum(2,1,feedTime1,4);
-		OLED_ShowNum(2,6,feedTime2,4);
-		OLED_ShowNum(2,11,feedTime3,4);
+		OLED_ShowNum(2,1,feeder1.AutoTime_ms,4);
+		OLED_ShowNum(2,6,feeder2.AutoTime_ms,4);
+		OLED_ShowNum(2,11,feeder3.AutoTime_ms,4);
 		
 			
 		While_Init();
-		if(Left >=2)
-			Left--;
-		if(Right >=2)
-			Right--;
 		switch (State)//遥控右上角拨杆档位
 		{
 			case SETTINGSTATE://下
@@ -106,10 +99,7 @@ int main(void)
 			Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 
 
-
-
-		LEDO_OFF();
-				
+		LEDO_OFF();			
 	}
 }
 
@@ -132,10 +122,10 @@ void Init(void)
 }
 void While_Init()
 {
-	Get_BirdNum();
-	Get_Distance(&Hcsr04_StartFlag);
-	MonitorFeed();
-	StartFeed(&feedTime1, &feedTime2, &feedTime3);
+	Get_BirdNum(&Timeout);
+	//手动设置的落料时间
+	StartFeed(&feeder1.Time, &feeder2.Time, &feeder3.Time);
+	MonitorFeed(&Hcsr04_StartFlag);
 	//		OLED_ShowNum(1,14,State,2); 
 	//		Num ++;
 	//		OLED_ShowNum(1, 16, Num, 1);
@@ -168,20 +158,19 @@ void While_Init()
 	NRF24L01_GetData(SWITCH_TRANSMIT);	
 	NRF24L01_GetData(ROCKER_TRANSMIT)	;
 	NRF24L01_GetData(ENCODER_TRANSMIT);	
-	Data_Analyse();	
+	Data_Analyse(&Value);	
 }
 
 void State1(void)
 {
+	OLED_ShowNum(4,15,Set_Speed,2);
 		if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM+SWITCH2_PIN1_NUM)	//拨钮开关05启用普通按键控制
 	{
 	/*********************摇杆检测************************************/
-		//根据遥杠调整电机速度
-		NRF24L01_GetData(ROCKER_TRANSMIT);
 
 		switch(Y)
 		{
-			case 0x09:Speed(0x00);break;
+			case STOP_Y:Speed(0x00);break;
 			case UP_1:Speed(Set_Speed/10);break;
 			case UP_2:Speed(Set_Speed/4);break;
 			case UP_3:Speed(Set_Speed/2);break;
@@ -202,7 +191,7 @@ void State1(void)
 			case RIGHT_2:Speed(Set_Speed/10);RightInversion=-1;break;
 			case RIGHT_3:Speed(Set_Speed/4);RightInversion=-1;break;
 			case RIGHT_4:Speed(Set_Speed/2);RightInversion=-1;break;
-		
+			case STOP_X:Speed(0x00);break;	
 		}
 		
 		/********************按键检测************************************/
@@ -257,7 +246,7 @@ void State2(void)
 //				Relay_Set(ALL, SET);
 //			break;
 			case AUTO_FEED:	//自动喂料开
-				GetFeedTime(&feedTime1, &feedTime2, &feedTime3); 
+				Get_FeedTime(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
 			break;
 		}
 		
@@ -277,7 +266,7 @@ void State3(void)
 {
 	switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case EmergencyFault	:	SpeedLeft=0;SpeedRight=0;break;//急停
+			case EmergencyFault		:	SpeedLeft=0;SpeedRight=0;break;//急停
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//启动
 			case KEY_PIN2_NUM		:	break;
 			case KEY_PIN3_NUM		:	SpeedLeft=0;SpeedRight=0;break;//急停
@@ -288,10 +277,10 @@ void State3(void)
 		}
 }
 
-void Data_Analyse(void)
+void Data_Analyse(uint8_t *Rocker_XY)
 {
 	static uint8_t SwitchNum, LastSwitchNum;	
-	Value = NRF24L01_GetData(ROCKER_TRANSMIT);
+	*Rocker_XY = NRF24L01_GetData(ROCKER_TRANSMIT);
 	//X表示实际操作时摇杆左、右拨(应用层)
 	X = (Value&0xF0)>>4;
 	Y = Value&0x0F;
@@ -375,28 +364,26 @@ void TIM2_IRQHandler(void)
 				Hcsr04_StartFlag = 0x01;		//大于4，变为1
 			Hcsr04_StartFlag |= 0x08;			//超声波检测使能位
 		}
-	
-        //灯闪烁
-        T2Count[1] ++;
-        if (T2Count[1] >= 500)
-        {
-            T2Count[1] = 0;
-            GPIO_WriteBit(GPIOB, GPIO_Pin_1, (BitAction)!GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_1));
-        }  
 
-        //超时时间
+        //Timeout减到0，则获取鸽子数量
         if (Timeout > 0)
             Timeout --;
 		else
 			Timeout = 0;
 		//喂料器时间
-		if (feedTime1 > 0) feedTime1 --;
-		else feedTime1 = 0;
-		if (feedTime2 > 0) feedTime2 --;
-		else feedTime2 = 0;
-		if (feedTime3 > 0) feedTime3 --;
-		else feedTime3 = 0;
-		
+		if (feeder1.Time > 0) feeder1.Time --;
+		else feeder1.Time = 0;
+		if (feeder2.Time > 0) feeder2.Time --;
+		else feeder2.Time = 0;
+		if (feeder3.Time > 0) feeder3.Time --;
+		else feeder3.Time = 0;
+		//自动落料的时间
+		if (feeder1.AutoTime_ms > 0) feeder1.AutoTime_ms --;
+		else feeder1.AutoTime_ms = 0;
+		if (feeder2.AutoTime_ms > 0) feeder2.AutoTime_ms --;
+		else feeder2.AutoTime_ms = 0;
+		if (feeder3.AutoTime_ms > 0) feeder3.AutoTime_ms --;
+		else feeder3.AutoTime_ms = 0;	
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
 }

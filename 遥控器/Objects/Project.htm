@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Sun Apr 16 18:13:51 2023
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Mon Apr 17 12:18:14 2023
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1433,7 +1433,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[3e]"></a>Normal_IRQHandler</STRONG> (Thumb, 166 bytes, Stack size 8 bytes, main.o(i.Normal_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = Normal_IRQHandler &rArr; Rocker_Loop &rArr; Rocker_GetNum2Loop &rArr; __aeabi_fmul
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = Normal_IRQHandler &rArr; Rocker_Loop &rArr; Rocker_GetNum2Loop &rArr; __aeabi_fmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CloseBuzzer
 <LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Switch_Loop
@@ -1661,8 +1661,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetData
 </UL>
 
-<P><STRONG><a name="[d4]"></a>Rocker_GetNum2Loop</STRONG> (Thumb, 304 bytes, Stack size 32 bytes, rocker.o(i.Rocker_GetNum2Loop))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Rocker_GetNum2Loop &rArr; __aeabi_fmul
+<P><STRONG><a name="[d4]"></a>Rocker_GetNum2Loop</STRONG> (Thumb, 306 bytes, Stack size 40 bytes, rocker.o(i.Rocker_GetNum2Loop))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = Rocker_GetNum2Loop &rArr; __aeabi_fmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
@@ -1683,7 +1683,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[e9]"></a>Rocker_Loop</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, rocker.o(i.Rocker_Loop))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = Rocker_Loop &rArr; Rocker_GetNum2Loop &rArr; __aeabi_fmul
+<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = Rocker_Loop &rArr; Rocker_GetNum2Loop &rArr; __aeabi_fmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rocker_GetNum2Loop
 </UL>

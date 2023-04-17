@@ -46,7 +46,8 @@ void USART1_Config(void)
 }
 
 /**
-  * @brief  串口向电脑调用视觉，得到要喂料的时间。
+  * @brief  串口向电脑调用视觉，得到要喂料的时间。数据格式：1xxx2xxx3xxx。其中1，2，3表示
+对应的1，2，3号相机，后面的三位数表示识别到的鸽子数量。
   * @param  
   * @retval None
   */
@@ -64,17 +65,17 @@ void USART1_GetBirdNum(uint8_t* Bird1, uint8_t* Bird2, uint8_t* Bird3)
 //        OLED_ShowNum(1,16,1,1);
 //    else
 //        OLED_ShowNum(1,16,0,1);
-    //喂料时间1
+    //1号相机的鸽子数量
 	if (USART_Temp[1]<'0' || USART_Temp[2]<'0' || USART_Temp[3]<'0')
 		*Bird1 = 0;
 	else
 		*Bird1 = (USART_Temp[1]-'0')*100 + (USART_Temp[2]-'0')*10 + (USART_Temp[3]-'0');
-	//喂料时间2
+	//2号相机的鸽子数量
 	if (USART_Temp[5]<'0' || USART_Temp[6]<'0' || USART_Temp[7]<'0')
 		*Bird2 = 0;
 	else
 		*Bird2 = (USART_Temp[5]-'0')*100 + (USART_Temp[6]-'0')*10 + (USART_Temp[7]-'0');
-	//喂料时间3
+	//3号相机的鸽子数量
 	if (USART_Temp[9]<'0' || USART_Temp[10]<'0' || USART_Temp[11]<'0')
 		*Bird3 = 0;
 	else

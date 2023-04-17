@@ -50,6 +50,8 @@
 #define RIGHT_2					X_Z2
 #define RIGHT_3					X_Z3
 #define RIGHT_4					X_Z4
+#define STOP_X					X_MIDDLE	//应用层上的X
+#define STOP_Y					Y_MIDDLE	//应用层上的Y
 //物理层(F为负，Z为正)
 #define X_F1					0x1		//1,2,3,4表示程度。1为最小，5最大。
 #define X_F2					0x2
@@ -67,6 +69,8 @@
 #define Y_Z2					0x6
 #define Y_Z3					0x7
 #define Y_Z4					0x8
+#define X_MIDDLE				0x9
+#define Y_MIDDLE				0x9
 #define MEDIWM					0x99
 
 typedef enum{

@@ -6,7 +6,6 @@
 #include "Hcsr04.h"
 
 uint8_t Bird1, Bird2, Bird3;
-uint32_t Timeout;
 float Distance1, Distance2, Distance3, Distance4;
 
 /**		得到四个超声波到料仓间的距离
@@ -18,7 +17,7 @@ void Get_Distance(uint8_t *Hcsr04_StartFlag)
 {
 	if ((*Hcsr04_StartFlag)&0x08)	//超声波是否使能
 	{
-		switch((*Hcsr04_StartFlag)&0x07)	//第几个超声波运行
+		switch((*Hcsr04_StartFlag)&0x07)	//第几个超声波运行(这里用十进制的逻辑，不是二进制)
 		{
 			case 1: Distance1 = Hcsr04_GetDistance1();break;
 			case 2: Distance2 = Hcsr04_GetDistance2();break;
@@ -43,8 +42,9 @@ void Get_Distance(uint8_t *Hcsr04_StartFlag)
   * @param  
   * @retval None
   */
-void MonitorFeed(void)
+void MonitorFeed(uint8_t *Hcsr04_StartFlag)
 {
+	Get_Distance(Hcsr04_StartFlag);
 //1	
 		if(Distance1 > 169.7)
 			OLED_ShowString(3, 3, "Lo");
@@ -77,6 +77,14 @@ void MonitorFeed(void)
 			else
 				OLED_ShowString(3, 14, "Fu");
 		}
+//		OLED_ShowNum(3 , 1, Distance1/10, 2);
+////		OLED_ShowString(3, 3,"%");
+//		OLED_ShowNum(3 , 5, Distance2/10, 2);
+////		OLED_ShowString(3, 7,"%");
+//		OLED_ShowNum(3 , 9, Distance3/10, 2);
+////		OLED_ShowString(3, 11,"%");
+////		OLED_ShowNum(3 , 13, Distance4/10, 2);//避障用
+
 }
 
 
@@ -92,33 +100,45 @@ void Feeding_Init(void)
 }
 
 //每隔0.5s获取现在的鸽子数量
-void Get_BirdNum(void)
+void Get_BirdNum(uint32_t *Timeout)
 {
-	if (Timeout == 0)
+	if (*Timeout == 0)
 	{
 		USART1_GetBirdNum(&Bird1, &Bird2, &Bird3);
-		Timeout = 500;
+		*Timeout = 500;
 	}
 	OLED_ShowNum(1,4,Bird1,1);
 	OLED_ShowNum(1,6,Bird2,1);
 	OLED_ShowNum(1,8,Bird3,1);
 }
 
-void GetFeedTime(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3)
+/**		将落料秒数转化为毫秒(一只鸽子定义为1s)
+  * @brief  Convert unit 's' of feeding to 'ms'.
+  * @param  
+  * @retval None
+  */
+void Get_FeedTime(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3)
 {
 	*feedTime1 = Bird1 * FEEDTIME_PERBIRD;
 	*feedTime2 = Bird2 * FEEDTIME_PERBIRD;
 	*feedTime3 = Bird3 * FEEDTIME_PERBIRD;
 }	
 
-void StartFeed(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3)
+/**		根据输入的秒数驱动落料器
+  * @brief  Driving feeder according to the input seconds.
+* @param  feedTime1: 落料器1的秒数
+  		  feedTime2: 落料器2的秒数
+		  feedTime3: 落料器3的秒数
+  * @retval None
+  */
+void StartFeed(uint32_t* feedTime1_ms, uint32_t* feedTime2_ms, uint32_t* feedTime3_ms)
 {
-	if (*feedTime1 > 0) Relay_Set(1, SET);
+	if (*feedTime1_ms > 0) Relay_Set(1, SET);
 	else Relay_Set(1, RESET);
 	
-	if (*feedTime2 > 0) Relay_Set(2, SET);
+	if (*feedTime2_ms > 0) Relay_Set(2, SET);
 	else Relay_Set(2, RESET);
 		
-	if (*feedTime3 > 0) Relay_Set(3, SET);
+	if (*feedTime3_ms > 0) Relay_Set(3, SET);
 	else Relay_Set(3, RESET);		
 }

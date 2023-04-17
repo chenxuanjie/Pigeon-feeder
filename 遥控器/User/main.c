@@ -282,17 +282,18 @@ void GetData(void)
 	if (State == STATE_SETTING)
 	{
 		//遥控器对”上下左右”的判定
-		RockerNum = Rocker_GetNum();
-		RockerNum_Y = RockerNum&0x0F;
+		RockerNum = Rocker_GetNum();	//只有摇杆拨动到不同位置，才有数值，且数值执行一次后会清0
 		RockerNum_X = (RockerNum&0xF0)>>4;
+		RockerNum_Y = RockerNum&0x0F;
 	}
 	else if (State == STATE_DEBUG)
 	{
- 		RockerNum = Rocker_GetNum2Loop();	//原始数据
-		RockerNum_Y = RockerNum&0x0F;
+ 		RockerNum = Rocker_GetNum2Loop();	//数值不断更新，且不清0	
 		RockerNum_X = (RockerNum&0xF0)>>4;
-		OLED_ShowNum(1, 3, RockerNum_X, 2);
-		OLED_ShowNum(1, 8, RockerNum_Y, 2);	
+		RockerNum_Y = RockerNum&0x0F;
+		//应用层上的XY显示 便于调试
+		OLED_ShowNum(1, 3, RockerNum_X, 2);	//应用上的X
+		OLED_ShowNum(1, 8, RockerNum_Y, 2);	//应用上的Y
 	}
 }
 
