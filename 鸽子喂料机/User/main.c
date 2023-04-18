@@ -13,6 +13,7 @@
 Program: pigeon-feeder
 History:
 	2023/4/17	Shane	17th release
+	1. change speed() -> Robot_SetSpeed()
 */
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
@@ -28,7 +29,6 @@ History:
 #include "TIM2.h"
 #include "Feed.h"
 #include "State3.h"
-//#include "Hcsr04.h"
 
 typedef struct machine{
 	uint32_t Time;
@@ -58,7 +58,8 @@ void HandleData(void);
 	
 int main(void)
 {	
-	Init();	
+	Init();
+	
 	while (1)
 	{
 		OLED_ShowHexNum(1,15,Value,2);  //遥杆坐标
@@ -116,6 +117,7 @@ void Init(void)
 }
 void While_Init()
 {
+	//定时获取鸽子识别数量
 	Get_BirdNum(&Timeout);
 	//手动设置的落料时间
 	if (Feeding_AutoFlag==RESET && Feeding_ManualFlag==RESET)
