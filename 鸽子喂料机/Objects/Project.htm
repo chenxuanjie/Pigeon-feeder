@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Apr 18 21:09:14 2023
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Apr 18 22:55:46 2023
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1400,7 +1400,6 @@ Global Symbols
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_Pow
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;State1
 <LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_BirdNum
 <LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_TIMEOUT_UserCallback
 </UL>
@@ -1610,19 +1609,18 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;While_Init
 </UL>
 
-<P><STRONG><a name="[ef]"></a>State1</STRONG> (Thumb, 162 bytes, Stack size 8 bytes, main.o(i.State1))
-<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = State1 &rArr; OLED_ShowNum &rArr; OLED_ShowChar &rArr; OLED_SetCursor &rArr; OLED_WriteCommand &rArr; OLED_I2C_SendByte
+<P><STRONG><a name="[ef]"></a>State1</STRONG> (Thumb, 146 bytes, Stack size 8 bytes, main.o(i.State1))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = State1 &rArr; TSDA_Order &rArr; Usart_SendByte &rArr; LEDO_ON
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Robot_SelfTurn
 <LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Robot_SetSpeed
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TSDA_Order
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NRF24L01_GetData
-<LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_ShowNum
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[f0]"></a>State2</STRONG> (Thumb, 266 bytes, Stack size 8 bytes, main.o(i.State2))
+<P><STRONG><a name="[f0]"></a>State2</STRONG> (Thumb, 272 bytes, Stack size 8 bytes, main.o(i.State2))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = State2 &rArr; TSDA_Order &rArr; Usart_SendByte &rArr; LEDO_ON
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_FeedTime
@@ -1934,7 +1932,7 @@ Global Symbols
 <LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TSDA_Data
 </UL>
 
-<P><STRONG><a name="[118]"></a>While_Init</STRONG> (Thumb, 242 bytes, Stack size 8 bytes, main.o(i.While_Init))
+<P><STRONG><a name="[118]"></a>While_Init</STRONG> (Thumb, 282 bytes, Stack size 8 bytes, main.o(i.While_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = While_Init &rArr; NRF24L01_ReceiveData &rArr; NRF24L01_ReadData &rArr; SPI_SendByte &rArr; SPI_TIMEOUT_UserCallback &rArr; OLED_ShowNum &rArr; OLED_ShowChar &rArr; OLED_SetCursor &rArr; OLED_WriteCommand &rArr; OLED_I2C_SendByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_SetBits

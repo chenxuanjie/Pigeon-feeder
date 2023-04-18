@@ -122,6 +122,10 @@ void While_Init()
 	//手动设置的落料时间
 	if (Feeding_AutoFlag==RESET && Feeding_ManualFlag==RESET)
 		StartFeed(&feeder1.Time, &feeder2.Time, &feeder3.Time);
+	else if (Feeding_AutoFlag==SET && Feeding_ManualFlag==RESET)	//自动落料时间
+		StartFeed(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms);
+	if (feeder1.AutoTime_ms==0 && &feeder2.AutoTime_ms==0 && &feeder3.AutoTime_ms==0)
+		Feeding_AutoFlag = RESET;
 	MonitorFeed(&Hcsr04_StartFlag);
 	State0 = NRF24L01_ReadByte(STATUS);
 	Info1 = NRF24L01_ReadByte(EN_AA);
@@ -152,7 +156,6 @@ void While_Init()
 
 void State1(void)
 {
-	OLED_ShowNum(4,15,Set_Speed,2);
 		if(NRF24L01_GetData(SWITCH_TRANSMIT)==SWITCH3_PIN2_NUM+SWITCH2_PIN1_NUM)	//拨钮开关05启用普通按键控制
 	{
 	/*********************摇杆检测************************************/
@@ -203,7 +206,8 @@ void State2(void)
 		switch( NRF24L01_GetData(NORMAL_TRANSMIT))
 		{
 			case FEED_OFF:	//喂料器关
-				Relay_Set(ALL, RESET);
+				if(Feeding_AutoFlag == RESET)
+					Relay_Set(ALL, RESET);
 				Feeding_ManualFlag = RESET;
 			break;
 			case FEED_ON:	//喂料器开

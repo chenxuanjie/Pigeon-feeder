@@ -124,7 +124,7 @@ uint8_t NRF24L01_ReceiveData(void)
   */
 uint8_t NRF24L01_GetData(uint8_t ArrayNum)
 {
-	return RX_BUF[ArrayNum];
+	return TX_BUF[ArrayNum];
 }
 
 /**

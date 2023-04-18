@@ -35,7 +35,7 @@ History:
 #include <stdio.h>
 
 uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum, Feeding_AutoFlag;
-uint8_t FeedChose, FeedSwitch, Select=2, LastSelect, State=10, State1;
+uint8_t FeedChose, FeedSwitch=RESET, Select=2, LastSelect, State=10, State1;
 uint8_t State, StateChangeFlag;
 uint16_t Voltage;
 uint32_t FeedTemp;
@@ -68,6 +68,9 @@ int main(void)
 	ReadData();
 	while (1)
 	{
+		OLED_ShowNum(4, 15, Feeding_AutoFlag, 2);
+		OLED_ShowNum(4, 1, NRF24L01_GetData(NORMAL_TRANSMIT), 2);
+
 		GetData();
 		Get_State();
 		Transmit();

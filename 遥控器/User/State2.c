@@ -44,6 +44,8 @@ void Feeding_AutoFeedSet(uint8_t *Flag, uint8_t BlinkTimes)
 	{
 		*Flag = BlinkTimes;
 		NRF24L01_SetBuf(NORMAL_TRANSMIT, AUTO_FEED_ON);
+		OLED_ShowNum(1,1,1,1);
+		OLED_ShowNum(4,3,NRF24L01_GetData(NORMAL_TRANSMIT),1);
 	}
 }
 
