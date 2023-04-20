@@ -28,6 +28,7 @@ History:
 #include "Hcsr04.h"
 #include "TIM2.h"
 #include "Feed.h"
+#include "TrackingLine.h"
 #include "State3.h"
 
 typedef struct machine{
@@ -37,7 +38,6 @@ typedef struct machine{
 
 int16_t Set_Data,Set_Speed=20, Num;//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
-uint8_t Info1, Info2, Info3, Info4, State0;
 uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET;
 int16_t SpeedRight_Robot=0,SpeedLeft_Robot=0;
 int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
@@ -66,7 +66,8 @@ int main(void)
 		OLED_ShowNum(2,1,feeder1.AutoTime_ms,4);
 		OLED_ShowNum(2,6,feeder2.AutoTime_ms,4);
 		OLED_ShowNum(2,11,feeder3.AutoTime_ms,4);
-		
+		OLED_ShowNum(1,10,Feeding_AutoFlag,2);
+		OLED_ShowNum(1,12,Feeding_ManualFlag,2);
 			
 		While_Init();
 		switch (State)//遥控右上角拨杆档位
@@ -104,6 +105,7 @@ int main(void)
   */
 void Init(void)
 {
+//	TrackingLine_Init();
 	LED_Init();
 	OLED_Init( );
 	NRF24L01_Init();
@@ -121,29 +123,20 @@ void While_Init()
 	Get_BirdNum(&Timeout);
 	//手动设置的落料时间
 	if (Feeding_AutoFlag==RESET && Feeding_ManualFlag==RESET)
-		StartFeed(&feeder1.Time, &feeder2.Time, &feeder3.Time);
+		StartFeed(feeder1.Time, feeder2.Time, feeder3.Time);
 	else if (Feeding_AutoFlag==SET && Feeding_ManualFlag==RESET)	//自动落料时间
-		StartFeed(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms);
-	if (feeder1.AutoTime_ms==0 && &feeder2.AutoTime_ms==0 && &feeder3.AutoTime_ms==0)
+		StartFeed(feeder1.AutoTime_ms, feeder2.AutoTime_ms, feeder3.AutoTime_ms);
+
+	if (feeder1.AutoTime_ms==0 && feeder2.AutoTime_ms==0 && feeder3.AutoTime_ms==0)
 		Feeding_AutoFlag = RESET;
 	MonitorFeed(&Hcsr04_StartFlag);
-	State0 = NRF24L01_ReadByte(STATUS);
-	Info1 = NRF24L01_ReadByte(EN_AA);
-	Info2 = NRF24L01_ReadByte(EN_RXADDR);
-	Info3 = NRF24L01_ReadByte(RX_ADDR_P0);
-	Info4 = NRF24L01_ReadByte(FIFO_STATUS);
 	Flag = NRF24L01_ReceiveData();
-	//light
-	if (Info4 != 0x11)
-		GPIO_ResetBits(GPIOA, GPIO_Pin_8);
-	else
-		GPIO_SetBits(GPIOA, GPIO_Pin_8);
 
-	OLED_ShowHexNum(4, 1, State0, 2);
-	OLED_ShowHexNum(4, 4, Info1, 2);
-	OLED_ShowHexNum(4, 7, Info2, 2);
-	OLED_ShowHexNum(4, 10, Info3, 2);
-	OLED_ShowHexNum(4, 13, Info4, 2);
+	OLED_ShowHexNum(4, 1, NRF24L01_ReadByte(STATUS), 2);
+	OLED_ShowHexNum(4, 4, NRF24L01_ReadByte(EN_AA), 2);
+	OLED_ShowHexNum(4, 7, NRF24L01_ReadByte(EN_RXADDR), 2);
+	OLED_ShowHexNum(4, 10, NRF24L01_ReadByte(RX_ADDR_P0), 2);
+	OLED_ShowHexNum(4, 13, NRF24L01_ReadByte(FIFO_STATUS), 2);
 
 	if (NRF24L01_GetData(NORMAL_TRANSMIT) != 0)
 	OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);

@@ -131,15 +131,15 @@ void Get_FeedTime(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3)
 		  feedTime3: ÂäÁÏÆ÷3µÄÃëÊý
   * @retval None
   */
-void StartFeed(uint32_t* feedTime1_ms, uint32_t* feedTime2_ms, uint32_t* feedTime3_ms)
+void StartFeed(uint32_t feedTime1_ms, uint32_t feedTime2_ms, uint32_t feedTime3_ms)
 {
-	if (*feedTime1_ms > 0) Relay_Set(1, SET);
+	if (feedTime1_ms > 0) Relay_Set(1, SET);
 	else Relay_Set(1, RESET);
 	
-	if (*feedTime2_ms > 0) Relay_Set(2, SET);
+	if (feedTime2_ms > 0) Relay_Set(2, SET);
 	else Relay_Set(2, RESET);
 		
-	if (*feedTime3_ms > 0) Relay_Set(3, SET);
+	if (feedTime3_ms > 0) Relay_Set(3, SET);
 	else Relay_Set(3, RESET);			
 }
 

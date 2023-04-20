@@ -68,9 +68,6 @@ int main(void)
 	ReadData();
 	while (1)
 	{
-		OLED_ShowNum(4, 15, Feeding_AutoFlag, 2);
-		OLED_ShowNum(4, 1, NRF24L01_GetData(NORMAL_TRANSMIT), 2);
-
 		GetData();
 		Get_State();
 		Transmit();
@@ -218,6 +215,11 @@ uint8_t State2(void)
 {
 	OLED_ShowString(1, 2, "CONTROL");
 	OLED_ShowString(3, 1, "HandFeed:");
+	//车体能否运行
+	if (KeyNum == KEY_PIN2_NUM)
+		OLED_ShowString(4, 1, "ENABLE ");
+	else if (KeyNum == KEY_PIN3_NUM)
+		OLED_ShowString(4, 1, "DISABLE");
 	//设置相同的落料时间
 	if (FeedSwitch==SET && Feeding_AutoFlag==RESET)
 	{

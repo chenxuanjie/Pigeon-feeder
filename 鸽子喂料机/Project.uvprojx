@@ -830,6 +830,16 @@
               <FileType>5</FileType>
               <FilePath>.\User\State3.h</FilePath>
             </File>
+            <File>
+              <FileName>TrackingLine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\TrackingLine.c</FilePath>
+            </File>
+            <File>
+              <FileName>TrackingLine.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\TrackingLine.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
