@@ -1,6 +1,9 @@
 #ifndef __TRACKINGLINE_H__
 #define __TRACKINGLINE_H__
 
+//鸽子机在一次循迹过程中的喂料次数
+#define DIGITAL_FEEDINGTIMES	2
+
 //循迹模式下的速度设置
 #define TRACKINGLINE_BASESPEED		20/10	//一般的Set_Speed为20
 #define TRACKINGLINE_TURNSPEED		20/5

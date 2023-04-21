@@ -19,20 +19,20 @@ void Robot_DifferentialTurn(uint8_t X, uint8_t Y, int16_t Set_Speed)
 	// add speed with TURNSPEED
 	switch(Y)
 	{
-		case UP_1: FinalSPeedLeft += BASESPEED;  FinalSPeedRight += BASESPEED;break;	//改善手感，在摇杆1处不改变方向
+		case UP_1: FinalSPeedLeft += SPEED1;  FinalSPeedRight += SPEED1;break;	//改善手感，在摇杆1处不改变方向
 		case UP_2: Set_LeftDirection(FRONT);Set_RightDirection(FRONT);
-			FinalSPeedLeft += BASESPEED;  FinalSPeedRight += BASESPEED;break;
+			FinalSPeedLeft += SPEED1;  FinalSPeedRight += SPEED1;break;
 		case UP_3: Set_LeftDirection(FRONT);Set_RightDirection(FRONT);
-			FinalSPeedLeft += SPEED1;  FinalSPeedRight += SPEED1;break;
+			FinalSPeedLeft += SPEED2;  FinalSPeedRight += SPEED2;break;
 		case UP_4:  Set_LeftDirection(FRONT);Set_RightDirection(FRONT);
-			FinalSPeedLeft += SPEED2;  FinalSPeedRight += SPEED2;break;
-		case DOWN_1: FinalSPeedLeft += BASESPEED;  FinalSPeedRight += BASESPEED;break;	//改善手感，在摇杆1处不改变方向
+			FinalSPeedLeft += SPEED3;  FinalSPeedRight += SPEED3;break;
+		case DOWN_1: FinalSPeedLeft += SPEED1;  FinalSPeedRight += SPEED1;break;	//改善手感，在摇杆1处不改变方向
 		case DOWN_2: Set_LeftDirection(BACK);Set_RightDirection(BACK);
-			FinalSPeedLeft += BASESPEED;  FinalSPeedRight += BASESPEED;break;
-		case DOWN_3: Set_LeftDirection(BACK);Set_RightDirection(BACK);
 			FinalSPeedLeft += SPEED1;  FinalSPeedRight += SPEED1;break;
-		case DOWN_4: Set_LeftDirection(BACK);Set_RightDirection(BACK);
+		case DOWN_3: Set_LeftDirection(BACK);Set_RightDirection(BACK);
 			FinalSPeedLeft += SPEED2;  FinalSPeedRight += SPEED2;break;
+		case DOWN_4: Set_LeftDirection(BACK);Set_RightDirection(BACK);
+			FinalSPeedLeft += SPEED3;  FinalSPeedRight += SPEED3;break;
 		case STOP_Y: Robot_SetSpeed(0x00);break;
 	}
 	switch(X)
@@ -53,7 +53,7 @@ void Robot_DifferentialTurn(uint8_t X, uint8_t Y, int16_t Set_Speed)
 		Set_LeftDirection(FRONT);
 		Set_RightDirection(FRONT);
 	}
-	//摇杆不在中位时才可设置速度。
+	//摇杆不在中位时才可设置速度。(避免摇杆在中位时仍然会动)
 	if (Y!=STOP_Y || X!=STOP_X)
 	{
 		Robot_SetSpeedLeft(FinalSPeedLeft);

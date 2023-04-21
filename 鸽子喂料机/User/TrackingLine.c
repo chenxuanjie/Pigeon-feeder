@@ -6,6 +6,8 @@
 #include "Robot.h"
 #include "Feed.h"
 
+uint8_t Digital_StopFlag;
+
 /**
   * @brief  灰度传感器初始化函数
   * @param  无
@@ -77,7 +79,7 @@ uint8_t TrackingLine(void)
 {
 	uint8_t Digital_Mode;
 	//是否切换手动
-	if (TrackingLine_IfExit() != 0)
+	if (TrackingLine_IfExit())
 		Digital_Mode = DIGITAL_STOP;
 	else
 		Digital_Mode = Digital_ModeJudge();
@@ -110,19 +112,15 @@ uint8_t TrackingLine(void)
   */
 uint8_t Digital_ModeJudge(void)
 {
-	static uint8_t StopFlag;
 	if (Digital_L2==RESET && Digital_R2==RESET)		//直走
 		return DIGITAL_STRAIGHT;
 	else if (Digital_L2==SET && Digital_R2!=SET)	//左转
 		return DIGITAL_TURNLEFT;
 	else if (Digital_L2!=SET && Digital_R2==SET)	//右转
 		return DIGITAL_TURNRIGHT;
-	else if (Digital_L2==SET && Digital_R2==SET && StopFlag<=2)	//喂料
-	{
-//		StopFlag ++;	//每喂一次料加一
+	else if (Digital_L2==SET && Digital_R2==SET && Digital_StopFlag<=DIGITAL_FEEDINGTIMES)	//喂料
 		return DIGITAL_FEEDING;
-	}
-	else if (Digital_L2==SET && Digital_R2==SET && StopFlag>=3)	//停止
+	else if (Digital_L2==SET && Digital_R2==SET && Digital_StopFlag>DIGITAL_FEEDINGTIMES)	//停止
 		return DIGITAL_STOP;
 	else		
 		return 0;
@@ -179,14 +177,14 @@ uint8_t Digital_Turn(uint8_t Direction)
 		case LEFT:
 		{
 			while (!(Digital_L1==0 && Digital_M==0 && Digital_R1==1))	//转到右边有两边无
-				if (TrackingLine_IfExit() != 0)
+				if (TrackingLine_IfExit())
 					return 1;
 				else
 					Robot_Cirle(NI);
 			Robot_StopTime(500);
 			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
 			{
-				if (TrackingLine_IfExit() != 0)
+				if (TrackingLine_IfExit())
 					return 1;
 				else
 					Robot_Cirle(NI);
@@ -195,14 +193,14 @@ uint8_t Digital_Turn(uint8_t Direction)
 		case RIGHT:
 		{
 			while (!(Digital_L1==1 && Digital_M==0 && Digital_R1==0))	//转到左边有两边无
-				if (TrackingLine_IfExit() != 0)
+				if (TrackingLine_IfExit())
 					return 1;
 				else
 					Robot_Cirle(SHUN);
 			Robot_StopTime(500);
 			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
 			{
-				if (TrackingLine_IfExit() != 0)
+				if (TrackingLine_IfExit())
 					return 1;
 				else
 					Robot_Cirle(SHUN);
@@ -230,17 +228,30 @@ uint8_t Digital_Turn(uint8_t Direction)
 uint8_t Digital_Feeding(void)
 {
 	uint32_t feederTime1=0, feederTime2=0, feederTime3=0;
+	//停止1秒，准备落料
 	if (Robot_StopTime(1000) != 0)
 		return 1;
 	Get_FeedTime(&feederTime1, &feederTime2, &feederTime3);
+	//智能喂料，直到喂料完成
 	while(feederTime1!=0 && feederTime2!=0 && feederTime3!=0)
 	{
-		if (TrackingLine_IfExit() != 0)
+		if (TrackingLine_IfExit())
 			return 1;
 		else
 			StartFeed(feederTime1, feederTime2, feederTime3);
 	}
-		if (Robot_StopTime(500) != 0)
+	Digital_StopFlag ++;	//每喂一次料加一
+	//停止0.5秒，避免余料没有落完
+	if (Robot_StopTime(500) != 0)
 		return 1;	
+	//继续向前走一点，免得下次监测到继续喂料
+	Robot_DelaySet(1000);
+	while (!(Robot_DelayGet()))
+	{
+		if (TrackingLine_IfExit())
+			return 1;
+		else		
+			Digital_Straight();
+	}
 	return 0;
 }

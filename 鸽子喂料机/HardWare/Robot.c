@@ -37,11 +37,13 @@ int8_t Get_RightDirection(void)
 void Robot_TurnLeft(uint8_t Direction)
 {
 	//确定前进或者后退
-	Direction_Left = Direction; 
-	Direction_Right = Direction;
+	Set_LeftDirection(Direction); 
+	Set_RightDirection(Direction); 
 	//设定速度	
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
+				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
 }
 
 /**		循迹模式下的右转。
@@ -52,11 +54,13 @@ void Robot_TurnLeft(uint8_t Direction)
 void Robot_TurnRight(uint8_t Direction)
 {
 	//确定前进或者后退
-	Direction_Left = Direction; 
-	Direction_Right = Direction;
+	Set_LeftDirection(Direction); 
+	Set_RightDirection(Direction); 
 	//设定速度	
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
+	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
+				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
 }
 
 /**		循迹模式下的直行。
@@ -68,6 +72,8 @@ void Robot_Front(void)
 {
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
+				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
 }
 
 /**		循迹模式下的自旋旋转。(Direction为顺时针或逆时针)
@@ -83,13 +89,15 @@ void Robot_Cirle(uint8_t Direction)
 		Direction_Left = FRONT;		
 		Direction_Right = BACK;		//右转，右轮后退。
 	}		
-	if (Direction == NI)
+	else if (Direction == NI)
 	{
 		Direction_Left = BACK;		//左转，左轮后退。		
 		Direction_Right = FRONT;				
 	}
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);	
+	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
+				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
 }
 
 /**
@@ -124,7 +132,7 @@ uint8_t Robot_StopTime(uint16_t Num)
 	while(Robot_DelayGet())
 	{
 		Robot_Stop();
-		if (TrackingLine_IfExit() != 0)
+		if (TrackingLine_IfExit())
 			return 1;
 	}
 	return 0;
@@ -213,7 +221,7 @@ void Robot_Move(int16_t LeftSpeed,int16_t RightSpeed)
   */
 void Robot_Stop(void)
 {
+	Robot_SetSpeed(0);
 	TSDA_Data(LeftWheel,SpeedSetting,0X00);
 	TSDA_Data(RightWheel,SpeedSetting,0X00);
 }
-

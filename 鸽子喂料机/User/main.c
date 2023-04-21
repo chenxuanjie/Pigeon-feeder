@@ -149,7 +149,6 @@ void Remote_Managment(void)
 	//喂料结束后清0标志位
 	if (feeder1.AutoTime_ms==0 && feeder2.AutoTime_ms==0 && feeder3.AutoTime_ms==0)
 		Feeding_AutoFlag = RESET;
-
 }
 
 void While_Init()
@@ -324,7 +323,6 @@ void HandleData(void)
 	//常规发送位最高位作为连接标志位	
 	if ((NormalNum&0x80)!=RESET && Error==SET)	//半秒后最高位没有被清除
 	{
-
 		LINK_FLAG = 0;
 	}
 	else if ((NormalNum&0x80)==RESET && Error==SET)//正常工作
