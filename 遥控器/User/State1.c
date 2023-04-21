@@ -63,6 +63,10 @@ uint8_t Setting_OriginMode(uint8_t *State, uint8_t Select, uint8_t KeyNum)
   */
 uint8_t Setting_BuzzerMode(uint8_t *State, uint8_t Select, uint8_t KeyNum)
 {
+	OLED_ShowString(2, 1, "1.Buzzer:");
+	OLED_ShowString(3, 1, "2.KeyMusic:");
+	OLED_ShowString(4, 1, "3.Back");
+
 	BeepNum %= Buzzer_NUM+1;	//³¬¶î±£»¤
 	OLED_ShowNum(3, 12, BeepNum, 2);
 	if (BeepChose == SET)
@@ -103,6 +107,10 @@ uint8_t Setting_BuzzerMode(uint8_t *State, uint8_t Select, uint8_t KeyNum)
   */
 uint8_t Setting_OtherMode(uint8_t *State, uint8_t Select, uint8_t KeyNum)
 {
+	OLED_ShowString(2, 1, "1.");
+	OLED_ShowString(3, 1, "2.");
+	OLED_ShowString(4, 1, "3.Back");			
+
 	switch(Select)
 	{
 		case 4:

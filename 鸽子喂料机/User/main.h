@@ -1,6 +1,9 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
+//方向
+#define FRONT 	1
+#define BACK 	-1
 
 //发送的第n个数组
 #define NORMAL_TRANSMIT			0
@@ -16,6 +19,8 @@
 #define FEED_ON					(0x1 + 1)
 #define AUTO_FEED_OFF			(0x0 + 3)
 #define AUTO_FEED_ON			(0x1 + 3)
+#define TRACKINGLINE_OFF		(0x0 + 5)
+#define TRACKINGLINE_ON			(0x1 + 5)
 #define CHECK					(0xFE)
 
 //按键 KEY_TRANSMIT

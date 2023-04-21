@@ -5,9 +5,9 @@ void LED_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;	
 	/*开启LED相关的GPIO外设时钟*/
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE);
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB, ENABLE);
 	/*选择要控制的GPIO引脚*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;	
 
 	/*设置引脚模式为通用推挽输出*/
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;   
@@ -17,17 +17,17 @@ void LED_Init(void)
 
 	/*调用库函数，初始化GPIO*/
 	GPIO_Init(GPIOC, &GPIO_InitStructure);	
-	GPIO_ResetBits(GPIOC,GPIO_Pin_13);
+	GPIO_ResetBits(GPIOB,GPIO_Pin_1);
 	
 	LEDO_OFF();
 }
 
 void LEDO_ON(void)
 {
-	GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+	GPIO_ResetBits(GPIOB, GPIO_Pin_1);
 }
 
 void LEDO_OFF(void)
 {
-	GPIO_SetBits(GPIOC, GPIO_Pin_13);
+	GPIO_SetBits(GPIOB, GPIO_Pin_1);
 }

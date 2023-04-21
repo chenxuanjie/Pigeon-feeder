@@ -30,3 +30,6 @@
 .\objects\state3.o: .\Library\misc.h
 .\objects\state3.o: User\main.h
 .\objects\state3.o: .\HardWare\ROBOT.H
+.\objects\state3.o: User\State3.h
+.\objects\state3.o: .\HardWare\OLED.h
+.\objects\state3.o: .\HardWare\NRF24L01.h

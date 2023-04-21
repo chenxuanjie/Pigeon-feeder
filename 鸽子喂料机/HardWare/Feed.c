@@ -69,13 +69,13 @@ void MonitorFeed(uint8_t *Hcsr04_StartFlag)
 		
 //3
 		if(Distance3 > 169.7)
-			OLED_ShowString(3, 14, "Lo");
+			OLED_ShowString(3, 13, "Lo");
 		else
 		{
 			if(Distance3 > 62.35 && Distance3 <= 169.7)
-				OLED_ShowString(3, 14, "Mi");
+				OLED_ShowString(3, 13, "Mi");
 			else
-				OLED_ShowString(3, 14, "Fu");
+				OLED_ShowString(3, 13, "Fu");
 		}
 //		OLED_ShowNum(3 , 1, Distance1/10, 2);
 ////		OLED_ShowString(3, 3,"%");

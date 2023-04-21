@@ -31,3 +31,6 @@
 .\objects\robot.o: .\Library\misc.h
 .\objects\robot.o: HardWare\TSDA.H
 .\objects\robot.o: .\System\DELAY.H
+.\objects\robot.o: .\User\TrackingLine.h
+.\objects\robot.o: HardWare\NRF24L01.h
+.\objects\robot.o: .\User\main.h

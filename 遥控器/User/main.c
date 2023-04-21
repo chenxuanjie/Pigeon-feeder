@@ -34,7 +34,7 @@ History:
 #include "State3.h"
 #include <stdio.h>
 
-uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum, Feeding_AutoFlag;
+uint8_t RockerNum, RockerNum_X, RockerNum_Y, KeyNum, SwitchNum, Feeding_AutoFlag, TrackingLineFlag;
 uint8_t FeedChose, FeedSwitch=RESET, Select=2, LastSelect, State=10, State1;
 uint8_t State, StateChangeFlag;
 uint16_t Voltage;
@@ -215,6 +215,7 @@ uint8_t State2(void)
 {
 	OLED_ShowString(1, 2, "CONTROL");
 	OLED_ShowString(3, 1, "HandFeed:");
+	OLED_ShowString(4, 1, "Tracking:");
 	//车体能否运行
 	if (KeyNum == KEY_PIN2_NUM)
 		OLED_ShowString(4, 1, "ENABLE ");
@@ -240,10 +241,12 @@ uint8_t State2(void)
 	{
 		//自动喂料
 		case 2:
-		{
+		
 			if (KeyNum==KEY_ENTER && FeedSwitch==RESET)	//自动与手动不能同时开启
 				Feeding_AutoFeedSet(&Feeding_AutoFlag, 6);			
-		}break;
+		
+		break;
+		
 		case 3:
 			if ((KeyNum==KEY_LEFT || KeyNum==KEY_ENTER) && Feeding_AutoFlag==RESET)
 			{
@@ -254,7 +257,14 @@ uint8_t State2(void)
 					feeder2.Time_ms = feeder2.Time_s * 1000;
 					feeder3.Time_ms = feeder3.Time_s * 1000;
 				}
-			}
+			}			
+			break;
+		case 4:
+			if (KeyNum==KEY_ENTER)
+			{
+				TrackingLineFlag = ! TrackingLineFlag;
+				Control_TrackingLineMode(TrackingLineFlag);
+			}		
 			break;
 	}
 	Feeding_AutoFeedShow(Feeding_AutoFlag);
@@ -266,6 +276,8 @@ void GetData(void)
 	if (KeyNum != 0 && Get_BeepChose()==SET)
 		Buzzer_SetBeep(Get_BeepNum(), 100);
 	EncoderNum += Encoder_Get();
+	//封顶
+	EncoderNum %= 6;
 	if (State == STATE_SETTING)
 	{
 		//遥控器对”上下左右”的判定
@@ -378,14 +390,9 @@ void Turn(uint8_t inputState)
 	switch(inputState)
 	{
 		case STATE_SETTING_BUZZER:
-			OLED_ShowString(2, 1, "1.Buzzer:");
-			OLED_ShowString(3, 1, "2.KeyMusic:");
-			OLED_ShowString(4, 1, "3.Back");
 			break;
 		case STATE_SETTING_OTHER:
-			OLED_ShowString(2, 1, "1.");
-			OLED_ShowString(3, 1, "2.");
-			OLED_ShowString(4, 1, "3.Back");			
+			break;
 	}	
 }
 

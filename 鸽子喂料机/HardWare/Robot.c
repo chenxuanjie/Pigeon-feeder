@@ -1,8 +1,134 @@
 #include "ROBOT.H"
 #include "TSDA.H"
 #include "DELAY.H"
+#include "TrackingLine.h"
+#include "NRF24L01.h"
+#include "main.h"
 
+uint16_t Delay_Time;
+int8_t Direction_Right = FRONT, Direction_Left = FRONT;
 int16_t SpeedLeft=0,SpeedRight=0;
+
+void Set_LeftDirection(int8_t Direction)
+{
+	Direction_Left = Direction;
+}
+
+void Set_RightDirection(int8_t Direction)
+{
+	Direction_Right = Direction;
+}
+
+int8_t Get_LeftDirection(void)
+{
+	return Direction_Left;
+}
+
+int8_t Get_RightDirection(void)
+{
+	return Direction_Left;
+}
+
+/**		循迹模式下的左转。
+  * @brief  Turn left in the TrackingLine mode. 
+  * @param  无
+  * @retval 无
+  */
+void Robot_TurnLeft(uint8_t Direction)
+{
+	//确定前进或者后退
+	Direction_Left = Direction; 
+	Direction_Right = Direction;
+	//设定速度	
+	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+}
+
+/**		循迹模式下的右转。
+  * @brief  Turn right in the TrackingLine mode. 
+  * @param  无
+  * @retval 无
+  */
+void Robot_TurnRight(uint8_t Direction)
+{
+	//确定前进或者后退
+	Direction_Left = Direction; 
+	Direction_Right = Direction;
+	//设定速度	
+	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
+}
+
+/**		循迹模式下的直行。
+  * @brief  Go straight in the TrackingLine mode. 
+  * @param  无
+  * @retval 无
+  */
+void Robot_Front(void)
+{
+	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+}
+
+/**		循迹模式下的自旋旋转。(Direction为顺时针或逆时针)
+  * @brief  Self Turn in the TrackingLine mode. 
+* @param  Direction: SHUN: 
+					 NI:
+  * @retval 无
+  */
+void Robot_Cirle(uint8_t Direction)
+{
+	if (Direction == SHUN)
+	{
+		Direction_Left = FRONT;		
+		Direction_Right = BACK;		//右转，右轮后退。
+	}		
+	if (Direction == NI)
+	{
+		Direction_Left = BACK;		//左转，左轮后退。		
+		Direction_Right = FRONT;				
+	}
+	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);	
+}
+
+/**
+  * @brief  通过设定的延时时间，获取当前剩余时间值。
+  * @param  无
+  * @retval 剩余的时间值。单位：ms
+  */
+uint16_t Robot_DelayGet(void)
+{
+	return Delay_Time;
+}
+
+/**
+  * @brief  设定延时时间，设置1则为1ms。
+  * @param  Num：延时Value ms。
+  * @retval 无
+  */
+void Robot_DelaySet(uint16_t Num)
+{
+		Delay_Time = Num;
+}
+
+/**
+  * @brief  设置小车停止时间。
+  * @param  Num:停止时间。单位：ms
+* @retval 1: unexpected return. exit the trackingline mode.
+		  0: end stop. 
+  */
+uint8_t Robot_StopTime(uint16_t Num)
+{
+	Robot_DelaySet(Num);
+	while(Robot_DelayGet())
+	{
+		Robot_Stop();
+		if (TrackingLine_IfExit() != 0)
+			return 1;
+	}
+	return 0;
+}
 
 void Robot_SetSpeed(int16_t data)
 {
@@ -85,11 +211,9 @@ void Robot_Move(int16_t LeftSpeed,int16_t RightSpeed)
   * @param  无
   * @retval 无
   */
-void Robot_ShutDown(void)
+void Robot_Stop(void)
 {
-	
-	
-  TSDA_Data(LeftWheel,SpeedSetting,0X00);
+	TSDA_Data(LeftWheel,SpeedSetting,0X00);
 	TSDA_Data(RightWheel,SpeedSetting,0X00);
 }
 

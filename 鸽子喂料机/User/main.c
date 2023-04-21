@@ -36,11 +36,11 @@ typedef struct machine{
 	uint32_t AutoTime_ms;
 }machine;
 
-int16_t Set_Data,Set_Speed=20, Num;//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
+int16_t Set_Data,Set_Speed=20, Num;		//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
-uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET;
+uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET, TrackLineFlag=RESET;
 int16_t SpeedRight_Robot=0,SpeedLeft_Robot=0;
-int8_t LeftCalibration=1,RightCalibration=-1,LeftInversion=1,RightInversion=1;
+int8_t LeftCalibration=1,RightCalibration=-1 ;
 uint8_t DataReset=1,StopFlag=0;
 uint8_t Left=0,Right=0, State=1;
 uint32_t Timeout=0;
@@ -54,45 +54,45 @@ void State1(void);
 void State2(void);
 void State3(void);
 void While_Init(void);
+void TrackingLine_Managment(void);
 void HandleData(void);
+void Remote_Managment(void);
 	
 int main(void)
 {	
 	Init();
-	
 	while (1)
 	{
-		OLED_ShowHexNum(1,15,Value,2);  //遥杆坐标
-		OLED_ShowNum(2,1,feeder1.AutoTime_ms,4);
-		OLED_ShowNum(2,6,feeder2.AutoTime_ms,4);
-		OLED_ShowNum(2,11,feeder3.AutoTime_ms,4);
-		OLED_ShowNum(1,10,Feeding_AutoFlag,2);
-		OLED_ShowNum(1,12,Feeding_ManualFlag,2);
-			
-		While_Init();
-		switch (State)//遥控右上角拨杆档位
+		While_Init();		
+		//循迹模式
+		if (TrackLineFlag == SET)
 		{
-			case SETTINGSTATE://下
-				State3();
-				break;
-			case CONTROLSTATE://中
-				State2();
-				break;
-			case DEBUGSTATE://上
-				State1();
-				break;
+			TrackLineFlag = !(TrackingLine());
+			TrackingLine_Managment();
 		}
-		
+		else
+		{
+			Remote_Managment();
+			switch (State)//遥控右上角拨杆档位
+			{
+				case SETTINGSTATE://下
+					State3();
+					break;
+				case CONTROLSTATE://中
+					State2();
+					break;
+				case DEBUGSTATE://上
+					State1();
+					break;
+			}		
+		}
 		HandleData();
+		//停止
 		if(StopFlag==SET ){Robot_SetSpeed(0);}
-		
-
-/*********************算法驱动************************************/
-		SpeedLeft_Robot=LeftInversion*LeftCalibration*SpeedConversion(Robot_GetSpeedLeft());
-		SpeedRight_Robot=RightInversion*RightCalibration*SpeedConversion(Robot_GetSpeedRight());
-
-			Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
-
+		/*********************电机驱动************************************/
+		SpeedLeft_Robot=Get_LeftDirection()*LeftCalibration*SpeedConversion(Robot_GetSpeedLeft());
+		SpeedRight_Robot=Get_RightDirection()*RightCalibration*SpeedConversion(Robot_GetSpeedRight());
+		Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 
 		LEDO_OFF();			
 	}
@@ -105,7 +105,7 @@ int main(void)
   */
 void Init(void)
 {
-//	TrackingLine_Init();
+	TrackingLine_Init();
 	LED_Init();
 	OLED_Init( );
 	NRF24L01_Init();
@@ -115,23 +115,54 @@ void Init(void)
 	USART_Config();
 	Feeding_Init();	
 	Robot_Init();
-	OLED_printf(3, 1, "1:   2:     3:");
+	OLED_printf(3, 1, "1:   2:   3:");
 }
-void While_Init()
+
+void TrackingLine_Managment(void)
 {
-	//定时获取鸽子识别数量
-	Get_BirdNum(&Timeout);
-	//手动设置的落料时间
+	switch(NRF24L01_GetData(NORMAL_TRANSMIT))
+	{
+		case AUTO_FEED_ON:	//自动喂料开
+			Get_FeedTime(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms);
+			Feeding_AutoFlag = SET;
+		break;
+		case AUTO_FEED_OFF:	//自动喂料关
+			Feeding_CloseFeeder(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
+			Feeding_AutoFlag = RESET;
+		break;
+		case TRACKINGLINE_ON:	//自动循迹开启
+			TrackLineFlag = SET;
+		break;
+		case TRACKINGLINE_OFF:
+			TrackLineFlag = RESET;
+		break;
+	}
+}
+
+void Remote_Managment(void)
+{
+	//启动手动设置时间的落料
 	if (Feeding_AutoFlag==RESET && Feeding_ManualFlag==RESET)
 		StartFeed(feeder1.Time, feeder2.Time, feeder3.Time);
-	else if (Feeding_AutoFlag==SET && Feeding_ManualFlag==RESET)	//自动落料时间
+	else if (Feeding_AutoFlag==SET && Feeding_ManualFlag==RESET)	//启动自动落料
 		StartFeed(feeder1.AutoTime_ms, feeder2.AutoTime_ms, feeder3.AutoTime_ms);
-
+	//喂料结束后清0标志位
 	if (feeder1.AutoTime_ms==0 && feeder2.AutoTime_ms==0 && feeder3.AutoTime_ms==0)
 		Feeding_AutoFlag = RESET;
+
+}
+
+void While_Init()
+{
+	OLED_ShowHexNum(1,15,Value,2);  //遥杆坐标
+	OLED_ShowNum(2,1,feeder1.AutoTime_ms,4);
+	OLED_ShowNum(2,6,feeder2.AutoTime_ms,4);
+	OLED_ShowNum(2,11,feeder3.AutoTime_ms,4);
+	//定时获取鸽子识别数量
+	Get_BirdNum(&Timeout);
 	MonitorFeed(&Hcsr04_StartFlag);
 	Flag = NRF24L01_ReceiveData();
-
+	//NRF寄存器
 	OLED_ShowHexNum(4, 1, NRF24L01_ReadByte(STATUS), 2);
 	OLED_ShowHexNum(4, 4, NRF24L01_ReadByte(EN_AA), 2);
 	OLED_ShowHexNum(4, 7, NRF24L01_ReadByte(EN_RXADDR), 2);
@@ -153,9 +184,9 @@ void State1(void)
 	{
 	/*********************摇杆检测************************************/
 		//自旋转弯
-		Robot_SelfTurn(X, Y, &LeftInversion, &RightInversion, Set_Speed);
+//		Robot_SelfTurn(X, Y, Set_Speed);
 		//差速转弯
-//		Robot_DifferentialTurn(X, Y, &LeftInversion, &RightInversion, Set_Speed);
+		Robot_DifferentialTurn(X, Y, Set_Speed);
 	/********************按键检测************************************/
 	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
@@ -170,6 +201,7 @@ void State1(void)
 			case KEY_PIN7_NUM		:	break;
 		
 		}
+
 	}
 }
 
@@ -195,7 +227,7 @@ void State2(void)
 //		}
 
 	
-/*********************喂料************************************/		
+/*********************喂料与循迹************************************/		
 		switch( NRF24L01_GetData(NORMAL_TRANSMIT))
 		{
 			case FEED_OFF:	//喂料器关
@@ -214,6 +246,12 @@ void State2(void)
 			case AUTO_FEED_OFF:	//自动喂料关
 				Feeding_CloseFeeder(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
 				Feeding_AutoFlag = RESET;
+			break;
+			case TRACKINGLINE_ON:	//自动循迹开启
+				TrackLineFlag = SET;
+			break;
+			case TRACKINGLINE_OFF:
+				TrackLineFlag = RESET;
 			break;
 		}
 		
@@ -337,6 +375,9 @@ void TIM2_IRQHandler(void)
 		if (feeder1.AutoTime_ms > 0) feeder1.AutoTime_ms --;
 		if (feeder2.AutoTime_ms > 0) feeder2.AutoTime_ms --;
 		if (feeder3.AutoTime_ms > 0) feeder3.AutoTime_ms --;
+		//循迹模式下的延时时间
+		if (Robot_DelayGet() != 0)
+			Robot_DelaySet(Robot_DelayGet()-1);
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);	
 }

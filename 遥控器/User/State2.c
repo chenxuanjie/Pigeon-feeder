@@ -58,3 +58,18 @@ void Feeding_AutoFeedShow(uint8_t Flag)
 	OLED_ShowString(2, 1, "AutoFeed:   ");
 	
 }
+void Control_TrackingLineMode(uint8_t Flag)
+{
+	//显示循迹模式的开启与关闭
+	if (Flag == SET)
+	{
+		OLED_ShowString(4, 11, "ON ");
+		NRF24L01_SetBuf(NORMAL_TRANSMIT, TRACKINGLINE_ON);	
+	}
+	else
+	{
+		OLED_ShowString(4, 11, "OFF");
+		NRF24L01_SetBuf(NORMAL_TRANSMIT, TRACKINGLINE_OFF);	
+	}
+	
+}
