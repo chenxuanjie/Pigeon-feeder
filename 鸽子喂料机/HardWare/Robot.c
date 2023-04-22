@@ -121,6 +121,25 @@ void Robot_DelaySet(uint16_t Num)
 }
 
 /**
+  * @brief  设置小车直走时间。
+  * @param  Num:运行时间。单位：ms
+* @retval 1: unexpected return. exit the trackingline mode.
+		  0: end go straight. 
+  */
+uint8_t Robot_RunTime(uint16_t Num)
+{
+	Robot_DelaySet(Num);
+	while (Robot_DelayGet())
+	{
+		if (TrackingLine_IfExit())
+			return 1;
+		else		
+			Digital_Straight();
+	}
+	return 0;
+}
+
+/**
   * @brief  设置小车停止时间。
   * @param  Num:停止时间。单位：ms
 * @retval 1: unexpected return. exit the trackingline mode.

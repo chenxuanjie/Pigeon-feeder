@@ -25,6 +25,7 @@ void Robot_TurnLeft(uint8_t Direction);
 void Robot_TurnRight(uint8_t Direction);
 void Robot_Front(void);
 void Robot_Cirle(uint8_t Direction);
+uint8_t Robot_RunTime(uint16_t Num);
 uint8_t Robot_StopTime(uint16_t Num);
 void Robot_DelaySet(uint16_t Num);
 uint16_t Robot_DelayGet(void);

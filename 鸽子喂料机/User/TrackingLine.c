@@ -87,6 +87,8 @@ uint8_t TrackingLine(machine* machine1, machine* machine2, machine* machine3)
 {
 	uint8_t Digital_Mode;
 	static uint8_t Feeding_TrackingLineAutoTimes;
+	//显示
+	OLED_ShowNum(1,10,Feeding_TrackingLineAutoTimes,1);
 	//是否切换手动
 	if (TrackingLine_IfExit())
 		Digital_Mode = DIGITAL_STOP;
@@ -186,12 +188,6 @@ uint8_t Digital_Turn(uint8_t Direction)
 	{
 		case LEFT:
 		{
-			while (!(Digital_L1==0 && Digital_M==0 && Digital_R1==1))	//转到右边有两边无
-				if (TrackingLine_IfExit())
-					return 1;
-				else
-					Robot_Cirle(NI);
-			Robot_StopTime(500);
 			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
 			{
 				if (TrackingLine_IfExit())
@@ -202,12 +198,6 @@ uint8_t Digital_Turn(uint8_t Direction)
 		}break;
 		case RIGHT:
 		{
-			while (!(Digital_L1==1 && Digital_M==0 && Digital_R1==0))	//转到左边有两边无
-				if (TrackingLine_IfExit())
-					return 1;
-				else
-					Robot_Cirle(SHUN);
-			Robot_StopTime(500);
 			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
 			{
 				if (TrackingLine_IfExit())
@@ -232,6 +222,8 @@ uint8_t Digital_Turn(uint8_t Direction)
 	}
 	if (Robot_StopTime(500) != 0)
 		return 1;
+	if (Robot_RunTime(1000) != 0)
+		return 1;
 	return 0;
 }
 
@@ -250,18 +242,12 @@ uint8_t Digital_Feeding(machine* machine1, machine* machine2, machine* machine3,
 			StartFeed(machine1->SecondAutoTime_ms, machine2->SecondAutoTime_ms, machine3->SecondAutoTime_ms);
 	}
 	Feeding_CloseFeeder();		//喂料完成后，确保喂料器全部关闭
-	*TrackingLine_FeedFlag ++;	//每喂一次料加一
+	(*TrackingLine_FeedFlag) ++;	//每喂一次料加一
 	//停止0.5秒，避免余料没有落完
 	if (Robot_StopTime(500) != 0)
 		return 1;	
 	//继续向前走一点，免得下次监测到继续喂料
-	Robot_DelaySet(1000);
-	while (!(Robot_DelayGet()))
-	{
-		if (TrackingLine_IfExit())
-			return 1;
-		else		
-			Digital_Straight();
-	}
+	if (Robot_RunTime(500) != 0)
+		return 1;
 	return 0;
 }

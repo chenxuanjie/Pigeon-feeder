@@ -49,9 +49,9 @@ void State1(void);
 void State2(void);
 void State3(void);
 void While_Init(void);
+void Remote_Managment(void);
 void TrackingLine_Managment(void);
 void HandleData(void);
-void Remote_Managment(void);
 	
 int main(void)
 {	
@@ -64,12 +64,12 @@ int main(void)
 		{
 //			TrackLineFlag = !TrackingLine_Test();
 			TrackLineFlag = !(TrackingLine(&feeder1, &feeder2, &feeder3));
-			TrackingLine_Managment();
+//			TrackingLine_Managment();
 		}
 		else
 		{
 			Remote_Managment();
-			switch (State)//遥控右上角拨杆档位
+			switch (State)		//遥控右上角拨杆档位
 			{
 				case SETTINGSTATE://下
 					State3();
@@ -80,15 +80,15 @@ int main(void)
 				case DEBUGSTATE://上
 					State1();
 					break;
-			}		
+			}
+			/*********************电机驱动************************************/
+			SpeedLeft_Robot=Get_LeftDirection()*LeftCalibration*SpeedConversion(Robot_GetSpeedLeft());
+			SpeedRight_Robot=Get_RightDirection()*RightCalibration*SpeedConversion(Robot_GetSpeedRight());
+			Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 		}
 		HandleData();
 		//停止
 		if(StopFlag==SET ){Robot_SetSpeed(0);}
-		/*********************电机驱动************************************/
-		SpeedLeft_Robot=Get_LeftDirection()*LeftCalibration*SpeedConversion(Robot_GetSpeedLeft());
-		SpeedRight_Robot=Get_RightDirection()*RightCalibration*SpeedConversion(Robot_GetSpeedRight());
-		Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 
 		LEDO_OFF();			
 	}
@@ -116,28 +116,28 @@ void Init(void)
 
 void TrackingLine_Managment(void)
 {
-	switch(NRF24L01_GetData(NORMAL_TRANSMIT))
-	{
-		case AUTO_FEED_ON:	//自动喂料开
-			Get_FeedTime(&feeder1, &feeder2, &feeder3, Feeding_GetRemoteAutoTimes());
-			Feeding_AutoFlag = SET;
-			Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
-		break;
-		case AUTO_FEED_OFF:	//自动喂料关
-			Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
-			Feeding_AutoFlag = RESET;
-			Feeding_SetRemoteAutoTimes(0);
-		break;
-	}
-	switch (NRF24L01_GetData(TRACKINGLINE_TRANSMIT))
-	{
-		case TRACKINGLINE_ON:	//自动循迹开启
-			TrackLineFlag = SET;
-		break;
-		case TRACKINGLINE_OFF:
-			TrackLineFlag = RESET;
-		break;
-	}
+//	switch(NRF24L01_GetData(NORMAL_TRANSMIT))
+//	{
+//		case AUTO_FEED_ON:	//自动喂料开
+//			Get_FeedTime(&feeder1, &feeder2, &feeder3, Feeding_GetRemoteAutoTimes());
+//			Feeding_AutoFlag = SET;
+//			Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
+//		break;
+//		case AUTO_FEED_OFF:	//自动喂料关
+//			Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
+//			Feeding_AutoFlag = RESET;
+//			Feeding_SetRemoteAutoTimes(0);
+//		break;
+//	}
+//	switch (NRF24L01_GetData(TRACKINGLINE_TRANSMIT))
+//	{
+//		case TRACKINGLINE_ON:	//自动循迹开启
+//			TrackLineFlag = SET;
+//		break;
+//		case TRACKINGLINE_OFF:
+//			TrackLineFlag = RESET;
+//		break;
+//	}
 }
 
 void Remote_Managment(void)
@@ -244,7 +244,7 @@ void State2(void)
 				Feeding_AutoFlag = SET;
 				Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
 			break;
-			case AUTO_FEED_OFF:	//自动喂料关
+			case AUTO_FEED_OFF:	//自动喂料关(若关闭，需要回退一格笼子重新识别当前要喂料的笼子)
 				Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
 				Feeding_AutoFlag = RESET;
 				Feeding_SetRemoteAutoTimes(0);
