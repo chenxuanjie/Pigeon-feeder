@@ -121,12 +121,12 @@ void TrackingLine_Managment(void)
 		case AUTO_FEED_ON:	//自动喂料开
 			Get_FeedTime(&feeder1, &feeder2, &feeder3, Feeding_GetRemoteAutoTimes());
 			Feeding_AutoFlag = SET;
-//			Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
+			Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
 		break;
 		case AUTO_FEED_OFF:	//自动喂料关
 			Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
 			Feeding_AutoFlag = RESET;
-//			Feeding_SetRemoteAutoTimes(0);
+			Feeding_SetRemoteAutoTimes(0);
 		break;
 	}
 	switch (NRF24L01_GetData(TRACKINGLINE_TRANSMIT))
@@ -242,12 +242,12 @@ void State2(void)
 			case AUTO_FEED_ON:	//自动喂料开
 				Get_FeedTime(&feeder1, &feeder2, &feeder3, Feeding_GetRemoteAutoTimes());
 				Feeding_AutoFlag = SET;
-//				Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
+				Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
 			break;
 			case AUTO_FEED_OFF:	//自动喂料关
 				Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
 				Feeding_AutoFlag = RESET;
-//				Feeding_SetRemoteAutoTimes(0);
+				Feeding_SetRemoteAutoTimes(0);
 			break;
 		}
 		switch (NRF24L01_GetData(TRACKINGLINE_TRANSMIT))

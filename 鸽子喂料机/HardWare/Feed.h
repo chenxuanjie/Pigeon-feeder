@@ -5,8 +5,8 @@
 #define FEEDTIME_PERBIRD	1000
 
 
-uint16_t Get_Feeding_RemoteTimes(void);
-void Set_Feeding_RemoteTimes(uint16_t Num);
+uint16_t Feeding_GetRemoteAutoTimes(void);
+void Feeding_SetRemoteAutoTimes(uint16_t Num);
 void Get_Distance(uint8_t *Hcsr04_StartFlag);
 void Feeding_Init(void);
 void Get_BirdNum(uint32_t *Timeout);
