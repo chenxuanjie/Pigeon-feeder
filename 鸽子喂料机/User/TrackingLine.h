@@ -1,6 +1,8 @@
 #ifndef __TRACKINGLINE_H__
 #define __TRACKINGLINE_H__
 
+#include "main.h"
+
 //鸽子机在一次循迹过程中的喂料次数
 #define DIGITAL_FEEDINGTIMES	2
 
@@ -39,12 +41,13 @@
 #define DIGITAL_5_PIN	GPIO_Pin_8
 
 void TrackingLine_Init(void);
-uint8_t TrackingLine(void);
+uint8_t TrackingLine(machine* machine1, machine* machine2, machine* machine3);
 uint8_t TrackingLine_ReadDigital(uint16_t DigitalPin);
-uint8_t Digital_ModeJudge(void);
+uint8_t Digital_ModeJudge(uint8_t TrackingLine_FeedFlag);
 uint8_t Digital_Straight(void);
 uint8_t Digital_Turn(uint8_t Direction);
-uint8_t Digital_Feeding(void);
+uint8_t Digital_Feeding(machine* machine1, machine* machine2, machine* machine3, uint8_t* TrackingLine_FeedFlag);
 uint8_t TrackingLine_IfExit(void);
+uint8_t TrackingLine_Test(void);
 
 #endif

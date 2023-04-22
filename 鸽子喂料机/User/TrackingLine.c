@@ -6,8 +6,6 @@
 #include "Robot.h"
 #include "Feed.h"
 
-uint8_t Digital_StopFlag;
-
 /**
   * @brief  灰度传感器初始化函数
   * @param  无
@@ -42,13 +40,22 @@ uint8_t TrackingLine_ReadDigital(uint16_t DigitalPin)
 		return 2;
 }
 
-void TrackingLine_Test(void)
+uint8_t TrackingLine_Test(void)
 {
-		OLED_ShowNum(1,1,TrackingLine_ReadDigital(DIGITAL_1_PIN),2);
-		OLED_ShowNum(1,4,TrackingLine_ReadDigital(DIGITAL_2_PIN),2);
-		OLED_ShowNum(1,7,TrackingLine_ReadDigital(DIGITAL_3_PIN),2);
-		OLED_ShowNum(1,10,TrackingLine_ReadDigital(DIGITAL_4_PIN),2);
-		OLED_ShowNum(1,13,TrackingLine_ReadDigital(DIGITAL_5_PIN),2);
+	if (TrackingLine_IfExit())
+	{
+		OLED_ShowNum(1,12,1,1);
+		return 1;
+	}
+	else
+		OLED_ShowNum(1,12,0,1);
+		
+	return 0;
+//		OLED_ShowNum(1,1,TrackingLine_ReadDigital(DIGITAL_1_PIN),2);
+//		OLED_ShowNum(1,4,TrackingLine_ReadDigital(DIGITAL_2_PIN),2);
+//		OLED_ShowNum(1,7,TrackingLine_ReadDigital(DIGITAL_3_PIN),2);
+//		OLED_ShowNum(1,10,TrackingLine_ReadDigital(DIGITAL_4_PIN),2);
+//		OLED_ShowNum(1,13,TrackingLine_ReadDigital(DIGITAL_5_PIN),2);
 }
 
 /**     判断是否退出循迹模式
@@ -60,7 +67,8 @@ void TrackingLine_Test(void)
 uint8_t TrackingLine_IfExit(void)
 {
 	NRF24L01_ReceiveData();
-	if (NRF24L01_GetData(NORMAL_TRANSMIT) == TRACKINGLINE_OFF)
+	OLED_ShowHexNum(4, 13, NRF24L01_ReadByte(FIFO_STATUS), 2);
+	if (NRF24L01_GetData(TRACKINGLINE_TRANSMIT) == TRACKINGLINE_OFF)
 	{
 		Robot_Stop();
 		return 1;
@@ -75,14 +83,15 @@ uint8_t TrackingLine_IfExit(void)
 * @retval Flag: 0: still in the Tracking mode.
 				1: exit the Tracking mode. 
   */
-uint8_t TrackingLine(void)
+uint8_t TrackingLine(machine* machine1, machine* machine2, machine* machine3)
 {
 	uint8_t Digital_Mode;
+	static uint8_t Feeding_TrackingLineAutoTimes;
 	//是否切换手动
 	if (TrackingLine_IfExit())
 		Digital_Mode = DIGITAL_STOP;
 	else
-		Digital_Mode = Digital_ModeJudge();
+		Digital_Mode = Digital_ModeJudge(Feeding_TrackingLineAutoTimes);
 	switch (Digital_Mode)
 	{
 		case DIGITAL_STRAIGHT:		//正常直行
@@ -92,7 +101,7 @@ uint8_t TrackingLine(void)
 		case DIGITAL_TURNRIGHT:	//右转
 			return Digital_Turn(RIGHT);
 		case DIGITAL_FEEDING:	//喂料模式
-			return Digital_Feeding();
+			return Digital_Feeding(machine1, machine2, machine3, &Feeding_TrackingLineAutoTimes);
 		case DIGITAL_STOP:		//循迹结束，自动切换为遥控器控制模式
 			Robot_Stop();
 			return 1;
@@ -110,7 +119,7 @@ uint8_t TrackingLine(void)
 		  return DIGITAL_FEEDING:   Feeding mode.
 		  return DIGITAL_STOP:		Stop robot and return the remote control mode.
   */
-uint8_t Digital_ModeJudge(void)
+uint8_t Digital_ModeJudge(uint8_t TrackingLine_FeedFlag)
 {
 	if (Digital_L2==RESET && Digital_R2==RESET)		//直走
 		return DIGITAL_STRAIGHT;
@@ -118,9 +127,10 @@ uint8_t Digital_ModeJudge(void)
 		return DIGITAL_TURNLEFT;
 	else if (Digital_L2!=SET && Digital_R2==SET)	//右转
 		return DIGITAL_TURNRIGHT;
-	else if (Digital_L2==SET && Digital_R2==SET && Digital_StopFlag<=DIGITAL_FEEDINGTIMES)	//喂料
+	//喂料(之前踩线次数。若踩线2次，实际只喂1次，因此仍然需要再喂一次）
+	else if (Digital_L2==SET && Digital_R2==SET && TrackingLine_FeedFlag<=DIGITAL_FEEDINGTIMES)	
 		return DIGITAL_FEEDING;
-	else if (Digital_L2==SET && Digital_R2==SET && Digital_StopFlag>DIGITAL_FEEDINGTIMES)	//停止
+	else if (Digital_L2==SET && Digital_R2==SET && TrackingLine_FeedFlag>DIGITAL_FEEDINGTIMES)	//达到喂料的次数，停止
 		return DIGITAL_STOP;
 	else		
 		return 0;
@@ -225,22 +235,22 @@ uint8_t Digital_Turn(uint8_t Direction)
 	return 0;
 }
 
-uint8_t Digital_Feeding(void)
+uint8_t Digital_Feeding(machine* machine1, machine* machine2, machine* machine3, uint8_t* TrackingLine_FeedFlag)
 {
-	uint32_t feederTime1=0, feederTime2=0, feederTime3=0;
 	//停止1秒，准备落料
 	if (Robot_StopTime(1000) != 0)
 		return 1;
-	Get_FeedTime(&feederTime1, &feederTime2, &feederTime3);
+	Get_FeedTime(machine1, machine2, machine3, *TrackingLine_FeedFlag);
 	//智能喂料，直到喂料完成
-	while(feederTime1!=0 && feederTime2!=0 && feederTime3!=0)
+	while(machine1->SecondAutoTime_ms!=0 && machine2->SecondAutoTime_ms!=0 && machine3->SecondAutoTime_ms!=0)
 	{
 		if (TrackingLine_IfExit())
 			return 1;
 		else
-			StartFeed(feederTime1, feederTime2, feederTime3);
+			StartFeed(machine1->SecondAutoTime_ms, machine2->SecondAutoTime_ms, machine3->SecondAutoTime_ms);
 	}
-	Digital_StopFlag ++;	//每喂一次料加一
+	Feeding_CloseFeeder();		//喂料完成后，确保喂料器全部关闭
+	*TrackingLine_FeedFlag ++;	//每喂一次料加一
 	//停止0.5秒，避免余料没有落完
 	if (Robot_StopTime(500) != 0)
 		return 1;	

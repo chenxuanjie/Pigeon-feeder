@@ -32,5 +32,6 @@
 .\objects\feed.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\feed.o: HardWare\OLED.h
 .\objects\feed.o: HardWare\Feed.h
+.\objects\feed.o: .\User\main.h
 .\objects\feed.o: HardWare\Relay.h
 .\objects\feed.o: HardWare\Hcsr04.h

@@ -29,8 +29,8 @@
 .\objects\trackingline.o: .\Library\stm32f10x_wwdg.h
 .\objects\trackingline.o: .\Library\misc.h
 .\objects\trackingline.o: User\TrackingLine.h
-.\objects\trackingline.o: .\HardWare\NRF24L01.h
 .\objects\trackingline.o: User\main.h
+.\objects\trackingline.o: .\HardWare\NRF24L01.h
 .\objects\trackingline.o: .\HardWare\OLED.h
 .\objects\trackingline.o: .\HardWare\Robot.h
 .\objects\trackingline.o: .\HardWare\Feed.h

@@ -14,6 +14,7 @@
 #define FEEDTIME1_TRANSMIT		5
 #define FEEDTIME2_TRANSMIT		6
 #define FEEDTIME3_TRANSMIT		7
+#define TRACKINGLINE_TRANSMIT	8
 //Nrmal_Transmit
 #define FEED_OFF				(0x0 + 1)
 #define FEED_ON					(0x1 + 1)
@@ -22,6 +23,10 @@
 #define TRACKINGLINE_OFF		(0x0 + 5)
 #define TRACKINGLINE_ON			(0x1 + 5)
 #define CHECK					(0xFE)
+
+//TRACKINGLINE_TRANSMIT
+#define TRACKINGLINE_OFF		(0x0 + 5)
+#define TRACKINGLINE_ON			(0x1 + 5)
 
 //°´¼ü KEY_TRANSMIT
 #define KEY_ROCKER_TRANSMIT		0x1
@@ -78,6 +83,12 @@
 #define X_MIDDLE				0x9
 #define Y_MIDDLE				0x9
 #define MEDIWM					0x99
+
+typedef struct {
+	uint32_t Time;
+	uint32_t FirstAutoTime_ms;
+	uint32_t SecondAutoTime_ms;
+}machine;
 
 typedef enum{
 	SETTINGSTATE = 1,

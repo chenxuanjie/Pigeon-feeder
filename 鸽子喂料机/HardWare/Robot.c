@@ -43,7 +43,7 @@ void Robot_TurnLeft(uint8_t Direction)
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
-				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
+				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
 
 /**		循迹模式下的右转。
@@ -60,7 +60,7 @@ void Robot_TurnRight(uint8_t Direction)
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
-				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
+				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
 
 /**		循迹模式下的直行。
@@ -73,7 +73,7 @@ void Robot_Front(void)
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
-				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
+				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
 
 /**		循迹模式下的自旋旋转。(Direction为顺时针或逆时针)
@@ -97,7 +97,7 @@ void Robot_Cirle(uint8_t Direction)
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);	
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
-				Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()));
+				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
 
 /**

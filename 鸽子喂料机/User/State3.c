@@ -59,8 +59,6 @@ void Robot_DifferentialTurn(uint8_t X, uint8_t Y, int16_t Set_Speed)
 		Robot_SetSpeedLeft(FinalSPeedLeft);
 		Robot_SetSpeedRight(FinalSPeedRight);	
 	}
-		OLED_ShowNum(1,10,FinalSPeedLeft,2);
-		OLED_ShowNum(1,12,FinalSPeedRight,2);
 
 }
 

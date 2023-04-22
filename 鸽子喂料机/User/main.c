@@ -31,11 +31,6 @@ History:
 #include "TrackingLine.h"
 #include "State3.h"
 
-typedef struct machine{
-	uint32_t Time;
-	uint32_t AutoTime_ms;
-}machine;
-
 int16_t Set_Data,Set_Speed=20, Num;		//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
 uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
 uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET, TrackLineFlag=RESET;
@@ -67,7 +62,8 @@ int main(void)
 		//循迹模式
 		if (TrackLineFlag == SET)
 		{
-			TrackLineFlag = !(TrackingLine());
+//			TrackLineFlag = !TrackingLine_Test();
+			TrackLineFlag = !(TrackingLine(&feeder1, &feeder2, &feeder3));
 			TrackingLine_Managment();
 		}
 		else
@@ -123,13 +119,18 @@ void TrackingLine_Managment(void)
 	switch(NRF24L01_GetData(NORMAL_TRANSMIT))
 	{
 		case AUTO_FEED_ON:	//自动喂料开
-			Get_FeedTime(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms);
+			Get_FeedTime(&feeder1, &feeder2, &feeder3, Feeding_GetRemoteAutoTimes());
 			Feeding_AutoFlag = SET;
+//			Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
 		break;
 		case AUTO_FEED_OFF:	//自动喂料关
-			Feeding_CloseFeeder(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
+			Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
 			Feeding_AutoFlag = RESET;
+//			Feeding_SetRemoteAutoTimes(0);
 		break;
+	}
+	switch (NRF24L01_GetData(TRACKINGLINE_TRANSMIT))
+	{
 		case TRACKINGLINE_ON:	//自动循迹开启
 			TrackLineFlag = SET;
 		break;
@@ -140,23 +141,23 @@ void TrackingLine_Managment(void)
 }
 
 void Remote_Managment(void)
-{
+{	
 	//启动手动设置时间的落料
 	if (Feeding_AutoFlag==RESET && Feeding_ManualFlag==RESET)
 		StartFeed(feeder1.Time, feeder2.Time, feeder3.Time);
 	else if (Feeding_AutoFlag==SET && Feeding_ManualFlag==RESET)	//启动自动落料
-		StartFeed(feeder1.AutoTime_ms, feeder2.AutoTime_ms, feeder3.AutoTime_ms);
+		StartFeed(feeder1.SecondAutoTime_ms, feeder2.SecondAutoTime_ms, feeder3.SecondAutoTime_ms);
 	//喂料结束后清0标志位
-	if (feeder1.AutoTime_ms==0 && feeder2.AutoTime_ms==0 && feeder3.AutoTime_ms==0)
-		Feeding_AutoFlag = RESET;
+	if (feeder1.SecondAutoTime_ms==0 && feeder2.SecondAutoTime_ms==0 && feeder3.SecondAutoTime_ms==0)
+		Feeding_AutoFlag = RESET;		
 }
 
 void While_Init()
 {
 	OLED_ShowHexNum(1,15,Value,2);  //遥杆坐标
-	OLED_ShowNum(2,1,feeder1.AutoTime_ms,4);
-	OLED_ShowNum(2,6,feeder2.AutoTime_ms,4);
-	OLED_ShowNum(2,11,feeder3.AutoTime_ms,4);
+	OLED_ShowNum(2,1,feeder1.SecondAutoTime_ms,4);
+	OLED_ShowNum(2,6,feeder2.SecondAutoTime_ms,4);
+	OLED_ShowNum(2,11,feeder3.SecondAutoTime_ms,4);
 	//定时获取鸽子识别数量
 	Get_BirdNum(&Timeout);
 	MonitorFeed(&Hcsr04_StartFlag);
@@ -239,13 +240,18 @@ void State2(void)
 				Feeding_ManualFlag = SET;
 			break;
 			case AUTO_FEED_ON:	//自动喂料开
-				Get_FeedTime(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms);
+				Get_FeedTime(&feeder1, &feeder2, &feeder3, Feeding_GetRemoteAutoTimes());
 				Feeding_AutoFlag = SET;
+//				Feeding_SetRemoteAutoTimes(Feeding_GetRemoteAutoTimes()+1);
 			break;
 			case AUTO_FEED_OFF:	//自动喂料关
-				Feeding_CloseFeeder(&feeder1.AutoTime_ms, &feeder2.AutoTime_ms, &feeder3.AutoTime_ms); 
+				Feeding_ResetFeeder(&feeder1, &feeder2, &feeder3); 
 				Feeding_AutoFlag = RESET;
+//				Feeding_SetRemoteAutoTimes(0);
 			break;
+		}
+		switch (NRF24L01_GetData(TRACKINGLINE_TRANSMIT))
+		{
 			case TRACKINGLINE_ON:	//自动循迹开启
 				TrackLineFlag = SET;
 			break;
@@ -370,9 +376,9 @@ void TIM2_IRQHandler(void)
 		if (feeder2.Time > 0) feeder2.Time --;
 		if (feeder3.Time > 0) feeder3.Time --;
 		//自动落料的时间
-		if (feeder1.AutoTime_ms > 0) feeder1.AutoTime_ms --;
-		if (feeder2.AutoTime_ms > 0) feeder2.AutoTime_ms --;
-		if (feeder3.AutoTime_ms > 0) feeder3.AutoTime_ms --;
+		if (feeder1.SecondAutoTime_ms > 0) feeder1.SecondAutoTime_ms --;
+		if (feeder2.SecondAutoTime_ms > 0) feeder2.SecondAutoTime_ms --;
+		if (feeder3.SecondAutoTime_ms > 0) feeder3.SecondAutoTime_ms --;
 		//循迹模式下的延时时间
 		if (Robot_DelayGet() != 0)
 			Robot_DelaySet(Robot_DelayGet()-1);

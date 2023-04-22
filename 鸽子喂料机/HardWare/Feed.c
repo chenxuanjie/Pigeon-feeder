@@ -5,8 +5,23 @@
 #include "Relay.h"
 #include "Hcsr04.h"
 
-uint8_t Bird1, Bird2, Bird3;
+uint8_t Bird1, Bird2, Bird3, Feeding_RemoteAutoTimes;
 float Distance1, Distance2, Distance3, Distance4;
+
+uint16_t Feeding_GetRemoteAutoTimes(void)
+{
+	return Feeding_RemoteAutoTimes;
+}
+
+/**
+  * @brief  设定延时时间，设置1则为1ms。
+  * @param  Num：延时Value ms。
+  * @retval 无
+  */
+void Feeding_SetRemoteAutoTimes(uint16_t Num)
+{
+		Feeding_RemoteAutoTimes = Num;
+}
 
 /**		得到四个超声波到料仓间的距离
   * @brief  Monitor the Distance from to sensor 3 repository .
@@ -117,11 +132,26 @@ void Get_BirdNum(uint32_t *Timeout)
   * @param  
   * @retval None
   */
-void Get_FeedTime(uint32_t* feedTime1, uint32_t* feedTime2, uint32_t* feedTime3)
+void Get_FeedTime(machine* machine1, machine* machine2, machine* machine3, uint8_t Flag)
 {
-	*feedTime1 = Bird1 * FEEDTIME_PERBIRD;
-	*feedTime2 = Bird2 * FEEDTIME_PERBIRD;
-	*feedTime3 = Bird3 * FEEDTIME_PERBIRD;
+	if (Flag == 0)
+	{
+		machine1->SecondAutoTime_ms = 0;
+		machine2->SecondAutoTime_ms = 0;
+		machine3->SecondAutoTime_ms = 0;	
+		machine1->FirstAutoTime_ms = Bird1 * FEEDTIME_PERBIRD;
+		machine2->FirstAutoTime_ms = Bird2 * FEEDTIME_PERBIRD;
+		machine3->FirstAutoTime_ms = Bird3 * FEEDTIME_PERBIRD;
+	}
+	else
+	{
+		machine1->SecondAutoTime_ms = machine1->FirstAutoTime_ms;
+		machine2->SecondAutoTime_ms = machine2->FirstAutoTime_ms;
+		machine3->SecondAutoTime_ms = machine3->FirstAutoTime_ms;	
+		machine1->FirstAutoTime_ms = Bird1 * FEEDTIME_PERBIRD;
+		machine2->FirstAutoTime_ms = Bird2 * FEEDTIME_PERBIRD;
+		machine3->FirstAutoTime_ms = Bird3 * FEEDTIME_PERBIRD;
+	}		
 }	
 
 /**		根据输入的秒数驱动落料器
@@ -143,10 +173,18 @@ void StartFeed(uint32_t feedTime1_ms, uint32_t feedTime2_ms, uint32_t feedTime3_
 	else Relay_Set(3, RESET);			
 }
 
-void Feeding_CloseFeeder(uint32_t* feedTime1_ms, uint32_t* feedTime2_ms, uint32_t* feedTime3_ms)
+void Feeding_CloseFeeder(void)
 {
-	*feedTime1_ms = 0;
-	*feedTime2_ms = 0;
-	*feedTime3_ms = 0;
+	Relay_Set(ALL, RESET);
+}
+
+void Feeding_ResetFeeder(machine* machine1, machine* machine2, machine* machine3)
+{
+	machine1->FirstAutoTime_ms = 0;
+	machine2->FirstAutoTime_ms = 0;
+	machine3->FirstAutoTime_ms = 0;
+	machine1->SecondAutoTime_ms = 0;
+	machine2->SecondAutoTime_ms = 0;
+	machine3->SecondAutoTime_ms = 0;	
 	Relay_Set(ALL, RESET);
 }

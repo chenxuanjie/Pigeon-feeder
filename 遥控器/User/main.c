@@ -215,7 +215,6 @@ uint8_t State2(void)
 {
 	OLED_ShowString(1, 2, "CONTROL");
 	OLED_ShowString(3, 1, "HandFeed:");
-	OLED_ShowString(4, 1, "Tracking:");
 	//车体能否运行
 	if (KeyNum == KEY_PIN2_NUM)
 		OLED_ShowString(4, 1, "ENABLE ");
@@ -263,10 +262,10 @@ uint8_t State2(void)
 			if (KeyNum==KEY_ENTER)
 			{
 				TrackingLineFlag = ! TrackingLineFlag;
-				Control_TrackingLineMode(TrackingLineFlag);
 			}		
 			break;
 	}
+	Control_TrackingLineMode(TrackingLineFlag);
 	Feeding_AutoFeedShow(Feeding_AutoFlag);
 	return 0;
 }
