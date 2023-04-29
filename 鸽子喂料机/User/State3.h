@@ -10,7 +10,7 @@
 #define TURNSPEED1	Set_Speed/5
 #define TURNSPEED2	Set_Speed/5*2
 #define TURNSPEED3	Set_Speed/5*3
-#define TURNDOWNLEVEL	3
+#define TURNDOWNLEVEL	3		//转弯时一边轮子比另一边轮子下降的速度
 
 void Robot_SelfTurn(uint8_t X, uint8_t Y, int16_t Set_Speed);
 void Robot_DifferentialTurn(uint8_t X, uint8_t Y, int16_t Set_Speed);

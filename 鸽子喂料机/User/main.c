@@ -32,10 +32,10 @@ History:
 #include "State3.h"
 
 int16_t Set_Data,Set_Speed=20, Num;		//Set_Speed 是默认的速度，基于摇杆角度，设定电机按照该速度百分比旋转，单位是cm/s
-uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0;
+uint8_t Flag, Hcsr04_StartFlag,LINK_FLAG, Error = 0, Robot_CloseMotorFlag;
 uint8_t X, Y, Value, Feeding_AutoFlag=RESET, Feeding_ManualFlag=RESET, TrackLineFlag=RESET;
 int16_t SpeedRight_Robot=0,SpeedLeft_Robot=0;
-int8_t LeftCalibration=1,RightCalibration=-1 ;
+int8_t LeftCalibration=1,RightCalibration=1 ;
 uint8_t DataReset=1,StopFlag=0;
 uint8_t Left=0,Right=0, State=1;
 uint32_t Timeout=0;
@@ -58,7 +58,10 @@ int main(void)
 	Init();
 	while (1)
 	{
-		While_Init();		
+		While_Init();
+		//调试
+		OLED_ShowString(4,5,"T:");	
+		OLED_ShowNum(4,7,0,1);		
 		//循迹模式
 		if (TrackLineFlag == SET)
 		{
@@ -84,12 +87,16 @@ int main(void)
 			/*********************电机驱动************************************/
 			SpeedLeft_Robot=Get_LeftDirection()*LeftCalibration*SpeedConversion(Robot_GetSpeedLeft());
 			SpeedRight_Robot=Get_RightDirection()*RightCalibration*SpeedConversion(Robot_GetSpeedRight());
-			Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
+			if(StopFlag==SET || Robot_CloseMotorFlag==SET)
+				Robot_Stop();
+			else
+				Robot_Move(SpeedLeft_Robot,SpeedRight_Robot);
 		}
 		HandleData();
-		//停止
-		if(StopFlag==SET ){Robot_SetSpeed(0);}
-
+		//断开连接时，停止
+		if(StopFlag==SET )
+			Robot_Stop();
+		
 		LEDO_OFF();			
 	}
 }
@@ -163,12 +170,19 @@ void While_Init()
 	MonitorFeed(&Hcsr04_StartFlag);
 	Flag = NRF24L01_ReceiveData();
 	//NRF寄存器
-	OLED_ShowHexNum(4, 1, NRF24L01_ReadByte(STATUS), 2);
-	OLED_ShowHexNum(4, 4, NRF24L01_ReadByte(EN_AA), 2);
-	OLED_ShowHexNum(4, 7, NRF24L01_ReadByte(EN_RXADDR), 2);
-	OLED_ShowHexNum(4, 10, NRF24L01_ReadByte(RX_ADDR_P0), 2);
-	OLED_ShowHexNum(4, 13, NRF24L01_ReadByte(FIFO_STATUS), 2);
-
+//	OLED_ShowHexNum(4, 1, NRF24L01_ReadByte(STATUS), 2);
+//	OLED_ShowHexNum(4, 4, NRF24L01_ReadByte(EN_AA), 2);
+//	OLED_ShowHexNum(4, 7, NRF24L01_ReadByte(EN_RXADDR), 2);
+//	OLED_ShowHexNum(4, 10, NRF24L01_ReadByte(RX_ADDR_P0), 2);
+	//1为正常，0为接收寄存器满，2为未知错误
+	OLED_ShowString(4,1,"R:");
+	if (NRF24L01_ReadByte(FIFO_STATUS) == 0x10)
+		OLED_ShowNum(4, 3, 0, 1);
+	else if (NRF24L01_ReadByte(FIFO_STATUS) == 0x11)
+		OLED_ShowNum(4, 3, 1, 1);
+	else
+		OLED_ShowNum(4, 3, 2, 1);
+	
 	if (NRF24L01_GetData(NORMAL_TRANSMIT) != 0)
 	OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);
 
@@ -190,10 +204,10 @@ void State1(void)
 	
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-//			case EmergencyFault	:	Robot_SetSpeed(0);break;//急停
-			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//启动
-			case KEY_PIN2_NUM		:	TSDA_Order(LeftWheel,MotorStop);TSDA_Order(RightWheel,MotorStop);break;//关闭
-			case KEY_PIN3_NUM		:	Robot_SetSpeed(0);break;//急停
+//			case EmergencyFault	:	Robot_Stop();break;//急停
+			case KEY_PIN1_NUM		:	Robot_Start();break;//启动
+			case KEY_PIN2_NUM		:	Robot_Stop();break;//关闭
+			case KEY_PIN3_NUM		:	Robot_Stop();break;//急停
 			case KEY_PIN4_NUM		:	break;//使用旋转编码器
 			case KEY_PIN5_NUM		:	Set_Speed=NRF24L01_GetData(ENCODER_TRANSMIT);break;
 			case KEY_PIN6_NUM		:	break;
@@ -262,10 +276,10 @@ void State2(void)
 		
 		switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case EmergencyFault	:	Robot_SetSpeed(0);break;//急停
+			case EmergencyFault		:	Robot_Stop();break;//急停
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//启动
-			case KEY_PIN2_NUM		:	TSDA_Order(LeftWheel,MotorStop);TSDA_Order(RightWheel,MotorStop);break;//关闭
-			case KEY_PIN3_NUM		:	Robot_SetSpeed(0);break;//急停
+			case KEY_PIN2_NUM		:	Robot_Stop();;break;//关闭
+			case KEY_PIN3_NUM		:	Robot_Stop();;break;//急停
 		}
 		
 		
@@ -275,10 +289,10 @@ void State3(void)
 {
 	switch(NRF24L01_GetData(KEY_TRANSMIT))
 		{
-			case EmergencyFault		:	Robot_SetSpeed(0);break;//急停
+			case EmergencyFault		:	Robot_Stop();;break;//急停
 			case KEY_PIN1_NUM		:	TSDA_Order(LeftWheel,MotorStart);TSDA_Order(RightWheel,MotorStart);break;//启动
 			case KEY_PIN2_NUM		:	break;
-			case KEY_PIN3_NUM		:	Robot_SetSpeed(0);break;//急停
+			case KEY_PIN3_NUM		:	Robot_Stop();;break;//急停
 			case KEY_PIN4_NUM		:	break;
 			case KEY_PIN5_NUM		:	break;
 			case KEY_PIN6_NUM		:	break;

@@ -20,7 +20,7 @@ for(i=0;i<4;i++)
 //	while (USART_GetFlagStatus(TSDA_Usart, USART_FLAG_TXE) == RESET);
 //	
 		Usart_SendByte(pUSARTx,orders[i] );
-//		SysTick_Delay_ms(1);
+		Delay_ms(2);	
 	
 	}
 //	while (USART_GetFlagStatus(TSDA_Usart, USART_FLAG_TXE) == RESET);
@@ -49,6 +49,7 @@ for(i=0;i<4;i++)
 //		/* 发送一个字节数据到USART */
 //	USART_SendData(TSDA_Usart,datas[i]);
 	Usart_SendByte(pUSARTx,datas[i] );
+	Delay_ms(2);
 //	/* 等待发送数据寄存器为空 */
 //	while (USART_GetFlagStatus(TSDA_Usart, USART_FLAG_TXE) == RESET);
 //		

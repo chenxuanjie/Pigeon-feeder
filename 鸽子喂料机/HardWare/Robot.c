@@ -26,7 +26,7 @@ int8_t Get_LeftDirection(void)
 
 int8_t Get_RightDirection(void)
 {
-	return Direction_Left;
+	return -Direction_Right;
 }
 
 /**		循迹模式下的左转。
@@ -40,8 +40,8 @@ void Robot_TurnLeft(uint8_t Direction)
 	Set_LeftDirection(Direction); 
 	Set_RightDirection(Direction); 
 	//设定速度	
-	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
-	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
 				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
@@ -57,8 +57,8 @@ void Robot_TurnRight(uint8_t Direction)
 	Set_LeftDirection(Direction); 
 	Set_RightDirection(Direction); 
 	//设定速度	
-	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
-	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
+	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
 				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
@@ -70,6 +70,8 @@ void Robot_TurnRight(uint8_t Direction)
   */
 void Robot_Front(void)
 {
+	Set_LeftDirection(FRONT);
+	Set_RightDirection(FRONT);
 	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
 	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
@@ -84,6 +86,7 @@ void Robot_Front(void)
   */
 void Robot_Cirle(uint8_t Direction)
 {
+	Robot_Start();
 	if (Direction == SHUN)
 	{
 		Direction_Left = FRONT;		
@@ -134,7 +137,7 @@ uint8_t Robot_RunTime(uint16_t Num)
 		if (TrackingLine_IfExit())
 			return 1;
 		else		
-			Digital_Straight();
+			Robot_Front();
 	}
 	return 0;
 }
@@ -150,7 +153,8 @@ uint8_t Robot_StopTime(uint16_t Num)
 	Robot_DelaySet(Num);
 	while(Robot_DelayGet())
 	{
-		Robot_Stop();
+		TSDA_Data(LeftWheel,SpeedSetting,0X00);
+		TSDA_Data(RightWheel,SpeedSetting,0X00);
 		if (TrackingLine_IfExit())
 			return 1;
 	}
@@ -209,8 +213,6 @@ int16_t SpeedConversion(int32_t data)
   */
 void Robot_Init(void)
 {
-	TSDA_Order(LeftWheel,MotorStop);
-	TSDA_Order(RightWheel,MotorStop);
 	//开启通讯中断自动停机
 	TSDA_Order(LeftWheel,CommunicationOutage_ON);
 	TSDA_Order(RightWheel,CommunicationOutage_ON);
@@ -218,6 +220,11 @@ void Robot_Init(void)
 	//选择速度模式输入
 	TSDA_Order(LeftWheel,SpeedMod);
 	TSDA_Order(RightWheel,SpeedMod);
+	//设定加、减速度时间, 2000ms
+	TSDA_Data(LeftWheel, A_D_Time, 0x14);
+	TSDA_Data(RightWheel, A_D_Time, 0x14);
+	TSDA_Order(LeftWheel,MotorStop);
+	TSDA_Order(RightWheel,MotorStop);
 	Delay_ms(10);	
 	
 }
@@ -233,14 +240,27 @@ void Robot_Move(int16_t LeftSpeed,int16_t RightSpeed)
 	TSDA_Data(RightWheel,SpeedSetting,RightSpeed);
 	
 }
+
+
 /**
-  * @brief  紧急停机
+  * @brief  电机启动
+  * @param  无
+  * @retval 无
+  */
+void Robot_Start(void)
+{
+	TSDA_Order(LeftWheel,MotorStart);
+	TSDA_Order(RightWheel,MotorStart);
+}
+
+/**
+  * @brief  紧急停机。不是设置速度为0的停止（会使电机产生轰鸣声）
   * @param  无
   * @retval 无
   */
 void Robot_Stop(void)
 {
 	Robot_SetSpeed(0);
-	TSDA_Data(LeftWheel,SpeedSetting,0X00);
-	TSDA_Data(RightWheel,SpeedSetting,0X00);
+	TSDA_Order(LeftWheel,MotorStop);
+	TSDA_Order(RightWheel,MotorStop);	
 }

@@ -8,6 +8,7 @@
 #define LeftWheel		  			TSDA_Usart  //×ó³µÂÖ
 #define RightWheel					TSDA_Usart2 //ÓÒ³µÂÖ
 
+
 void Set_LeftDirection(int8_t Direction);
 void Set_RightDirection(int8_t Direction);
 int8_t Get_LeftDirection(void);
@@ -20,6 +21,7 @@ void Robot_SetSpeedLeft(int16_t Data);
 void Robot_SetSpeedRight(int16_t Data);
 int16_t SpeedConversion(int32_t data);
 void Robot_Move(int16_t LeftSpeed,int16_t RightSpeed);
+void Robot_Start(void);
 void Robot_Stop(void);
 void Robot_TurnLeft(uint8_t Direction);
 void Robot_TurnRight(uint8_t Direction);
