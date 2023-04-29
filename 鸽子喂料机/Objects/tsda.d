@@ -2,7 +2,7 @@
 .\objects\tsda.o: HardWare\TSDA.h
 .\objects\tsda.o: .\Start\stm32f10x.h
 .\objects\tsda.o: .\Start\core_cm3.h
-.\objects\tsda.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\tsda.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\tsda.o: .\Start\system_stm32f10x.h
 .\objects\tsda.o: .\User\stm32f10x_conf.h
 .\objects\tsda.o: .\Library\stm32f10x_adc.h
@@ -30,6 +30,6 @@
 .\objects\tsda.o: .\Library\stm32f10x_wwdg.h
 .\objects\tsda.o: .\Library\misc.h
 .\objects\tsda.o: HardWare\bsp_usart.h
-.\objects\tsda.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\tsda.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\tsda.o: .\System\DELAY.h
 .\objects\tsda.o: HardWare\ROBOT.H

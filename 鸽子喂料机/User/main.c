@@ -184,8 +184,7 @@ void State1(void)
 	{
 	/*********************摇杆检测************************************/
 		//自旋转弯
-//		Robot_SelfTurn(X, Y, Set_Speed);
-		//差速转弯
+//		Robot_SelfTurn(X, Y, Set_Speed);//差速转弯
 		Robot_DifferentialTurn(X, Y, Set_Speed);
 	/********************按键检测************************************/
 	

@@ -1,7 +1,7 @@
 .\objects\relay.o: HardWare\Relay.c
 .\objects\relay.o: .\Start\stm32f10x.h
 .\objects\relay.o: .\Start\core_cm3.h
-.\objects\relay.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\relay.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\relay.o: .\Start\system_stm32f10x.h
 .\objects\relay.o: .\User\stm32f10x_conf.h
 .\objects\relay.o: .\Library\stm32f10x_adc.h

@@ -1,7 +1,7 @@
 .\objects\trackingline.o: User\TrackingLine.c
 .\objects\trackingline.o: .\Start\stm32f10x.h
 .\objects\trackingline.o: .\Start\core_cm3.h
-.\objects\trackingline.o: C:\Study\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\trackingline.o: D:\Pigeon-feeder\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\trackingline.o: .\Start\system_stm32f10x.h
 .\objects\trackingline.o: .\User\stm32f10x_conf.h
 .\objects\trackingline.o: .\Library\stm32f10x_adc.h

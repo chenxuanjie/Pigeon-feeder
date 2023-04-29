@@ -37,14 +37,14 @@ void Robot_DifferentialTurn(uint8_t X, uint8_t Y, int16_t Set_Speed)
 	}
 	switch(X)
 	{			
-		case LEFT_1:FinalSPeedLeft += TURNSPEED/2;FinalSPeedRight += TURNSPEED;break;
-		case LEFT_2:FinalSPeedRight += TURNSPEED;break;
-		case LEFT_3:FinalSPeedRight += TURNSPEED;break;
-		case LEFT_4:FinalSPeedRight += TURNSPEED;;break;
-		case RIGHT_1:FinalSPeedLeft += TURNSPEED; FinalSPeedLeft += TURNSPEED/2;break;
-		case RIGHT_2: FinalSPeedLeft += TURNSPEED;break;
-		case RIGHT_3: FinalSPeedLeft += TURNSPEED;break;
-		case RIGHT_4: FinalSPeedLeft += TURNSPEED;break;
+		case LEFT_1: FinalSPeedLeft += TURNSPEED/TURNDOWNLEVEL;FinalSPeedRight += TURNSPEED;break;
+		case LEFT_2: FinalSPeedLeft += TURNSPEED1/TURNDOWNLEVEL;FinalSPeedRight += TURNSPEED1;break;
+		case LEFT_3: FinalSPeedLeft += TURNSPEED2/TURNDOWNLEVEL;FinalSPeedRight += TURNSPEED2;break;
+		case LEFT_4: FinalSPeedLeft += TURNSPEED3/TURNDOWNLEVEL;FinalSPeedRight += TURNSPEED3;;break;
+		case RIGHT_1: FinalSPeedLeft += TURNSPEED1; FinalSPeedRight += TURNSPEED/TURNDOWNLEVEL;break;
+		case RIGHT_2: FinalSPeedLeft += TURNSPEED1; FinalSPeedRight += TURNSPEED1/TURNDOWNLEVEL;break;
+		case RIGHT_3: FinalSPeedLeft += TURNSPEED2; FinalSPeedRight += TURNSPEED2/TURNDOWNLEVEL;break;
+		case RIGHT_4: FinalSPeedLeft += TURNSPEED3; FinalSPeedRight += TURNSPEED3/TURNDOWNLEVEL;break;
 		case STOP_X:Robot_SetSpeed(0x00);break;	
 	}
 	//在摇杆负方向回正后拨平，车体应该向前。改善手感。
@@ -82,9 +82,12 @@ void Robot_SelfTurn(uint8_t X, uint8_t Y, int16_t Set_Speed)
 	switch(X)
 	{			
 		case LEFT_1:break;
-		case LEFT_2:Robot_SetSpeed(Set_Speed/10);Set_LeftDirection(BACK);break;
-		case LEFT_3:Robot_SetSpeed(Set_Speed/4);Set_LeftDirection(BACK);break;
-		case LEFT_4:Robot_SetSpeed(Set_Speed/2);Set_LeftDirection(BACK);break;
+//		case LEFT_2:Robot_SetSpeed(Set_Speed/10);Set_LeftDirection(BACK);break;
+//		case LEFT_3:Robot_SetSpeed(Set_Speed/4);Set_LeftDirection(BACK);break;
+//		case LEFT_4:Robot_SetSpeed(Set_Speed/2);Set_LeftDirection(BACK);break;
+		case LEFT_2:Robot_SetSpeedRight(Set_Speed/10);Set_RightDirection(BACK);break;
+		case LEFT_3:Robot_SetSpeedRight(Set_Speed/4);Set_RightDirection(BACK);break;
+		case LEFT_4:Robot_SetSpeedRight(Set_Speed/2);Set_RightDirection(BACK);break;
 		case RIGHT_1:break;
 		case RIGHT_2:Robot_SetSpeed(Set_Speed/10);Set_RightDirection(BACK);;break;
 		case RIGHT_3:Robot_SetSpeed(Set_Speed/4);Set_RightDirection(BACK);break;
