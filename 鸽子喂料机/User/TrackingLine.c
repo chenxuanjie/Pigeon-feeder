@@ -114,7 +114,7 @@ uint8_t TrackingLine(machine* machine1, machine* machine2, machine* machine3)
 	switch (Digital_Mode)
 	{
 		case DIGITAL_STRAIGHT:		//正常直行
-			return Digital_Straight();
+			return Digital_Straight2();
 		case DIGITAL_TURNLEFT:		//左转
 			return Digital_Turn(LEFT);
 		case DIGITAL_TURNRIGHT:	//右转
@@ -193,6 +193,43 @@ uint8_t Digital_Straight(void)
 	return 0;
 }
 
+/**     循迹模式下的自旋式直走
+  * @brief  run forward straightly by recognizing  black line.
+  * @param  
+  * @retval return 0 meeting crossroad; return 1 in a straight road. 
+  */
+uint8_t Digital_Straight2(void)
+{
+	Robot_Start();
+	if (Digital_L1==1 && Digital_M==0 && Digital_R1==0)	//偏右
+	{
+		Digital_Turn2(LEFT);
+	}
+	else if (Digital_L1==1 && Digital_M==1 && Digital_R1==0)	//微微偏右
+	{
+		Digital_Turn2(LEFT);
+	}
+	else if (Digital_L1==0 && Digital_M==0 && Digital_R1==1)	//偏左
+	{
+		Digital_Turn2(RIGHT);
+	}
+	else if (Digital_L1==0 && Digital_M==1 && Digital_R1==1)	//微微偏左
+	{
+		Digital_Turn2(RIGHT);
+	}
+	else if (Digital_L1==0 && Digital_M==1 && Digital_R1==0)	//正常
+	{
+		Robot_Front();
+	}
+	else if (Digital_L1==0 && Digital_M==0 && Digital_R1==0)	//都检测不到
+	{
+		Robot_Front();
+	}
+	else 
+		Robot_Front();
+	return 0;
+}
+
 /**
   * @brief  转弯。调用此函数，转弯后会停0.5秒。
 * @param  Direction:方向。LEFT：左。RIGHT：右。
@@ -201,6 +238,8 @@ uint8_t Digital_Straight(void)
 uint8_t Digital_Turn(uint8_t Direction)
 {
 	Robot_Start();
+	if (Robot_RunTime(TRACKINGLINE_RUNTIME) != 0)
+		return 1;
 	if (Robot_StopTime(TRACKINGLINE_STOPTIME) != 0)
 		return 1;
 	switch(Direction)
@@ -241,8 +280,40 @@ uint8_t Digital_Turn(uint8_t Direction)
 	}
 	if (Robot_StopTime(TRACKINGLINE_STOPTIME) != 0)
 		return 1;
-	if (Robot_RunTime(TRACKINGLINE_RUNTIME) != 0)
-		return 1;
+	return 0;
+}
+
+/**
+  * @brief  循迹模式下的差速转弯。
+* @param  Direction:方向。LEFT：左。RIGHT：右。
+  * @retval 无
+  */
+uint8_t Digital_Turn2(uint8_t Direction)
+{
+	Robot_Start();
+	switch(Direction)
+	{
+		case LEFT:
+		{
+			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
+			{
+				if (TrackingLine_IfExit())
+					return 1;
+				else
+					Robot_Cirle(NI);
+			}
+		}break;
+		case RIGHT:
+		{
+			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
+			{
+				if (TrackingLine_IfExit())
+					return 1;
+				else
+					Robot_Cirle(SHUN);
+			}
+		}break;
+	}
 	return 0;
 }
 

@@ -4,6 +4,7 @@
 #include "TrackingLine.h"
 #include "NRF24L01.h"
 #include "main.h"
+#include "OLED.h"
 
 uint16_t Delay_Time;
 int8_t Direction_Right = FRONT, Direction_Left = FRONT;
@@ -132,12 +133,13 @@ void Robot_DelaySet(uint16_t Num)
 uint8_t Robot_RunTime(uint16_t Num)
 {
 	Robot_DelaySet(Num);
+	Robot_Start();
 	while (Robot_DelayGet())
 	{
 		if (TrackingLine_IfExit())
 			return 1;
-		else		
-			Robot_Front();
+		Robot_Front();
+		OLED_ShowNum(2,16,1,1);
 	}
 	return 0;
 }
