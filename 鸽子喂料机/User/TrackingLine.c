@@ -114,7 +114,7 @@ uint8_t TrackingLine(machine* machine1, machine* machine2, machine* machine3)
 	switch (Digital_Mode)
 	{
 		case DIGITAL_STRAIGHT:		//正常直行
-			return Digital_Straight2();
+			return Digital_Straight();
 		case DIGITAL_TURNLEFT:		//左转
 			return Digital_Turn(LEFT);
 		case DIGITAL_TURNRIGHT:	//右转
@@ -238,15 +238,15 @@ uint8_t Digital_Straight2(void)
 uint8_t Digital_Turn(uint8_t Direction)
 {
 	Robot_Start();
-	if (Robot_RunTime(TRACKINGLINE_RUNTIME) != 0)
-		return 1;
-	if (Robot_StopTime(TRACKINGLINE_STOPTIME) != 0)
-		return 1;
+//	if (Robot_RunTime(TRACKINGLINE_RUNTIME) != 0)
+//		return 1;
+//	if (Robot_StopTime(TRACKINGLINE_STOPTIME) != 0)
+//		return 1;
 	switch(Direction)
 	{
 		case LEFT:
 		{
-			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
+			while (!(Digital_R1==1))	//转到整车稍微偏左为止
 			{
 				if (TrackingLine_IfExit())
 					return 1;
@@ -256,7 +256,7 @@ uint8_t Digital_Turn(uint8_t Direction)
 		}break;
 		case RIGHT:
 		{
-			while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//中间黑线两边无
+			while (!(Digital_L1==1))	//转到整车稍微偏右为止
 			{
 				if (TrackingLine_IfExit())
 					return 1;
@@ -264,22 +264,9 @@ uint8_t Digital_Turn(uint8_t Direction)
 					Robot_Cirle(SHUN);
 			}
 		}break;
-	/*转弯后立马判断，是否走过头*/
-	// if (Digital_L1==0 && Digital_M==0 && Digital_R1==0)
-	// {
-	// 	SetPwm(50);
-	// 	Robot_Front();
-	// 	while (!(Digital_L1==0 && Digital_M==1 && Digital_R1==0))	//其中有一个灯亮，则停止检测
-	// 	{
-	// 		switch(Direction)
-	// 		{
-	// 			case LEFT: Robot_TurnRight(FRONT);break;
-	// 			case RIGHT:Robot_TurnLeft(FRONT);break;
-	// 		}
-	// 	}
 	}
-	if (Robot_StopTime(TRACKINGLINE_STOPTIME) != 0)
-		return 1;
+//	if (Robot_StopTime(TRACKINGLINE_STOPTIME) != 0)
+//		return 1;
 	return 0;
 }
 

@@ -30,6 +30,17 @@ int8_t Get_RightDirection(void)
 	return -Direction_Right;
 }
 
+
+/**		小车行驶的速度等级。
+  * @brief   小车行驶的速度等级。
+  * @param  无
+  * @retval 无
+  */
+uint8_t Robot_GetSpeedLevel(void)
+{
+	return NRF24L01_GetData(ENCODER_TRANSMIT);
+}
+
 /**		循迹模式下的左转。
   * @brief  Turn left in the TrackingLine mode. 
   * @param  无
@@ -41,8 +52,8 @@ void Robot_TurnLeft(uint8_t Direction)
 	Set_LeftDirection(Direction); 
 	Set_RightDirection(Direction); 
 	//设定速度	
-	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
-	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
+	Robot_SetSpeedLeft(TRACKINGLINE_FRONTSPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_FRONTSPEED + TRACKINGLINE_TURNSPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
 				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
@@ -58,8 +69,8 @@ void Robot_TurnRight(uint8_t Direction)
 	Set_LeftDirection(Direction); 
 	Set_RightDirection(Direction); 
 	//设定速度	
-	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED + TRACKINGLINE_TURNSPEED);
-	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedLeft(TRACKINGLINE_FRONTSPEED + TRACKINGLINE_TURNSPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_FRONTSPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
 				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
@@ -73,8 +84,8 @@ void Robot_Front(void)
 {
 	Set_LeftDirection(FRONT);
 	Set_RightDirection(FRONT);
-	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
-	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);
+	Robot_SetSpeedLeft(TRACKINGLINE_FRONTSPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_FRONTSPEED);
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
 				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
@@ -98,8 +109,8 @@ void Robot_Cirle(uint8_t Direction)
 		Direction_Left = BACK;		//左转，左轮后退。		
 		Direction_Right = FRONT;				
 	}
-	Robot_SetSpeedLeft(TRACKINGLINE_BASESPEED);
-	Robot_SetSpeedRight(TRACKINGLINE_BASESPEED);	
+	Robot_SetSpeedLeft(TRACKINGLINE_SELFTURNSPEED);
+	Robot_SetSpeedRight(TRACKINGLINE_SELFTURNSPEED);	
 	Robot_Move(Get_LeftDirection() * SpeedConversion(Robot_GetSpeedLeft()),\
 				Get_RightDirection() * SpeedConversion(Robot_GetSpeedRight()));
 }
@@ -223,8 +234,8 @@ void Robot_Init(void)
 	TSDA_Order(LeftWheel,SpeedMod);
 	TSDA_Order(RightWheel,SpeedMod);
 	//设定加、减速度时间, 2000ms
-	TSDA_Data(LeftWheel, A_D_Time, 0x14);
-	TSDA_Data(RightWheel, A_D_Time, 0x14);
+	TSDA_Data(LeftWheel, A_D_Time, 0x64);
+	TSDA_Data(RightWheel, A_D_Time, 0x64);
 	TSDA_Order(LeftWheel,MotorStop);
 	TSDA_Order(RightWheel,MotorStop);
 	Delay_ms(10);	
@@ -239,10 +250,47 @@ void Robot_Init(void)
 void Robot_Move(int16_t LeftSpeed,int16_t RightSpeed)
 {
 	TSDA_Data(LeftWheel,SpeedSetting,LeftSpeed);
-	TSDA_Data(RightWheel,SpeedSetting,RightSpeed);
-	
+	TSDA_Data(RightWheel,SpeedSetting,RightSpeed);	
 }
 
+/**
+  * @brief  带有加速度的移动
+* @param  LeftSpeed:左轮速度；RightSpeed：右轮速度；
+  * @retval 无
+  */
+//uint8_t Robot_Move2(int16_t LeftSpeed,int16_t RightSpeed)
+//{
+//	int16_t MaxSpeed, StartSpeed_Left, StartSpeed_Right;
+//	StartSpeed_Left = Robot_GetSpeedLeft();
+//	StartSpeed_Right = Robot_GetSpeedRight();
+//	//最大速度
+//	if (LeftSpeed > RightSpeed)
+//		MaxSpeed = LeftSpeed;
+//	else
+//		MaxSpeed = RightSpeed;	
+//	while ()					//循环加速
+//	{
+//		//是否退出循迹模式
+//		if (TrackingLine_IfExit())
+//			return 1;
+//		//如果速度未达到，则速度增
+//		if (i < Robot_GetSpeedLeft())
+//			 Robot_SetSpeedLeft(Robot_GetSpeedLeft()+1);
+//		if (i < Robot_GetSpeedRight())
+//			 Robot_SetSpeedRight(Robot_GetSpeedRight()+1);
+//		Robot_DelaySet(Time/(100-Value));	//ADDSPEED_TIME ms内完成加速
+//		while (Robot_DelayGet()&& Crossload_Flag)
+//			else
+//				Digital_Straight();		//车子识别黑线。
+//			if (Digital_L1==1 && Digital_R1==0)	//微微偏右
+//				Robot_Move();
+//			else if (Digital_L1==0 && Digital_M==1 && Digital_R1==1)	//微微偏左
+//			{
+//				Robot_TurnRight(FRONT);
+//			}
+//	}
+//	return 0;	
+//}
 
 /**
   * @brief  电机启动

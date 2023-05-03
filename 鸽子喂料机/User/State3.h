@@ -2,10 +2,10 @@
 #define __STATE3_H__
 
 #define BASESPEED	Set_Speed/10;
-#define SPEED1		Set_Speed/10 + NRF24L01_GetData(ENCODER_TRANSMIT) *6 * BASESPEED 
-#define SPEED2		Set_Speed/4  + NRF24L01_GetData(ENCODER_TRANSMIT) *6* BASESPEED 
-#define SPEED3		Set_Speed/2  + NRF24L01_GetData(ENCODER_TRANSMIT)*6* BASESPEED 
-#define SPEED4		Set_Speed/1  + NRF24L01_GetData(ENCODER_TRANSMIT) *6* BASESPEED 
+#define SPEED1		Set_Speed/10 + Robot_GetSpeedLevel() *6 * BASESPEED 
+#define SPEED2		Set_Speed/4  + Robot_GetSpeedLevel() *6* BASESPEED 
+#define SPEED3		Set_Speed/2  + Robot_GetSpeedLevel()*6* BASESPEED 
+#define SPEED4		Set_Speed/1  + Robot_GetSpeedLevel() *6* BASESPEED 
 #define TURNSPEED	Set_Speed/10*4
 #define TURNSPEED1	Set_Speed/5
 #define TURNSPEED2	Set_Speed/5*2

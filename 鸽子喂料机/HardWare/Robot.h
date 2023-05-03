@@ -14,6 +14,7 @@ void Set_RightDirection(int8_t Direction);
 int8_t Get_LeftDirection(void);
 int8_t Get_RightDirection(void);
 void Robot_Init(void);
+uint8_t Robot_GetSpeedLevel(void);
 void Robot_SetSpeed(int16_t data);
 int16_t Robot_GetSpeedLeft(void);
 int16_t Robot_GetSpeedRight(void);

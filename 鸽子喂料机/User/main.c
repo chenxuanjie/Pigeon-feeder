@@ -188,7 +188,6 @@ void While_Init()
 
 	if (Flag)
 		Flag = 0;
-//	Delay_ms(8);
 	Data_Analyse(&Value);	
 }
 
