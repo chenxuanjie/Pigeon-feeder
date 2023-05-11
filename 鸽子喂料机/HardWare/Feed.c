@@ -13,6 +13,16 @@ uint16_t Feeding_GetRemoteAutoTimes(void)
 	return Feeding_RemoteAutoTimes;
 }
 
+void Feeding_ShowTime(machine* machine1, machine* machine2, machine* machine3)
+{
+	OLED_ShowNum(2,2,machine1->SecondAutoTime_ms,4);
+	OLED_ShowNum(2,8,machine2->SecondAutoTime_ms,4);
+	OLED_ShowNum(2,14,machine3->SecondAutoTime_ms,4);
+	OLED_ShowNum(2,1,machine1->FirstAutoTime_ms/1000,1);
+	OLED_ShowNum(2,7,machine2->FirstAutoTime_ms/1000,1);
+	OLED_ShowNum(2,13,machine3->FirstAutoTime_ms/1000,1);
+}
+
 /**
   * @brief  设定延时时间，设置1则为1ms。
   * @param  Num：延时Value ms。
@@ -122,9 +132,9 @@ void Get_BirdNum(uint32_t *Timeout)
 		USART1_GetBirdNum(&Bird1, &Bird2, &Bird3);
 		*Timeout = 500;
 	}
-	OLED_ShowNum(1,4,Bird1,1);
-	OLED_ShowNum(1,6,Bird2,1);
-	OLED_ShowNum(1,8,Bird3,1);
+	OLED_ShowNum(1,1,Bird1,1);
+	OLED_ShowNum(1,3,Bird2,1);
+	OLED_ShowNum(1,5,Bird3,1);
 }
 
 /**		将落料秒数转化为毫秒(一只鸽子定义为1s)
@@ -151,7 +161,8 @@ void Get_FeedTime(machine* machine1, machine* machine2, machine* machine3, uint8
 		machine1->FirstAutoTime_ms = Bird1 * FEEDTIME_PERBIRD;
 		machine2->FirstAutoTime_ms = Bird2 * FEEDTIME_PERBIRD;
 		machine3->FirstAutoTime_ms = Bird3 * FEEDTIME_PERBIRD;
-	}		
+	}
+	Feeding_ShowTime(machine1, machine2, machine3);	
 }	
 
 /**		根据输入的秒数驱动落料器

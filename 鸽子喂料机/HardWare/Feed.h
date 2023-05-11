@@ -5,6 +5,7 @@
 #define FEEDTIME_PERBIRD	1000
 
 
+void Feeding_ShowTime(machine* machine1, machine* machine2, machine* machine3);
 uint16_t Feeding_GetRemoteAutoTimes(void);
 void Feeding_SetRemoteAutoTimes(uint16_t Num);
 void Get_Distance(uint8_t *Hcsr04_StartFlag);

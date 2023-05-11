@@ -34,3 +34,4 @@
 .\objects\trackingline.o: .\HardWare\OLED.h
 .\objects\trackingline.o: .\HardWare\Robot.h
 .\objects\trackingline.o: .\HardWare\Feed.h
+.\objects\trackingline.o: .\HardWare\Relay.h

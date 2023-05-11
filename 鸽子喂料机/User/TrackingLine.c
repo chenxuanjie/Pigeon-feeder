@@ -5,6 +5,7 @@
 #include "OLED.h"
 #include "Robot.h"
 #include "Feed.h"
+#include "Relay.h"
 
 /**
   * @brief  灰度传感器初始化函数
@@ -42,14 +43,6 @@ uint8_t TrackingLine_ReadDigital(uint16_t DigitalPin)
 
 uint8_t TrackingLine_Test(void)
 {
-	if (TrackingLine_IfExit())
-	{
-		OLED_ShowNum(1,12,1,1);
-		return 1;
-	}
-	else
-		OLED_ShowNum(1,12,0,1);
-		
 	return 0;
 //		OLED_ShowNum(1,1,TrackingLine_ReadDigital(DIGITAL_1_PIN),2);
 //		OLED_ShowNum(1,4,TrackingLine_ReadDigital(DIGITAL_2_PIN),2);
@@ -101,6 +94,7 @@ uint8_t TrackingLine(machine* machine1, machine* machine2, machine* machine3)
 	OLED_ShowNum(4,13,Digital_R1,1);
 	OLED_ShowNum(4,14,Digital_R2,1);
 	//显示
+	OLED_ShowString(1,8,"S:");
 	OLED_ShowNum(1,10,Feeding_TrackingLineAutoTimes,1);
 	//是否切换手动
 	if (TrackingLine_IfExit())
@@ -311,12 +305,18 @@ uint8_t Digital_Feeding(machine* machine1, machine* machine2, machine* machine3,
 		return 1;
 	Get_FeedTime(machine1, machine2, machine3, *TrackingLine_FeedFlag);
 	//智能喂料，直到喂料完成
-	while(machine1->SecondAutoTime_ms!=0 && machine2->SecondAutoTime_ms!=0 && machine3->SecondAutoTime_ms!=0)
+	while(machine1->SecondAutoTime_ms!=0 || machine2->SecondAutoTime_ms!=0 || machine3->SecondAutoTime_ms!=0)
 	{
+		//显示时间
+		Feeding_ShowTime(machine1, machine2, machine3);	
 		if (TrackingLine_IfExit())
 			return 1;
 		else
-			StartFeed(machine1->SecondAutoTime_ms, machine2->SecondAutoTime_ms, machine3->SecondAutoTime_ms);
+		{
+//			Relay_Set(1, SET);
+			StartFeed(machine1->SecondAutoTime_ms, machine2->SecondAutoTime_ms, machine3->SecondAutoTime_ms);		
+			OLED_ShowNum(1,11,machine1->SecondAutoTime_ms,4);
+		}
 	}
 	Feeding_CloseFeeder();		//喂料完成后，确保喂料器全部关闭
 	(*TrackingLine_FeedFlag) ++;	//每喂一次料加一

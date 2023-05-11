@@ -162,9 +162,7 @@ void Remote_Managment(void)
 void While_Init()
 {
 	OLED_ShowHexNum(1,15,Value,2);  //遥杆坐标
-	OLED_ShowNum(2,1,feeder1.SecondAutoTime_ms,4);
-	OLED_ShowNum(2,6,feeder2.SecondAutoTime_ms,4);
-	OLED_ShowNum(2,11,feeder3.SecondAutoTime_ms,4);
+	Feeding_ShowTime(&feeder1, &feeder2, &feeder3);	
 	//定时获取鸽子识别数量
 	Get_BirdNum(&Timeout);
 	MonitorFeed(&Hcsr04_StartFlag);
@@ -184,7 +182,7 @@ void While_Init()
 		OLED_ShowNum(4, 3, 2, 1);
 	
 	if (NRF24L01_GetData(NORMAL_TRANSMIT) != 0)
-	OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);
+//	OLED_ShowHexNum(1,1,NRF24L01_GetData(NORMAL_TRANSMIT),2);
 
 	if (Flag)
 		Flag = 0;
