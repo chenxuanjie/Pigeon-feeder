@@ -37,10 +37,10 @@ void Relay_Set(uint8_t Value, uint8_t State)
 		GPIO_WriteBit(RELAY_GPIO, RELAY2_PIN, (BitAction)State);
 		GPIO_WriteBit(RELAY_GPIO, RELAY3_PIN, (BitAction)State);
 	}
-	else if (Value==1 && NRF24L01_GetData(FEEDTIME1_TRANSMIT)!=0)
+	else if (Value== 1&& NRF24L01_GetData(FEEDTIME1_TRANSMIT)!=0)//
 		GPIO_WriteBit(RELAY_GPIO, RELAY1_PIN, (BitAction)State);
-	else if (Value == 2 && NRF24L01_GetData(FEEDTIME2_TRANSMIT)!=0)
+	else if (Value == 2&& NRF24L01_GetData(FEEDTIME2_TRANSMIT)!=0)// 
 		GPIO_WriteBit(RELAY_GPIO, RELAY2_PIN, (BitAction)State);
-	else if (Value == 3 && NRF24L01_GetData(FEEDTIME3_TRANSMIT)!=0)
+	else if (Value == 3&& NRF24L01_GetData(FEEDTIME3_TRANSMIT)!=0)//
 		GPIO_WriteBit(RELAY_GPIO, RELAY3_PIN, (BitAction)State);	
 }

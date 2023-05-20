@@ -58,6 +58,7 @@ int main(void)
 	Init();
 	while (1)
 	{
+//		Relay_Set(ALL, SET);   //调试喂料电机用，注释掉其他
 		While_Init();
 		//调试
 		OLED_ShowString(4,5,"T:");	
@@ -205,7 +206,7 @@ void State1(void)
 			case KEY_PIN1_NUM		:	Robot_Start();break;//启动
 			case KEY_PIN2_NUM		:	Robot_Stop();break;//关闭
 			case KEY_PIN3_NUM		:	Robot_Stop();break;//急停
-			case KEY_PIN4_NUM		:	break;//使用旋转编码器
+			case KEY_PIN4_NUM		:	break;
 			case KEY_PIN5_NUM		:	Set_Speed=NRF24L01_GetData(ENCODER_TRANSMIT);break;
 			case KEY_PIN6_NUM		:	break;
 			case KEY_PIN7_NUM		:	break;

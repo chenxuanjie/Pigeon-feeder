@@ -313,7 +313,7 @@ uint8_t Digital_Feeding(machine* machine1, machine* machine2, machine* machine3,
 			return 1;
 		else
 		{
-//			Relay_Set(1, SET);
+		Relay_Set(ALL, SET);
 			StartFeed(machine1->SecondAutoTime_ms, machine2->SecondAutoTime_ms, machine3->SecondAutoTime_ms);		
 			OLED_ShowNum(1,11,machine1->SecondAutoTime_ms,4);
 		}
