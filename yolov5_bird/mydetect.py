@@ -51,9 +51,9 @@ firstInfo, secondInfo, thirdInfo = 1000, 2000, 3000
 
 @torch.no_grad()
 def run(
-        weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
+        weights=ROOT / 'yolov5x.pt',  # model.pt path(s)
         source=ROOT / 'data/images',  # file/dir/URL/glob, 0 for webcam
-        data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
+        data=ROOT / 'data/mydata.yaml',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
@@ -159,13 +159,14 @@ def run(
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
                     # print(f"cuda:{i}  bird:{n}")
-                    if i == 0:
+                    if i == 0 and names[int(c)] == 'pigeon':
                         global firstInfo
                         firstInfo = f'{int(i+1)}{int(n/100%10)}{int(n/10%10)}{int(n%10)}'
-                    if i == 1:
+                    if i == 1 and names[int(c)] == 'pigeon':
                         global secondInfo
-                        secondInfo = f'{int(i+1)}{int(n/100%10)}{int(n/10%10)}{int(n%10)}'
-                    if i == 2:
+                        if names[int(c)] == 'pigeon':
+                            secondInfo = f'{int(i+1)}{int(n/100%10)}{int(n/10%10)}{int(n%10)}'
+                    if i == 2 and names[int(c)] == 'pigeon':
                         global thirdInfo
                         thirdInfo = f'{int(i+1)}{int(n/100%10)}{int(n/10%10)}{int(n%10)}'
 
@@ -187,9 +188,9 @@ def run(
             # Stream results
             im0 = annotator.result()
             if view_img:
+                #cv2.putText(im0,f"{n} {names[int(c)]}{'s' * (n > 1)}", (5,50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
                 cv2.imshow(str(p), im0)
                 cv2.waitKey(1)  # 1 millisecond
-
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
@@ -206,19 +207,21 @@ def run(
                         else:  # stream
                             fps, w, h = 30, im0.shape[1], im0.shape[0]
                         save_path = str(Path(save_path).with_suffix('.mp4'))  # force *.mp4 suffix on results videos
-                        vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-                    vid_writer[i].write(im0)
+                        vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))        
+                    # vid_writer[i].write(im0)
+                    
+
 
         # Print time (inference-only)
         LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
 
         #串口接收
 
-        print(firstInfo,secondInfo,thirdInfo)
+        print(firstInfo,thirdInfo,secondInfo)
         sendFlag = mcu.read(1)
         if sendFlag == b'a':
-            mcu.write(f'{firstInfo}{secondInfo}{thirdInfo}'.encode('utf-8'))
-        firstInfo,secondInfo,thirdInfo = 1000, 2000, 3000
+            mcu.write(f'{firstInfo}{thirdInfo}{secondInfo}'.encode('utf-8'))
+        firstInfo,thirdInfo,secondInfo = 1000, 2000, 3000
 
     # Print results
     t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
@@ -227,16 +230,16 @@ def run(
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
-        strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
+        strip_optimizer(weights)  # update model (to fix SourceChangeWarning)                                                       
 
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / './models/yolov5l.pt', help='model path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'runs/train/exp10/weights/last.pt', help='model path(s)')
     parser.add_argument('--source', type=str, default=ROOT / 'stream.txt', help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
-    parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
+    parser.add_argument('--conf-thres', type=float, default=0.65, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
     parser.add_argument('--device', default='0', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
@@ -245,8 +248,7 @@ def parse_opt():
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
     parser.add_argument('--save-crop', action='store_true', help='save cropped prediction boxes')
     parser.add_argument('--nosave', action='store_true', help='do not save images/videos')
-    parser.add_argument('--classes', nargs='+', type=int, default=14,
-                        help='filter by class: --classes 0, or --classes 0 2 3')
+    parser.add_argument('--classes', nargs='+', type=int, help='filter by class: --classes 0, or --classes 0 2 3')
     parser.add_argument('--agnostic-nms', action='store_true', help='class-agnostic NMS')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--visualize', action='store_true', help='visualize features')
@@ -267,14 +269,14 @@ def parse_opt():
 
 def serial_Init():
     global mcu
-    mcu = serial.Serial("COM4", 9600, timeout=0.1)
-    if not mcu.isOpen():
-        print("Connect with MCU ERROR!!")
+    mcu = serial.Serial("COM11", 9600, timeout=0.1)
+    if not mcu.isOpen():        print("Connect with MCU ERROR!!")
 
 
 def main(opt):
     check_requirements(exclude=('tensorboard', 'thop'))
     run(**vars(opt))
+
 
 
 if __name__ == "__main__":

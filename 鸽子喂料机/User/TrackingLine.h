@@ -8,7 +8,7 @@
 #define TRACKINGLINE_STOPTIME	500	//小车每次转弯前停止的时间
 #define TRACKINGLINE_RUNTIME	1500	//小车每次转弯前的停止后，再向前直行的时间
 //鸽子机在一次循迹过程中的喂料次数
-#define DIGITAL_FEEDINGTIMES	2
+#define DIGITAL_FEEDINGTIMES	100
 
 //循迹模式下的速度设置
 #define TRACKINGLINE_BASESPEED		20/10 * (Robot_GetSpeedLevel()+1)	//一般的Set_Speed为20
